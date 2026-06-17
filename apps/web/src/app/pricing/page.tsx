@@ -1,7 +1,8 @@
 'use client';
 
-import { SignedIn, SignedOut, useUser } from '@clerk/nextjs';
 import Link from 'next/link';
+
+import { SignedIn, SignedOut, useCurrentUser } from '@/lib/auth';
 import { useState } from 'react';
 
 import { NavBar } from '@/components/NavBar';
@@ -56,7 +57,7 @@ const TIERS = [
 
 export default function PricingPage() {
   const authedFetch = useAuthedFetch();
-  const { isSignedIn } = useUser();
+  const { isSignedIn } = useCurrentUser();
   const [loading, setLoading] = useState<Plan | null>(null);
   const [error, setError] = useState<string | null>(null);
 

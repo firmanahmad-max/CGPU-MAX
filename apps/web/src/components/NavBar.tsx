@@ -1,5 +1,6 @@
-import { SignedIn, SignedOut, UserButton } from '@clerk/nextjs';
 import Link from 'next/link';
+
+import { SignedIn, SignedOut, UserButton } from '@/lib/auth';
 
 export function NavBar() {
   return (
@@ -18,7 +19,7 @@ export function NavBar() {
           <Link href="/pricing">Pricing</Link>
           <SignedIn>
             <Link href="/account">Account</Link>
-            <UserButton afterSignOutUrl="/" />
+            <UserButton />
           </SignedIn>
           <SignedOut>
             <Link

@@ -1,5 +1,6 @@
-import { ClerkProvider } from '@clerk/nextjs';
 import type { Metadata } from 'next';
+
+import { AppAuthProvider } from '@/lib/auth';
 
 import './globals.css';
 
@@ -14,22 +15,10 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <ClerkProvider
-      appearance={{
-        variables: {
-          colorPrimary: '#185FA5',
-          colorBackground: '#0A0E1A',
-          colorText: '#F1F5F9',
-          colorInputBackground: 'rgba(255,255,255,0.04)',
-          borderRadius: '8px',
-        },
-      }}
-    >
-      <html lang="en" className="dark">
-        <body className="bg-surface-dark min-h-screen font-sans text-slate-100 antialiased">
-          {children}
-        </body>
-      </html>
-    </ClerkProvider>
+    <html lang="en" className="dark">
+      <body className="bg-surface-dark min-h-screen font-sans text-slate-100 antialiased">
+        <AppAuthProvider>{children}</AppAuthProvider>
+      </body>
+    </html>
   );
 }

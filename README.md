@@ -43,34 +43,42 @@ Each API module follows the Master Prompt template: `domain/`, `application/`, `
 - pnpm 9
 - Docker Desktop (for Postgres + Redis)
 
-### Setup
+### Run it locally — no accounts required
+
+Auth (Clerk), billing (Stripe), and the AI advisor (Anthropic) are **optional**.
+With no third-party keys set, the app boots in anonymous mode and the core
+features — browse, compare, bottleneck, gaming, streaming — work end-to-end.
+Auth-only surfaces (sign-in, account, Pro/Enterprise actions) degrade gracefully.
 
 ```bash
 # 1. Install dependencies
 pnpm install
 
-# 2. Copy env template
+# 2. Env: copy the template. The defaults already point at the docker-compose
+#    Postgres/Redis, so you can run without editing anything.
 cp .env.example .env.local
-# Edit .env.local — at minimum DATABASE_URL must match docker-compose
 
 # 3. Start infrastructure
 docker compose up -d postgres redis
 
-# 4. Generate Prisma client + run initial migration
+# 4. Generate Prisma client, migrate, and seed demo data (6 CPUs + 7 GPUs
+#    with benchmarks and price history)
 pnpm db:generate
 pnpm db:migrate
-
-# 5. (Optional) Seed minimal sample data
 pnpm db:seed
 
-# 6. Start dev servers
+# 5. Start the API + web in watch mode
 pnpm dev
 ```
 
-- Web → http://localhost:3000
+- Web → http://localhost:3000 (try **/processors**, **/compare**, **/bottleneck**)
 - API → http://localhost:3001
-- API health → http://localhost:3001/health
-- Sample endpoint → http://localhost:3001/api/v1/processors
+- Health → http://localhost:3001/health · Metrics → http://localhost:3001/metrics
+- Sample → http://localhost:3001/api/v1/processors
+
+To enable accounts/billing/AI later, fill the matching keys in `.env.local`
+(`NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY` + `CLERK_SECRET_KEY`, Stripe, `ANTHROPIC_API_KEY`)
+and restart — the app picks them up automatically.
 
 ### Scripts
 

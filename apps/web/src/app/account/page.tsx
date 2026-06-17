@@ -1,7 +1,8 @@
 'use client';
 
-import { useUser } from '@clerk/nextjs';
 import { useEffect, useState } from 'react';
+
+import { useCurrentUser } from '@/lib/auth';
 
 import { NavBar } from '@/components/NavBar';
 import { Pill } from '@/components/Pill';
@@ -26,7 +27,7 @@ interface SubscriptionResponse {
 }
 
 export default function AccountPage() {
-  const { user } = useUser();
+  const user = useCurrentUser();
   const authedFetch = useAuthedFetch();
   const [data, setData] = useState<SubscriptionResponse | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -72,7 +73,7 @@ export default function AccountPage() {
           <h1 className="font-display mt-2 text-4xl font-semibold tracking-tight text-white">
             {user?.firstName ?? user?.username ?? 'Your'} dashboard
           </h1>
-          <p className="mt-2 text-sm text-slate-400">{user?.primaryEmailAddress?.emailAddress}</p>
+          <p className="mt-2 text-sm text-slate-400">{user.email}</p>
         </header>
 
         {error && (

@@ -1,8 +1,8 @@
 'use client';
 
-import { SignedIn } from '@clerk/nextjs';
 import { useState } from 'react';
 
+import { SignedIn } from '@/lib/auth';
 import { useAuthedFetch } from '@/lib/useAuthedFetch';
 
 export function CreateAlertButton({ slug, suggested }: { slug: string; suggested: number | null }) {

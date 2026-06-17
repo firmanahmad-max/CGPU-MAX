@@ -1,7 +1,8 @@
 'use client';
 
-import { SignedIn, SignedOut } from '@clerk/nextjs';
 import Link from 'next/link';
+
+import { SignedIn, SignedOut } from '@/lib/auth';
 import { useState } from 'react';
 
 import { BuildAdviceResult } from '@/components/BuildAdviceResult';

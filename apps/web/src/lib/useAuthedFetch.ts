@@ -1,12 +1,14 @@
 'use client';
 
-import { useAuth } from '@clerk/nextjs';
 import { useCallback } from 'react';
 
 import { API_BASE_URL } from './env';
+import { useAuthToken } from './auth';
 
+// Attaches the Clerk JWT when auth is enabled; in anonymous mode the token is
+// null and the request goes through unauthenticated (auth-only endpoints 401).
 export function useAuthedFetch() {
-  const { getToken } = useAuth();
+  const getToken = useAuthToken();
   return useCallback(
     async (path: string, init: RequestInit = {}) => {
       const token = await getToken();

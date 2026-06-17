@@ -6,6 +6,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) 
 
 ## [Unreleased]
 
+### Changed — Runnable without third-party secrets
+
+- **Optional auth** — all Clerk usage now routes through a single shim (`apps/web/src/lib/auth.tsx`). When `NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY` is unset the app boots anonymously: `ClerkProvider`/middleware are skipped, `SignedIn`/`UserButton` render nothing, `SignedOut` renders its children, and auth hooks return safe no-op values. With the key present, full Clerk auth is restored. Sign-in/up pages show a friendly "auth not configured" notice instead of crashing.
+- **Richer seed** — `prisma/seed.ts` now loads 6 CPUs + 7 GPUs across Intel/AMD/Nvidia with benchmark scores and price history (idempotent), so a fresh install has data to browse, compare, bottleneck, and trend.
+- **Quickstart** — README documents a no-accounts local run; `.env.example` marks Clerk/Stripe/Anthropic as optional.
+
 ### Added — Data Licensing (Feature 13)
 
 - **`licensing` module (DDD)** — pure serializers (`toCsv` with RFC-4180 escaping, `toNdjson`, fixed-column ordering) with unit tests; `ExportCatalog` does cursor-paginated bulk export of the processor catalog (keyset on primary key → bounded memory for large pulls) plus a dataset `manifest` (formats, CPU/GPU counts, last-updated, license terms).
