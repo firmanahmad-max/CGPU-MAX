@@ -41,7 +41,8 @@
   },
   "pnpm": {
     "overrides": {
-      "ioredis": "5.11.1"
+      "ioredis": "5.11.1",
+      "pino": "9.14.0"
     }
   }
 }
