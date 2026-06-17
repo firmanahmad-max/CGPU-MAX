@@ -1,0 +1,31 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    color-scheme: dark;
+  }
+
+  body {
+    font-feature-settings: 'cv11', 'ss01';
+  }
+}
+
+@layer components {
+  .label {
+    @apply text-[10px] font-medium uppercase tracking-label text-slate-400;
+  }
+
+  .metric {
+    @apply font-display text-3xl font-semibold tracking-tight text-white;
+  }
+
+  .card {
+    @apply rounded-card border border-white/10 bg-white/[0.02] p-6 transition;
+  }
+
+  .pill {
+    @apply inline-flex items-center rounded-pill border border-white/15 bg-white/5 px-3 py-1 text-xs font-medium uppercase tracking-label text-slate-200;
+  }
+}

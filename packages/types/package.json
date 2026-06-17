@@ -1,0 +1,24 @@
+{
+  "name": "@cgpu-max/types",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "main": "./src/index.ts",
+  "types": "./src/index.ts",
+  "exports": {
+    ".": "./src/index.ts",
+    "./processor": "./src/processor.ts",
+    "./comparison": "./src/comparison.ts",
+    "./bottleneck": "./src/bottleneck.ts",
+    "./user": "./src/user.ts"
+  },
+  "scripts": {
+    "type-check": "tsc --noEmit",
+    "lint": "eslint src --ext .ts",
+    "clean": "rm -rf dist .turbo"
+  },
+  "devDependencies": {
+    "@cgpu-max/config": "workspace:*",
+    "typescript": "^5.4.0"
+  }
+}
