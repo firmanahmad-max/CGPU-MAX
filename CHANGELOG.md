@@ -6,6 +6,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) 
 
 ## [Unreleased]
 
+### Added — Phase 7 (Observability, Analytics, Edge caching)
+
+- **Observability** — `prom-client` registry with default Node metrics plus an `http_request_duration_seconds` histogram and `http_requests_total` counter; metrics middleware labels by matched route _pattern_ (not concrete path) to bound cardinality; `GET /metrics` Prometheus scrape endpoint.
+- **Advanced Analytics (Feature 10)** — Redis sorted-set counters (no per-event DB writes): processor views and comparison pairs are incremented fire-and-forget on the hot path from the route layer. `GET /api/v1/analytics/trending` and `/popular-comparisons` return cached, CDN-friendly leaderboards (hydrated from the DB, ranking order preserved). Pure `rankEntries`/`parseWithScores` helpers with unit tests.
+- **Edge caching** — `Cache-Control: public` headers on public read endpoints (processors list/detail ~6h, analytics ~5m) per the spec's CDN caching strategy.
+
 ### Added — Phase 5 Custom Reports
 
 - **`reports` module** — server-side PDF (pdfkit) and Excel (exceljs) export of saved comparisons and bottleneck analyses, rendered from the persisted JSON snapshots. Brand-styled PDF layout and formatted XLSX worksheets. `GET /api/v1/reports/{comparison,bottleneck}/:shareSlug?format=pdf|xlsx` (Pro-gated via `customReports`), streamed with `Content-Disposition` attachment headers.

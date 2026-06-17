@@ -8,6 +8,7 @@ import helmet from 'helmet';
 import { pinoHttp, type Options } from 'pino-http';
 
 import { aiAdvisorRouter } from './modules/ai-advisor/interface/routes.js';
+import { analyticsRouter } from './modules/analytics/interface/routes.js';
 import { apiKeysRouter } from './modules/api-keys/interface/routes.js';
 import { billingRouter, billingWebhookRouter } from './modules/billing/interface/routes.js';
 import { bottleneckRouter } from './modules/bottleneck/interface/routes.js';
@@ -25,7 +26,9 @@ import { healthRouter } from './shared/health/router.js';
 import { logger } from './shared/logging/logger.js';
 import { correlationId } from './shared/middleware/correlationId.js';
 import { errorHandler } from './shared/middleware/errorHandler.js';
+import { metricsMiddleware } from './shared/middleware/metrics.js';
 import { tieredRateLimiter } from './shared/middleware/tieredRateLimit.js';
+import { metricsRouter } from './shared/observability/router.js';
 
 export function createServer(): Express {
   const app = express();
@@ -34,6 +37,7 @@ export function createServer(): Express {
   app.set('trust proxy', 1);
 
   app.use(correlationId);
+  app.use(metricsMiddleware);
   // pino-http bundles its own pino types, which differ from our pino@9 copy by
   // a phantom type-param; the double-cast reconciles them (runtime unaffected).
   app.use(
@@ -77,6 +81,7 @@ export function createServer(): Express {
   app.use(tieredRateLimiter());
 
   app.use('/health', healthRouter);
+  app.use('/metrics', metricsRouter);
   app.use('/api/v1/processors', processorsRouter);
   app.use('/api/v1/comparisons', comparisonsRouter);
   app.use('/api/v1/bottleneck', bottleneckRouter);
@@ -88,6 +93,7 @@ export function createServer(): Express {
   app.use('/api/v1/gaming', gamingRouter);
   app.use('/api/v1/streaming', streamingRouter);
   app.use('/api/v1/reports', reportsRouter);
+  app.use('/api/v1/analytics', analyticsRouter);
 
   app.use(errorHandler);
   return app;

@@ -1,6 +1,7 @@
 import { Router } from 'express';
 
 import { prisma } from '../../../shared/persistence/prisma.js';
+import { analyticsStore } from '../../analytics/infrastructure/AnalyticsStore.js';
 import { CompareProcessors } from '../application/CompareProcessors.js';
 import { GetComparisonBySlug } from '../application/GetComparisonBySlug.js';
 
@@ -15,6 +16,7 @@ comparisonsRouter.post('/', async (req, res, next) => {
   try {
     const body = compareBody.parse(req.body);
     const result = await compareUseCase.execute({ ...body, auth: req.auth });
+    if (result.shareSlug) analyticsStore.recordComparison(result.shareSlug);
     res.status(body.persist ? 201 : 200).json(result);
   } catch (err) {
     next(err);

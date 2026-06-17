@@ -4,6 +4,7 @@ import { apiKeyAuth } from '../../../shared/auth/apiKeyMiddleware.js';
 import { requireFeature } from '../../../shared/auth/requireFeature.js';
 import { tieredRateLimiter } from '../../../shared/middleware/tieredRateLimit.js';
 import { prisma } from '../../../shared/persistence/prisma.js';
+import { analyticsStore } from '../../analytics/infrastructure/AnalyticsStore.js';
 import { CalculateBottleneck } from '../../bottleneck/application/CalculateBottleneck.js';
 import { calculateBody } from '../../bottleneck/interface/validators.js';
 import { CompareProcessors } from '../../comparisons/application/CompareProcessors.js';
@@ -41,7 +42,9 @@ publicApiRouter.get('/processors', async (req, res, next) => {
 publicApiRouter.get('/processors/:slug', async (req, res, next) => {
   try {
     const { slug } = slugParam.parse(req.params);
-    res.json(await getProcessor.execute(slug));
+    const result = await getProcessor.execute(slug);
+    analyticsStore.recordProcessorView(slug);
+    res.json(result);
   } catch (err) {
     next(err);
   }
@@ -50,7 +53,9 @@ publicApiRouter.get('/processors/:slug', async (req, res, next) => {
 publicApiRouter.post('/comparisons', async (req, res, next) => {
   try {
     const body = compareBody.parse(req.body);
-    res.json(await compare.execute({ ...body, auth: req.auth }));
+    const result = await compare.execute({ ...body, auth: req.auth });
+    if (result.shareSlug) analyticsStore.recordComparison(result.shareSlug);
+    res.json(result);
   } catch (err) {
     next(err);
   }
