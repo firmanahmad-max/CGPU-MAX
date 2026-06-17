@@ -11,6 +11,7 @@ export function NavBar() {
         </Link>
         <div className="flex items-center gap-6 text-sm text-slate-300">
           <Link href="/processors">Processors</Link>
+          <Link href="/rankings">Rankings</Link>
           <Link href="/compare">Compare</Link>
           <Link href="/bottleneck">Bottleneck</Link>
           <Link href="/advisor">Advisor</Link>

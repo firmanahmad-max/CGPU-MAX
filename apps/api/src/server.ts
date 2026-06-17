@@ -18,6 +18,7 @@ import { brandingRouter, organizationsRouter } from './modules/organizations/int
 import { pricingRouter } from './modules/pricing/interface/routes.js';
 import { processorsRouter } from './modules/processors/interface/routes.js';
 import { publicApiRouter } from './modules/public-api/interface/router.js';
+import { rankingsRouter } from './modules/rankings/interface/routes.js';
 import { reportsRouter } from './modules/reports/interface/routes.js';
 import { streamingRouter } from './modules/streaming/interface/routes.js';
 import { subscriptionsRouter } from './modules/subscriptions/interface/routes.js';
@@ -95,6 +96,7 @@ export function createServer(): Express {
   app.use('/api/v1/streaming', streamingRouter);
   app.use('/api/v1/reports', reportsRouter);
   app.use('/api/v1/analytics', analyticsRouter);
+  app.use('/api/v1/rankings', rankingsRouter);
   app.use('/api/v1/orgs', organizationsRouter);
   app.use('/api/v1/branding', brandingRouter);
 

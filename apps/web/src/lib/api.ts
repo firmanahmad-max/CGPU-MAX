@@ -46,6 +46,51 @@ export async function listProcessors(
   return res.json() as Promise<ListResponse<Processor>>;
 }
 
+export interface RankedProcessor {
+  rank: number;
+  slug: string;
+  modelName: string;
+  manufacturer: string;
+  type: string;
+  msrpUsd: number | null;
+  performance: number;
+  value: number | null;
+}
+
+export interface RankingsResponse {
+  items: RankedProcessor[];
+  total: number;
+  limit: number;
+  offset: number;
+  sort: 'performance' | 'value';
+}
+
+export async function getRankings(
+  params: {
+    type?: 'CPU' | 'GPU';
+    manufacturer?: 'INTEL' | 'AMD' | 'NVIDIA';
+    sort?: 'performance' | 'value';
+    limit?: number;
+  } = {},
+): Promise<RankingsResponse | null> {
+  const qs: Record<string, string | number | undefined> = {
+    type: params.type,
+    manufacturer: params.manufacturer,
+    sort: params.sort,
+    limit: params.limit,
+  };
+  try {
+    const res = await fetch(buildUrl('/api/v1/rankings', qs), {
+      next: { revalidate: 300, tags: ['processors:list'] },
+    });
+    if (!res.ok) return null;
+    return (await res.json()) as RankingsResponse;
+  } catch {
+    // API unreachable — let the page render its empty state instead of 500ing.
+    return null;
+  }
+}
+
 export interface PriceHistory {
   slug: string;
   points: { retailer: string; priceUsd: number; inStock: boolean; recordedAt: string }[];
