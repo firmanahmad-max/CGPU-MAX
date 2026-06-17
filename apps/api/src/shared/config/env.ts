@@ -6,6 +6,12 @@ const schema = z.object({
   LOG_LEVEL: z.enum(['fatal', 'error', 'warn', 'info', 'debug', 'trace']).default('info'),
   DATABASE_URL: z.string().url(),
   REDIS_URL: z.string().url().default('redis://localhost:6379'),
+  // Set REDIS_ENABLED=false to run without Redis (local/dev): caching, the
+  // tier rate limiter, and analytics counters degrade to no-ops.
+  REDIS_ENABLED: z
+    .string()
+    .default('true')
+    .transform((v) => v !== 'false'),
   CORS_ALLOWED_ORIGINS: z.string().default('http://localhost:3000'),
   APP_URL: z.string().url().default('http://localhost:3000'),
   API_URL: z.string().url().default('http://localhost:3001'),

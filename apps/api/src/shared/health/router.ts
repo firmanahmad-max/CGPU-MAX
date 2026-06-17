@@ -18,13 +18,17 @@ healthRouter.get('/', async (_req, res) => {
     checks.database = { status: 'down', error: (err as Error).message };
   }
 
-  const redisStart = Date.now();
-  try {
-    await redis.ping();
-    checks.redis = { status: 'up', latencyMs: Date.now() - redisStart };
-  } catch (err) {
-    allUp = false;
-    checks.redis = { status: 'down', error: (err as Error).message };
+  if (!redis) {
+    checks.redis = { status: 'up' }; // disabled by config — not a failure
+  } else {
+    const redisStart = Date.now();
+    try {
+      await redis.ping();
+      checks.redis = { status: 'up', latencyMs: Date.now() - redisStart };
+    } catch (err) {
+      allUp = false;
+      checks.redis = { status: 'down', error: (err as Error).message };
+    }
   }
 
   res.status(allUp ? 200 : 503).json({

@@ -10,23 +10,27 @@ const COMPARISONS_KEY = 'analytics:comparisons:pairs';
 // ZREVRANGE. This matches the spec's read-heavy, Redis-first scalability model.
 export class AnalyticsStore {
   recordProcessorView(slug: string): void {
+    if (!redis) return;
     redis
       .zincrby(VIEWS_KEY, 1, slug)
       .catch((err: unknown) => logger.debug({ err, slug }, 'Failed to record view'));
   }
 
   recordComparison(pairKey: string): void {
+    if (!redis) return;
     redis
       .zincrby(COMPARISONS_KEY, 1, pairKey)
       .catch((err: unknown) => logger.debug({ err, pairKey }, 'Failed to record comparison'));
   }
 
   async topProcessors(limit: number): Promise<RankedEntry[]> {
+    if (!redis) return [];
     const flat = await redis.zrevrange(VIEWS_KEY, 0, limit - 1, 'WITHSCORES');
     return parseWithScores(flat);
   }
 
   async topComparisons(limit: number): Promise<RankedEntry[]> {
+    if (!redis) return [];
     const flat = await redis.zrevrange(COMPARISONS_KEY, 0, limit - 1, 'WITHSCORES');
     return parseWithScores(flat);
   }

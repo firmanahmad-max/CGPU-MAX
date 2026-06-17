@@ -27,6 +27,8 @@ export async function getOrSet<T>(
   options: CacheOptions,
   fn: () => Promise<T>,
 ): Promise<T> {
+  if (!redis) return fn(); // Redis disabled — no caching.
+
   try {
     const cached = await redis.get(key);
     if (cached !== null) {
@@ -55,6 +57,7 @@ export async function getOrSet<T>(
 }
 
 export async function invalidateTag(tag: string): Promise<number> {
+  if (!redis) return 0;
   const setKey = `${TAG_INDEX_PREFIX}${tag}`;
   try {
     const keys = await redis.smembers(setKey);
