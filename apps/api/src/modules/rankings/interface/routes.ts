@@ -10,6 +10,8 @@ const query = z.object({
   type: z.enum(['CPU', 'GPU']).default('CPU'),
   manufacturer: z.enum(['INTEL', 'AMD', 'NVIDIA']).optional(),
   sort: z.enum(['performance', 'value']).default('performance'),
+  minPrice: z.coerce.number().min(0).optional(),
+  maxPrice: z.coerce.number().min(0).optional(),
   limit: z.coerce.number().int().min(1).max(100).default(50),
   offset: z.coerce.number().int().min(0).default(0),
 });

@@ -9,6 +9,8 @@ export interface RankingsInput {
   type: ProcessorType;
   manufacturer?: Manufacturer;
   sort: RankingSort;
+  minPrice?: number;
+  maxPrice?: number;
   limit: number;
   offset: number;
 }
@@ -28,7 +30,7 @@ export class GetRankings {
   constructor(private readonly prisma: PrismaClient) {}
 
   async execute(input: RankingsInput) {
-    const key = `rankings:${input.type}:${input.manufacturer ?? '*'}:${input.sort}:${input.limit}:${input.offset}`;
+    const key = `rankings:${input.type}:${input.manufacturer ?? '*'}:${input.sort}:${input.minPrice ?? 0}:${input.maxPrice ?? 0}:${input.limit}:${input.offset}`;
     return getOrSet(
       key,
       { ttlSeconds: CacheTTL.listShort, tags: ['processors:list'] },
@@ -69,7 +71,16 @@ export class GetRankings {
               value: valueScore(performance, msrpUsd),
             };
           })
-          .filter((x): x is Omit<RankedProcessor, 'rank'> => x !== null);
+          .filter((x): x is Omit<RankedProcessor, 'rank'> => x !== null)
+          // Price-bracket filter. Parts with no MSRP can't be bracketed, so a
+          // price filter excludes them.
+          .filter((x) => {
+            if (input.minPrice === undefined && input.maxPrice === undefined) return true;
+            if (x.msrpUsd === null) return false;
+            if (input.minPrice !== undefined && x.msrpUsd < input.minPrice) return false;
+            if (input.maxPrice !== undefined && x.msrpUsd > input.maxPrice) return false;
+            return true;
+          });
 
         scored.sort((a, b) =>
           input.sort === 'value' ? (b.value ?? 0) - (a.value ?? 0) : b.performance - a.performance,

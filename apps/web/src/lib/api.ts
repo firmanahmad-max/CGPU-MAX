@@ -70,6 +70,8 @@ export async function getRankings(
     type?: 'CPU' | 'GPU';
     manufacturer?: 'INTEL' | 'AMD' | 'NVIDIA';
     sort?: 'performance' | 'value';
+    minPrice?: number;
+    maxPrice?: number;
     limit?: number;
   } = {},
 ): Promise<RankingsResponse | null> {
@@ -77,6 +79,8 @@ export async function getRankings(
     type: params.type,
     manufacturer: params.manufacturer,
     sort: params.sort,
+    minPrice: params.minPrice,
+    maxPrice: params.maxPrice,
     limit: params.limit,
   };
   try {

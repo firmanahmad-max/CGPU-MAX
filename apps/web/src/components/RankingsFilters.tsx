@@ -7,7 +7,14 @@ const TYPES = ['CPU', 'GPU'] as const;
 const MANUFACTURERS = ['ALL', 'INTEL', 'AMD', 'NVIDIA'] as const;
 const SORTS = [
   { value: 'performance', label: 'Performance' },
-  { value: 'value', label: 'Value (perf/$)' },
+  { value: 'value', label: 'Best value' },
+] as const;
+// Price brackets mirror the prior version's pills.
+const BRACKETS = [
+  { key: 'all', label: 'All prices' },
+  { key: 'budget', label: 'Budget (<$300)' },
+  { key: 'mid', label: 'Mid ($300–700)' },
+  { key: 'high', label: 'High-end (>$700)' },
 ] as const;
 
 export function RankingsFilters() {
@@ -19,6 +26,7 @@ export function RankingsFilters() {
     type: params.get('type') ?? 'CPU',
     manufacturer: params.get('manufacturer') ?? 'ALL',
     sort: params.get('sort') ?? 'performance',
+    bracket: params.get('bracket') ?? 'all',
   };
 
   const push = (next: Partial<typeof current>) => {
@@ -27,6 +35,7 @@ export function RankingsFilters() {
     url.set('type', merged.type);
     if (merged.manufacturer !== 'ALL') url.set('manufacturer', merged.manufacturer);
     if (merged.sort !== 'performance') url.set('sort', merged.sort);
+    if (merged.bracket !== 'all') url.set('bracket', merged.bracket);
     startTransition(() => router.push(`/rankings?${url.toString()}`));
   };
 
@@ -58,6 +67,17 @@ export function RankingsFilters() {
             onClick={() => push({ sort: s.value })}
           >
             {s.label}
+          </Toggle>
+        ))}
+      </Group>
+      <Group label="Price">
+        {BRACKETS.map((b) => (
+          <Toggle
+            key={b.key}
+            active={current.bracket === b.key}
+            onClick={() => push({ bracket: b.key })}
+          >
+            {b.label}
           </Toggle>
         ))}
       </Group>
