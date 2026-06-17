@@ -7,10 +7,17 @@ interface CompareResultProps {
   result: ComparisonPayload;
 }
 
-const winnerBadge = (w: 'a' | 'b' | 'tied') =>
-  w === 'tied' ? 'TIED' : w === 'a' ? 'A WINS' : 'B WINS';
-
 export function CompareResult({ result }: CompareResultProps) {
+  const aWins = result.metrics.filter((m) => m.winner === 'a').length;
+  const bWins = result.metrics.filter((m) => m.winner === 'b').length;
+  const winnerName =
+    result.overallWinner === 'a'
+      ? result.a.modelName
+      : result.overallWinner === 'b'
+        ? result.b.modelName
+        : null;
+  const winnerCats = result.overallWinner === 'a' ? aWins : bWins;
+
   return (
     <section className="mt-10 space-y-8">
       <header className="grid items-center gap-4 sm:grid-cols-[1fr_auto_1fr]">
@@ -29,15 +36,24 @@ export function CompareResult({ result }: CompareResultProps) {
         />
       </header>
 
-      <div className="card flex flex-wrap items-center gap-4 text-sm">
-        <Pill>Overall · {winnerBadge(result.overallWinner)}</Pill>
-        <Pill>Price/Perf · {winnerBadge(result.pricePerformanceWinner)}</Pill>
-        <span className="text-xs text-slate-500">algorithm {result.algorithmVersion}</span>
-        {result.shareSlug && (
-          <span className="font-mono text-xs text-slate-500">
-            share: <span className="text-slate-300">{result.shareSlug}</span>
-          </span>
-        )}
+      {/* Prominent overall-winner banner (adopted from the prior version's
+          "menang dalam lebih banyak kategori" callout). */}
+      <div className="card border-state-success/30 bg-state-success/5 flex items-center gap-3">
+        <span className="text-2xl">🏆</span>
+        <p className="text-sm text-slate-200">
+          {winnerName ? (
+            <>
+              <span className="font-semibold text-white">{winnerName}</span> wins in more categories
+              <span className="text-slate-400">
+                {' '}
+                ({winnerCats} of {result.metrics.length} metrics)
+              </span>
+            </>
+          ) : (
+            <>Evenly matched — neither leads in more categories.</>
+          )}
+        </p>
+        <span className="ml-auto text-xs text-slate-500">algorithm {result.algorithmVersion}</span>
       </div>
 
       <div className="card overflow-hidden p-0">
@@ -61,6 +77,7 @@ export function CompareResult({ result }: CompareResultProps) {
                   )}
                 >
                   {formatVal(m.a, m.unit)}
+                  {m.winner === 'a' && <span className="ml-1.5">✓</span>}
                 </td>
                 <td
                   className={cn(
@@ -69,6 +86,7 @@ export function CompareResult({ result }: CompareResultProps) {
                   )}
                 >
                   {formatVal(m.b, m.unit)}
+                  {m.winner === 'b' && <span className="ml-1.5">✓</span>}
                 </td>
                 <td className="px-4 py-3 text-right font-mono text-xs text-slate-400">
                   {m.deltaPercent === null ? '—' : `${m.deltaPercent.toFixed(1)}%`}
@@ -78,7 +96,54 @@ export function CompareResult({ result }: CompareResultProps) {
           </tbody>
         </table>
       </div>
+
+      {/* Price-to-performance (adopted from the prior version): cost per
+          performance point, computed from real MSRP + performance index. */}
+      <div>
+        <p className="label mb-3">Price-to-performance analysis</p>
+        <div className="grid gap-4 sm:grid-cols-2">
+          <ValueCard
+            processor={result.a}
+            score={result.performanceScore.a}
+            bestValue={result.pricePerformanceWinner === 'a'}
+          />
+          <ValueCard
+            processor={result.b}
+            score={result.performanceScore.b}
+            bestValue={result.pricePerformanceWinner === 'b'}
+          />
+        </div>
+        {result.shareSlug && (
+          <p className="mt-3 font-mono text-xs text-slate-500">
+            share: <span className="text-slate-300">{result.shareSlug}</span>
+          </p>
+        )}
+      </div>
     </section>
+  );
+}
+
+function ValueCard({
+  processor,
+  score,
+  bestValue,
+}: {
+  processor: ComparisonPayload['a'];
+  score: number;
+  bestValue: boolean;
+}) {
+  const costPerScore = processor.msrpUsd && score > 0 ? processor.msrpUsd / score : null;
+  return (
+    <div className={cn('card', bestValue && 'border-state-success/40 bg-state-success/5')}>
+      <p className="text-sm text-slate-400">{processor.modelName}</p>
+      <p className="metric mt-2">
+        {processor.msrpUsd ? `$${processor.msrpUsd.toLocaleString()}` : '—'}
+      </p>
+      <p className="mt-1 text-xs text-slate-500">
+        {costPerScore !== null ? `$${costPerScore.toFixed(2)} / score` : 'no price data'}
+      </p>
+      {bestValue && <p className="text-state-success mt-2 text-sm font-medium">✓ Better value</p>}
+    </div>
   );
 }
 

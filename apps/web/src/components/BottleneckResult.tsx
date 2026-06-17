@@ -41,18 +41,19 @@ export function BottleneckResult({ result }: BottleneckResultProps) {
           </p>
         </div>
 
-        <div className="space-y-4">
-          <div className="card">
-            <p className="label mb-2">CPU</p>
-            <p className="font-display text-xl font-semibold text-white">{result.cpu.modelName}</p>
-            <p className="metric mt-3">{result.cpuPower.toFixed(1)}</p>
-            <p className="label mt-1">Power index</p>
-          </div>
-          <div className="card">
-            <p className="label mb-2">GPU</p>
-            <p className="font-display text-xl font-semibold text-white">{result.gpu.modelName}</p>
-            <p className="metric mt-3">{result.gpuPower.toFixed(1)}</p>
-            <p className="label mt-1">Power index</p>
+        <div className="card flex flex-col justify-center">
+          <p className="label mb-4">Power index (0–100)</p>
+          <PowerBar
+            label={`CPU: ${result.cpu.modelName}`}
+            value={result.cpuPower}
+            colorClass="bg-accent-purple"
+          />
+          <div className="mt-4">
+            <PowerBar
+              label={`GPU: ${result.gpu.modelName}`}
+              value={result.gpuPower}
+              colorClass="bg-cyan-400"
+            />
           </div>
         </div>
       </div>
@@ -136,7 +137,7 @@ export function BottleneckResult({ result }: BottleneckResultProps) {
           <ul className="space-y-2 text-sm text-slate-300">
             {result.recommendations.map((r, i) => (
               <li key={i} className="flex gap-2">
-                <span className="bg-accent-blue mt-1 inline-block h-1.5 w-1.5 flex-shrink-0 rounded-full" />
+                <span className="text-state-success mt-0.5 flex-shrink-0">✓</span>
                 <span>{r}</span>
               </li>
             ))}
@@ -161,6 +162,29 @@ function Stat({ label, value }: { label: string; value: string }) {
     <div className="card">
       <p className="label">{label}</p>
       <p className="metric mt-2">{value}</p>
+    </div>
+  );
+}
+
+function PowerBar({
+  label,
+  value,
+  colorClass,
+}: {
+  label: string;
+  value: number;
+  colorClass: string;
+}) {
+  const pct = Math.max(3, Math.min(100, value));
+  return (
+    <div>
+      <div className="mb-1 flex items-center justify-between text-sm">
+        <span className="truncate text-slate-300">{label}</span>
+        <span className="ml-2 font-mono font-semibold text-white">{Math.round(value)}/100</span>
+      </div>
+      <div className="h-2 overflow-hidden rounded-full bg-white/5">
+        <div className={`h-full rounded-full ${colorClass}`} style={{ width: `${pct}%` }} />
+      </div>
     </div>
   );
 }

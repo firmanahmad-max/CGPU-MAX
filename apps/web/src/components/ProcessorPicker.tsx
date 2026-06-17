@@ -6,6 +6,8 @@ import type { Processor } from '@cgpu-max/types';
 
 import { API_BASE_URL } from '@/lib/env';
 
+import { Pill } from './Pill';
+
 interface ProcessorPickerProps {
   label: string;
   type: 'CPU' | 'GPU';
@@ -13,6 +15,9 @@ interface ProcessorPickerProps {
   onChange: (slug: string | null, processor: Processor | null) => void;
   excludeSlug?: string | null;
 }
+
+const manufacturerVariant = (m: string) =>
+  m === 'INTEL' ? 'intel' : m === 'AMD' ? 'amd' : 'nvidia';
 
 export function ProcessorPicker({
   label,
@@ -25,8 +30,10 @@ export function ProcessorPicker({
   const [results, setResults] = useState<Processor[]>([]);
   const [loading, setLoading] = useState(false);
   const [selected, setSelected] = useState<Processor | null>(null);
+  const [editing, setEditing] = useState(false);
 
   useEffect(() => {
+    if (!editing && value) return; // collapsed — no need to query
     const controller = new AbortController();
     const url = new URL(`${API_BASE_URL}/api/v1/processors`);
     url.searchParams.set('type', type);
@@ -44,7 +51,39 @@ export function ProcessorPicker({
       .finally(() => setLoading(false));
 
     return () => controller.abort();
-  }, [search, type, excludeSlug]);
+  }, [search, type, excludeSlug, editing, value]);
+
+  // Collapsed summary card once a processor is selected (mirrors the prior
+  // version's "Ganti" pattern) — declutters the picker after choosing.
+  if (value && selected && selected.slug === value && !editing) {
+    return (
+      <div className="card">
+        <div className="mb-2 flex items-center justify-between">
+          <p className="label">{label}</p>
+          <button
+            type="button"
+            onClick={() => setEditing(true)}
+            className="text-accent-blue text-xs font-medium hover:underline"
+          >
+            Change
+          </button>
+        </div>
+        <div className="flex items-center gap-2">
+          <Pill variant={manufacturerVariant(selected.manufacturer)}>{selected.manufacturer}</Pill>
+          <span className="font-semibold text-white">{selected.modelName}</span>
+        </div>
+        <p className="mt-2 text-xs text-slate-500">
+          {[
+            selected.generation ? `Gen ${selected.generation}` : null,
+            selected.tdpWatts ? `${selected.tdpWatts} W` : null,
+            selected.msrpUsd ? `$${selected.msrpUsd}` : null,
+          ]
+            .filter(Boolean)
+            .join(' · ') || selected.slug}
+        </p>
+      </div>
+    );
+  }
 
   return (
     <div className="card">
@@ -66,6 +105,8 @@ export function ProcessorPicker({
             type="button"
             onClick={() => {
               setSelected(p);
+              setEditing(false);
+              setSearch('');
               onChange(p.slug, p);
             }}
             className={
@@ -80,12 +121,6 @@ export function ProcessorPicker({
           </button>
         ))}
       </div>
-
-      {selected && value === selected.slug && (
-        <div className="mt-4 border-t border-white/10 pt-3 text-xs text-slate-400">
-          Selected: <span className="font-mono text-slate-200">{selected.slug}</span>
-        </div>
-      )}
     </div>
   );
 }
