@@ -20,6 +20,7 @@ export interface TierLimits {
     customReports: boolean;
     apiAccess: boolean;
     whiteLabel: boolean;
+    dataLicensing: boolean;
   };
 }
 
@@ -41,6 +42,7 @@ export const TIER_LIMITS: Record<SubscriptionTier, TierLimits> = {
       customReports: false,
       apiAccess: false,
       whiteLabel: false,
+      dataLicensing: false,
     },
   },
   PRO: {
@@ -60,6 +62,7 @@ export const TIER_LIMITS: Record<SubscriptionTier, TierLimits> = {
       customReports: true,
       apiAccess: false,
       whiteLabel: false,
+      dataLicensing: false,
     },
   },
   ENTERPRISE: {
@@ -79,6 +82,7 @@ export const TIER_LIMITS: Record<SubscriptionTier, TierLimits> = {
       customReports: true,
       apiAccess: true,
       whiteLabel: true,
+      dataLicensing: true,
     },
   },
 };

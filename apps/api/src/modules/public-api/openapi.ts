@@ -147,6 +147,41 @@ export function buildOpenApiSpec() {
           },
         },
       },
+      '/licensing/manifest': {
+        get: {
+          summary: 'Data licensing manifest (Enterprise) — datasets, formats, counts',
+          responses: {
+            '200': { description: 'Manifest' },
+            '402': { description: 'Data licensing not in your plan' },
+          },
+        },
+      },
+      '/licensing/export': {
+        get: {
+          summary: 'Bulk catalog export (Enterprise) — cursor-paginated',
+          parameters: [
+            {
+              name: 'format',
+              in: 'query',
+              schema: { type: 'string', enum: ['json', 'csv', 'ndjson'] },
+            },
+            { name: 'type', in: 'query', schema: { type: 'string', enum: ['CPU', 'GPU'] } },
+            { name: 'cursor', in: 'query', schema: { type: 'string', format: 'uuid' } },
+            {
+              name: 'limit',
+              in: 'query',
+              schema: { type: 'integer', default: 500, maximum: 1000 },
+            },
+          ],
+          responses: {
+            '200': {
+              description:
+                'A page of records. For csv/ndjson the next cursor is in the X-Next-Cursor header; for json it is in the body.',
+            },
+            '402': { description: 'Data licensing not in your plan' },
+          },
+        },
+      },
     },
   } as const;
 }

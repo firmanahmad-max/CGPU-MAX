@@ -6,6 +6,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) 
 
 ## [Unreleased]
 
+### Added — Data Licensing (Feature 13)
+
+- **`licensing` module (DDD)** — pure serializers (`toCsv` with RFC-4180 escaping, `toNdjson`, fixed-column ordering) with unit tests; `ExportCatalog` does cursor-paginated bulk export of the processor catalog (keyset on primary key → bounded memory for large pulls) plus a dataset `manifest` (formats, CPU/GPU counts, last-updated, license terms).
+- **Routes** on the public API (`/api/public/v1/licensing/{manifest,export}`) — API-key auth + the namespace-wide `apiAccess` gate, layered with a `dataLicensing` feature check. Export supports `format=json|csv|ndjson`, `type`, `cursor`, `limit`; the next cursor is returned in the body (json) or the `X-Next-Cursor` header (csv/ndjson). OpenAPI spec updated.
+- **TierPolicy** — new `dataLicensing` feature flag (Enterprise only).
+
 ### Added — White-label foundation (Feature 12)
 
 - **`organizations` module (DDD)** — multi-tenant foundation. Pure `branding` domain (hex-color + hostname validation, domain normalization, org slugify, theme merge over platform defaults) with unit tests. `OrganizationService` covers create (creator becomes OWNER), list-mine, update-branding (OWNER/ADMIN, validates colors + unique custom domain), add-member by email (OWNER), and public theme resolution by custom domain.
