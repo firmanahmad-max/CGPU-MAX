@@ -66,7 +66,7 @@ function PickCard({ pick }: { pick: ComponentPick }) {
       {pick.slug ? (
         <Link
           href={`/processors/${pick.slug}`}
-          className="font-display text-lg font-semibold text-white hover:text-accent-blue"
+          className="font-display hover:text-accent-blue text-lg font-semibold text-white"
         >
           {pick.modelName}
         </Link>

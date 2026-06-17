@@ -1,9 +1,8 @@
 import type { PrismaClient } from '@prisma/client';
 
+import type { AuthContext } from '../../../shared/auth/AuthContext.js';
 import { getLimits } from '../domain/TierPolicy.js';
 import { currentPeriodKey } from '../domain/UsagePeriod.js';
-
-import type { AuthContext } from '../../../shared/auth/AuthContext.js';
 
 export class GetMySubscription {
   constructor(private readonly prisma: PrismaClient) {}

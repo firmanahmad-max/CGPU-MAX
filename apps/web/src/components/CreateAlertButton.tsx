@@ -39,7 +39,7 @@ export function CreateAlertButton({ slug, suggested }: { slug: string; suggested
       <div className="card">
         <p className="label mb-2">Price alert</p>
         {status === 'done' ? (
-          <p className="text-sm text-state-success">{message}</p>
+          <p className="text-state-success text-sm">{message}</p>
         ) : open ? (
           <div className="flex items-center gap-2">
             <span className="text-sm text-slate-400">Notify me when ≤ $</span>
@@ -47,13 +47,13 @@ export function CreateAlertButton({ slug, suggested }: { slug: string; suggested
               type="number"
               value={target}
               onChange={(e) => setTarget(e.currentTarget.value)}
-              className="w-28 rounded-sm border border-white/10 bg-white/5 px-2 py-1 text-sm text-white focus:border-accent-blue focus:outline-none"
+              className="focus:border-accent-blue w-28 rounded-sm border border-white/10 bg-white/5 px-2 py-1 text-sm text-white focus:outline-none"
             />
             <button
               type="button"
               onClick={submit}
               disabled={status === 'saving'}
-              className="rounded-sm border border-accent-blue bg-accent-blue/20 px-3 py-1 text-xs font-semibold text-white hover:bg-accent-blue/30 disabled:opacity-40"
+              className="border-accent-blue bg-accent-blue/20 hover:bg-accent-blue/30 rounded-sm border px-3 py-1 text-xs font-semibold text-white disabled:opacity-40"
             >
               {status === 'saving' ? 'Saving…' : 'Set alert'}
             </button>
@@ -68,7 +68,7 @@ export function CreateAlertButton({ slug, suggested }: { slug: string; suggested
           </button>
         )}
         {status === 'error' && message && (
-          <p className="mt-2 text-xs text-state-danger">{message}</p>
+          <p className="text-state-danger mt-2 text-xs">{message}</p>
         )}
       </div>
     </SignedIn>

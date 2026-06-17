@@ -18,9 +18,7 @@ export function ProcessorCard({ processor }: ProcessorCardProps) {
       className="card group block transition hover:border-white/25 hover:bg-white/[0.04]"
     >
       <div className="mb-3 flex items-center justify-between">
-        <Pill variant={manufacturerVariant(processor.manufacturer)}>
-          {processor.manufacturer}
-        </Pill>
+        <Pill variant={manufacturerVariant(processor.manufacturer)}>{processor.manufacturer}</Pill>
         <Pill>{processor.type}</Pill>
       </div>
       <h3 className="font-display text-lg font-semibold text-white">{processor.modelName}</h3>

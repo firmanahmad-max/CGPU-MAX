@@ -51,7 +51,8 @@ export default function GamingPage() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ gpuSlug, cpuSlug: cpuSlug ?? undefined, resolution, profile }),
       });
-      if (res.status === 402) throw new Error('Gaming optimizer is a Pro feature — upgrade on Pricing.');
+      if (res.status === 402)
+        throw new Error('Gaming optimizer is a Pro feature — upgrade on Pricing.');
       if (!res.ok) throw new Error(await res.text());
       setResult((await res.json()) as GamingResult);
     } catch (err) {
@@ -87,7 +88,12 @@ export default function GamingPage() {
         <SignedIn>
           <div className="grid gap-6 sm:grid-cols-2">
             <ProcessorPicker label="GPU" type="GPU" value={gpuSlug} onChange={setGpuSlug} />
-            <ProcessorPicker label="CPU (optional)" type="CPU" value={cpuSlug} onChange={setCpuSlug} />
+            <ProcessorPicker
+              label="CPU (optional)"
+              type="CPU"
+              value={cpuSlug}
+              onChange={setCpuSlug}
+            />
           </div>
 
           <div className="mt-6 flex flex-wrap gap-6">
@@ -118,11 +124,11 @@ export default function GamingPage() {
               type="button"
               onClick={run}
               disabled={!gpuSlug || loading}
-              className="rounded-sm border border-accent-purple bg-accent-purple/20 px-6 py-2 text-sm font-semibold text-white transition hover:bg-accent-purple/30 disabled:opacity-40"
+              className="border-accent-purple bg-accent-purple/20 hover:bg-accent-purple/30 rounded-sm border px-6 py-2 text-sm font-semibold text-white transition disabled:opacity-40"
             >
               {loading ? 'Predicting…' : 'Predict FPS'}
             </button>
-            {error && <p className="text-sm text-state-danger">{error}</p>}
+            {error && <p className="text-state-danger text-sm">{error}</p>}
           </div>
 
           {result && (
@@ -147,8 +153,8 @@ export default function GamingPage() {
               <div className="card">
                 <p className="label mb-1">Recommended</p>
                 <p className="text-sm text-slate-200">
-                  <span className="font-semibold capitalize">{result.recommendedPreset}</span> preset.{' '}
-                  {result.upscaling.note}
+                  <span className="font-semibold capitalize">{result.recommendedPreset}</span>{' '}
+                  preset. {result.upscaling.note}
                 </p>
               </div>
 
@@ -182,7 +188,7 @@ function Toggle({
       type="button"
       onClick={onClick}
       className={
-        'rounded-pill border px-3 py-1 text-xs font-medium uppercase tracking-label transition ' +
+        'rounded-pill tracking-label border px-3 py-1 text-xs font-medium uppercase transition ' +
         (active
           ? 'border-white/40 bg-white/15 text-white'
           : 'border-white/10 bg-white/5 text-slate-400 hover:text-slate-200')

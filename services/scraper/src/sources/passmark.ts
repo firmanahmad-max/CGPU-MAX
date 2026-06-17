@@ -41,7 +41,10 @@ export class PassmarkAdapter implements SourceAdapter {
     $('ul.chartlist li').each((index, li) => {
       if (index >= this.limit) return false;
       const modelName = $(li).find('.prdname').text().trim();
-      const scoreText = $(li).find('.count').text().replace(/[^0-9]/g, '');
+      const scoreText = $(li)
+        .find('.count')
+        .text()
+        .replace(/[^0-9]/g, '');
       const priceText = $(li).find('.price').text();
       if (!modelName) return;
       const manufacturer = detectCpuManufacturer(modelName);
@@ -77,7 +80,10 @@ export class PassmarkAdapter implements SourceAdapter {
     $('ul.chartlist li').each((index, li) => {
       if (index >= this.limit) return false;
       const modelName = $(li).find('.prdname').text().trim();
-      const scoreText = $(li).find('.count').text().replace(/[^0-9]/g, '');
+      const scoreText = $(li)
+        .find('.count')
+        .text()
+        .replace(/[^0-9]/g, '');
       const priceText = $(li).find('.price').text();
       if (!modelName) return;
       const manufacturer = detectGpuManufacturer(modelName);

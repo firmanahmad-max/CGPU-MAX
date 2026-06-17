@@ -47,12 +47,12 @@ export class GeekbenchAdapter implements SourceAdapter {
     ]);
 
     const cpus = this.transformCpus([
-      ...(single.status === 'fulfilled' ? single.value.results ?? [] : []),
-      ...(multi.status === 'fulfilled' ? multi.value.results ?? [] : []),
+      ...(single.status === 'fulfilled' ? (single.value.results ?? []) : []),
+      ...(multi.status === 'fulfilled' ? (multi.value.results ?? []) : []),
     ]);
     const gpus = this.transformGpus([
-      ...(gpu.status === 'fulfilled' ? gpu.value.results ?? [] : []),
-      ...(vulkan.status === 'fulfilled' ? vulkan.value.results ?? [] : []),
+      ...(gpu.status === 'fulfilled' ? (gpu.value.results ?? []) : []),
+      ...(vulkan.status === 'fulfilled' ? (vulkan.value.results ?? []) : []),
     ]);
 
     log.info({ cpus: cpus.length, gpus: gpus.length }, 'Geekbench fetch complete');
@@ -83,7 +83,9 @@ export class GeekbenchAdapter implements SourceAdapter {
             ? { benchmarkType: 'geekbench6_multi_core', score: row.multi_core_score, recordedAt }
             : null,
           row.score ? { benchmarkType: 'geekbench6_overall', score: row.score, recordedAt } : null,
-        ].filter((x): x is { benchmarkType: string; score: number; recordedAt: Date } => x !== null);
+        ].filter(
+          (x): x is { benchmarkType: string; score: number; recordedAt: Date } => x !== null,
+        );
 
         return {
           source: 'geekbench',

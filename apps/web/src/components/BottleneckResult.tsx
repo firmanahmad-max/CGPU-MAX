@@ -62,10 +62,12 @@ export function BottleneckResult({ result }: BottleneckResultProps) {
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
             <thead>
-              <tr className="text-left text-xs uppercase tracking-label text-slate-400">
+              <tr className="tracking-label text-left text-xs uppercase text-slate-400">
                 <th className="px-3 py-2">Resolution</th>
                 {PROFILES.map((p) => (
-                  <th key={p} className="px-3 py-2 text-center">{p}</th>
+                  <th key={p} className="px-3 py-2 text-center">
+                    {p}
+                  </th>
                 ))}
               </tr>
             </thead>
@@ -77,7 +79,12 @@ export function BottleneckResult({ result }: BottleneckResultProps) {
                     const s = result.scenarios.find(
                       (x) => x.resolution === res && x.profile === profile,
                     );
-                    if (!s) return <td key={profile} className="px-3 py-3 text-slate-600">—</td>;
+                    if (!s)
+                      return (
+                        <td key={profile} className="px-3 py-3 text-slate-600">
+                          —
+                        </td>
+                      );
                     return (
                       <td key={profile} className="px-3 py-3 text-center">
                         <div
@@ -89,7 +96,7 @@ export function BottleneckResult({ result }: BottleneckResultProps) {
                           <span className="font-mono font-semibold">
                             {s.bottleneckPercentage.toFixed(1)}%
                           </span>
-                          <span className="mt-0.5 text-[10px] uppercase tracking-label opacity-80">
+                          <span className="tracking-label mt-0.5 text-[10px] uppercase opacity-80">
                             {s.limitingComponent}
                           </span>
                           {s.expectedFpsRange && (
@@ -109,9 +116,18 @@ export function BottleneckResult({ result }: BottleneckResultProps) {
       </div>
 
       <div className="grid gap-4 sm:grid-cols-3">
-        <Stat label="Thermal estimate" value={result.thermalEstimateC ? `${result.thermalEstimateC} °C` : '—'} />
-        <Stat label="Power draw" value={result.totalPowerDrawW ? `${result.totalPowerDrawW} W` : '—'} />
-        <Stat label="Recommended PSU" value={result.recommendedPsuW ? `${result.recommendedPsuW} W` : '—'} />
+        <Stat
+          label="Thermal estimate"
+          value={result.thermalEstimateC ? `${result.thermalEstimateC} °C` : '—'}
+        />
+        <Stat
+          label="Power draw"
+          value={result.totalPowerDrawW ? `${result.totalPowerDrawW} W` : '—'}
+        />
+        <Stat
+          label="Recommended PSU"
+          value={result.recommendedPsuW ? `${result.recommendedPsuW} W` : '—'}
+        />
       </div>
 
       {result.recommendations.length > 0 && (
@@ -120,7 +136,7 @@ export function BottleneckResult({ result }: BottleneckResultProps) {
           <ul className="space-y-2 text-sm text-slate-300">
             {result.recommendations.map((r, i) => (
               <li key={i} className="flex gap-2">
-                <span className="mt-1 inline-block h-1.5 w-1.5 flex-shrink-0 rounded-full bg-accent-blue" />
+                <span className="bg-accent-blue mt-1 inline-block h-1.5 w-1.5 flex-shrink-0 rounded-full" />
                 <span>{r}</span>
               </li>
             ))}

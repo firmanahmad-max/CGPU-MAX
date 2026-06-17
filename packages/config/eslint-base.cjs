@@ -7,19 +7,12 @@ module.exports = {
     sourceType: 'module',
   },
   plugins: ['@typescript-eslint', 'import'],
-  extends: [
-    'eslint:recommended',
-    'plugin:@typescript-eslint/recommended',
-    'plugin:import/recommended',
-    'plugin:import/typescript',
-    'prettier',
-  ],
-  settings: {
-    'import/resolver': {
-      typescript: { alwaysTryTypes: true },
-      node: true,
-    },
-  },
+  extends: ['eslint:recommended', 'plugin:@typescript-eslint/recommended', 'prettier'],
+  // NOTE: we deliberately do NOT extend plugin:import/recommended. TypeScript
+  // (via `tsc --noEmit`) already validates module resolution, default/named
+  // exports, etc. — far more reliably than eslint-import-resolver-typescript,
+  // which chokes on ESM `.js`-suffixed imports and extended tsconfigs under
+  // pnpm. We keep only the `import/order` rule, which needs no resolver.
   rules: {
     '@typescript-eslint/no-unused-vars': [
       'error',

@@ -56,11 +56,7 @@ billingWebhookRouter.post(
         throw new AppError('MISSING_SIGNATURE', 'Stripe signature header missing', 400);
       }
       if (!env.STRIPE_WEBHOOK_SECRET) {
-        throw new AppError(
-          'WEBHOOK_NOT_CONFIGURED',
-          'STRIPE_WEBHOOK_SECRET not set',
-          503,
-        );
+        throw new AppError('WEBHOOK_NOT_CONFIGURED', 'STRIPE_WEBHOOK_SECRET not set', 503);
       }
 
       let event: Stripe.Event;

@@ -14,9 +14,19 @@ export function CompareResult({ result }: CompareResultProps) {
   return (
     <section className="mt-10 space-y-8">
       <header className="grid items-center gap-4 sm:grid-cols-[1fr_auto_1fr]">
-        <Side processor={result.a} score={result.performanceScore.a} winner={result.overallWinner === 'a'} side="A" />
+        <Side
+          processor={result.a}
+          score={result.performanceScore.a}
+          winner={result.overallWinner === 'a'}
+          side="A"
+        />
         <div className="font-display text-3xl font-semibold text-slate-500">VS</div>
-        <Side processor={result.b} score={result.performanceScore.b} winner={result.overallWinner === 'b'} side="B" />
+        <Side
+          processor={result.b}
+          score={result.performanceScore.b}
+          winner={result.overallWinner === 'b'}
+          side="B"
+        />
       </header>
 
       <div className="card flex flex-wrap items-center gap-4 text-sm">
@@ -30,9 +40,9 @@ export function CompareResult({ result }: CompareResultProps) {
         )}
       </div>
 
-      <div className="card p-0 overflow-hidden">
+      <div className="card overflow-hidden p-0">
         <table className="w-full text-sm">
-          <thead className="bg-white/[0.03] text-left text-xs uppercase tracking-label text-slate-400">
+          <thead className="tracking-label bg-white/[0.03] text-left text-xs uppercase text-slate-400">
             <tr>
               <th className="px-4 py-3">Metric</th>
               <th className="px-4 py-3 text-right">{result.a.modelName}</th>
@@ -87,10 +97,16 @@ function Side({
     <div className={cn('card', winner && 'border-state-success/40 bg-state-success/5')}>
       <div className="mb-2 flex items-center justify-between">
         <p className="label">Side {side}</p>
-        {winner && <Pill className="border-state-success/50 bg-state-success/15 text-state-success">Winner</Pill>}
+        {winner && (
+          <Pill className="border-state-success/50 bg-state-success/15 text-state-success">
+            Winner
+          </Pill>
+        )}
       </div>
       <p className="font-display text-xl font-semibold text-white">{processor.modelName}</p>
-      <p className="mt-1 text-xs text-slate-500">{processor.manufacturer} · {processor.type}</p>
+      <p className="mt-1 text-xs text-slate-500">
+        {processor.manufacturer} · {processor.type}
+      </p>
       <p className="metric mt-4">{score.toFixed(1)}</p>
       <p className="label mt-1">Performance index</p>
     </div>

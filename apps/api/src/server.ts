@@ -15,17 +15,17 @@ import { comparisonsRouter } from './modules/comparisons/interface/routes.js';
 import { gamingRouter } from './modules/gaming-optimizer/interface/routes.js';
 import { pricingRouter } from './modules/pricing/interface/routes.js';
 import { processorsRouter } from './modules/processors/interface/routes.js';
-import { streamingRouter } from './modules/streaming/interface/routes.js';
 import { publicApiRouter } from './modules/public-api/interface/router.js';
 import { reportsRouter } from './modules/reports/interface/routes.js';
+import { streamingRouter } from './modules/streaming/interface/routes.js';
 import { subscriptionsRouter } from './modules/subscriptions/interface/routes.js';
 import { withUser } from './shared/auth/middleware.js';
 import { env } from './shared/config/env.js';
-import { errorHandler } from './shared/middleware/errorHandler.js';
-import { correlationId } from './shared/middleware/correlationId.js';
-import { tieredRateLimiter } from './shared/middleware/tieredRateLimit.js';
 import { healthRouter } from './shared/health/router.js';
 import { logger } from './shared/logging/logger.js';
+import { correlationId } from './shared/middleware/correlationId.js';
+import { errorHandler } from './shared/middleware/errorHandler.js';
+import { tieredRateLimiter } from './shared/middleware/tieredRateLimit.js';
 
 export function createServer(): Express {
   const app = express();

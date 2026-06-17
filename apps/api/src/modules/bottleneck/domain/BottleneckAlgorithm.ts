@@ -251,9 +251,7 @@ export class BottleneckAlgorithm {
 
     const cpuLimited = scenarios.filter((s) => s.limitingComponent === 'cpu').length;
     const gpuLimited = scenarios.filter((s) => s.limitingComponent === 'gpu').length;
-    const worst = [...scenarios].sort(
-      (a, b) => b.bottleneckPercentage - a.bottleneckPercentage,
-    )[0];
+    const worst = [...scenarios].sort((a, b) => b.bottleneckPercentage - a.bottleneckPercentage)[0];
     if (!worst) return out;
 
     if (worst.severity === 'optimal') {

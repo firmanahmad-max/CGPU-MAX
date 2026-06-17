@@ -41,7 +41,8 @@ export default function StreamingPage() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ gpuManufacturer, platform, resolution, fps, uploadMbps }),
       });
-      if (res.status === 402) throw new Error('Streaming suite is a Pro feature — upgrade on Pricing.');
+      if (res.status === 402)
+        throw new Error('Streaming suite is a Pro feature — upgrade on Pricing.');
       if (!res.ok) throw new Error(await res.text());
       setResult((await res.json()) as StreamingResult);
     } catch (err) {
@@ -67,7 +68,10 @@ export default function StreamingPage() {
 
         <SignedOut>
           <div className="card text-center text-sm text-slate-400">
-            <Link href="/sign-in?redirect_url=/streaming" className="text-accent-blue hover:underline">
+            <Link
+              href="/sign-in?redirect_url=/streaming"
+              className="text-accent-blue hover:underline"
+            >
               Sign in
             </Link>{' '}
             with a Pro plan to configure streaming.
@@ -116,7 +120,7 @@ export default function StreamingPage() {
                 step={1}
                 value={uploadMbps}
                 onChange={(e) => setUpload(Number(e.currentTarget.value))}
-                className="w-full accent-accent-blue"
+                className="accent-accent-blue w-full"
               />
             </div>
 
@@ -124,11 +128,11 @@ export default function StreamingPage() {
               type="button"
               onClick={run}
               disabled={loading}
-              className="rounded-sm border border-accent-coral bg-accent-coral/20 px-6 py-2 text-sm font-semibold text-white transition hover:bg-accent-coral/30 disabled:opacity-40"
+              className="border-accent-coral bg-accent-coral/20 hover:bg-accent-coral/30 rounded-sm border px-6 py-2 text-sm font-semibold text-white transition disabled:opacity-40"
             >
               {loading ? 'Calculating…' : 'Build config'}
             </button>
-            {error && <p className="text-sm text-state-danger">{error}</p>}
+            {error && <p className="text-state-danger text-sm">{error}</p>}
           </div>
 
           {result && (
@@ -136,11 +140,7 @@ export default function StreamingPage() {
               <div className="grid gap-4 sm:grid-cols-3">
                 <Stat label="Encoder" value={result.encoder.encoder} small />
                 <Stat label="Bitrate" value={`${result.recommendedBitrateKbps} kbps`} />
-                <Stat
-                  label="Headroom"
-                  value={`${result.uploadHeadroomMbps} Mbps`}
-                  small
-                />
+                <Stat label="Headroom" value={`${result.uploadHeadroomMbps} Mbps`} small />
               </div>
               <div className="card">
                 <p className="label mb-1">Encoder rationale</p>
@@ -191,7 +191,7 @@ function Toggle({
       type="button"
       onClick={onClick}
       className={
-        'rounded-pill border px-3 py-1 text-xs font-medium uppercase tracking-label transition ' +
+        'rounded-pill tracking-label border px-3 py-1 text-xs font-medium uppercase transition ' +
         (active
           ? 'border-white/40 bg-white/15 text-white'
           : 'border-white/10 bg-white/5 text-slate-400 hover:text-slate-200')

@@ -38,11 +38,13 @@ export default function ComparePage() {
       <div className="mb-10 flex items-end justify-between">
         <div>
           <p className="label">Engine</p>
-          <h1 className="mt-2 font-display text-4xl font-semibold tracking-tight text-white">
+          <h1 className="font-display mt-2 text-4xl font-semibold tracking-tight text-white">
             Comparison
           </h1>
         </div>
-        <Link href="/" className="text-sm text-slate-400 hover:text-white">← Back</Link>
+        <Link href="/" className="text-sm text-slate-400 hover:text-white">
+          ← Back
+        </Link>
       </div>
 
       <div className="mb-6 flex gap-2">
@@ -57,7 +59,7 @@ export default function ComparePage() {
               setResult(null);
             }}
             className={
-              'rounded-pill border px-4 py-1 text-xs font-medium uppercase tracking-label transition ' +
+              'rounded-pill tracking-label border px-4 py-1 text-xs font-medium uppercase transition ' +
               (type === t
                 ? 'border-white/40 bg-white/15 text-white'
                 : 'border-white/10 bg-white/5 text-slate-400 hover:text-slate-200')
@@ -90,11 +92,11 @@ export default function ComparePage() {
           type="button"
           onClick={onCompare}
           disabled={!canCompare || loading}
-          className="rounded-sm border border-accent-blue bg-accent-blue/20 px-6 py-2 text-sm font-semibold text-white transition hover:bg-accent-blue/30 disabled:cursor-not-allowed disabled:opacity-40"
+          className="border-accent-blue bg-accent-blue/20 hover:bg-accent-blue/30 rounded-sm border px-6 py-2 text-sm font-semibold text-white transition disabled:cursor-not-allowed disabled:opacity-40"
         >
           {loading ? 'Comparing…' : 'Compare'}
         </button>
-        {error && <p className="text-sm text-state-danger">{error}</p>}
+        {error && <p className="text-state-danger text-sm">{error}</p>}
       </div>
 
       {result && <CompareResult result={result} />}

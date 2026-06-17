@@ -41,7 +41,7 @@ export function ProcessorFilters() {
                 type="button"
                 onClick={() => push({ type: t })}
                 className={
-                  'rounded-pill border px-3 py-1 text-xs font-medium uppercase tracking-label transition ' +
+                  'rounded-pill tracking-label border px-3 py-1 text-xs font-medium uppercase transition ' +
                   (current.type === t
                     ? 'border-white/40 bg-white/15 text-white'
                     : 'border-white/10 bg-white/5 text-slate-400 hover:text-slate-200')
@@ -61,7 +61,7 @@ export function ProcessorFilters() {
                 type="button"
                 onClick={() => push({ manufacturer: m })}
                 className={
-                  'rounded-pill border px-3 py-1 text-xs font-medium uppercase tracking-label transition ' +
+                  'rounded-pill tracking-label border px-3 py-1 text-xs font-medium uppercase transition ' +
                   (current.manufacturer === m
                     ? 'border-white/40 bg-white/15 text-white'
                     : 'border-white/10 bg-white/5 text-slate-400 hover:text-slate-200')
@@ -81,7 +81,7 @@ export function ProcessorFilters() {
           defaultValue={current.search}
           placeholder="Model name…"
           onChange={(e) => push({ search: e.currentTarget.value })}
-          className="w-full max-w-md rounded-sm border border-white/10 bg-white/5 px-3 py-2 text-sm text-white placeholder:text-slate-500 focus:border-accent-blue focus:outline-none"
+          className="focus:border-accent-blue w-full max-w-md rounded-sm border border-white/10 bg-white/5 px-3 py-2 text-sm text-white placeholder:text-slate-500 focus:outline-none"
         />
         {isPending && <p className="mt-1 text-xs text-slate-500">Updating…</p>}
       </div>

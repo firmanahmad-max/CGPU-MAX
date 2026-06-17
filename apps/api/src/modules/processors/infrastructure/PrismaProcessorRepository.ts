@@ -1,10 +1,7 @@
 import type { PrismaClient } from '@prisma/client';
 
 import { Processor } from '../domain/Processor.js';
-import type {
-  ListProcessorsFilter,
-  ProcessorRepository,
-} from '../domain/ProcessorRepository.js';
+import type { ListProcessorsFilter, ProcessorRepository } from '../domain/ProcessorRepository.js';
 
 export class PrismaProcessorRepository implements ProcessorRepository {
   constructor(private readonly prisma: PrismaClient) {}

@@ -58,7 +58,9 @@ export async function renderComparisonPdf(data: ComparisonReportData): Promise<B
   doc
     .fillColor('#222')
     .fontSize(10)
-    .text(`Performance index — ${data.a.modelName}: ${data.performanceScore.a}, ${data.b.modelName}: ${data.performanceScore.b}`)
+    .text(
+      `Performance index — ${data.a.modelName}: ${data.performanceScore.a}, ${data.b.modelName}: ${data.performanceScore.b}`,
+    )
     .text(`Overall winner: ${winnerLabel(data.overallWinner, data.a.modelName, data.b.modelName)}`)
     .text(
       `Best price/performance: ${winnerLabel(data.pricePerformanceWinner, data.a.modelName, data.b.modelName)}`,
@@ -85,7 +87,9 @@ export async function renderBottleneckPdf(data: BottleneckReportData): Promise<B
   doc.moveDown(0.4);
   doc.fillColor('#222').fontSize(9);
   for (const s of data.scenarios) {
-    const fps = s.expectedFpsRange ? ` (${s.expectedFpsRange.min}–${s.expectedFpsRange.max} fps)` : '';
+    const fps = s.expectedFpsRange
+      ? ` (${s.expectedFpsRange.min}–${s.expectedFpsRange.max} fps)`
+      : '';
     doc.text(
       `${s.resolution} · ${s.profile}: ${s.bottleneckPercentage.toFixed(1)}% ${s.limitingComponent}-limited [${s.severity}]${fps}`,
     );

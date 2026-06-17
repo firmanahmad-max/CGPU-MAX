@@ -54,14 +54,12 @@ export function ProcessorPicker({
         placeholder={`Search ${type}…`}
         value={search}
         onChange={(e) => setSearch(e.currentTarget.value)}
-        className="w-full rounded-sm border border-white/10 bg-white/5 px-3 py-2 text-sm text-white placeholder:text-slate-500 focus:border-accent-blue focus:outline-none"
+        className="focus:border-accent-blue w-full rounded-sm border border-white/10 bg-white/5 px-3 py-2 text-sm text-white placeholder:text-slate-500 focus:outline-none"
       />
 
       <div className="mt-3 max-h-64 space-y-1 overflow-y-auto">
         {loading && <p className="text-xs text-slate-500">Loading…</p>}
-        {!loading && results.length === 0 && (
-          <p className="text-xs text-slate-500">No matches.</p>
-        )}
+        {!loading && results.length === 0 && <p className="text-xs text-slate-500">No matches.</p>}
         {results.map((p) => (
           <button
             key={p.id}

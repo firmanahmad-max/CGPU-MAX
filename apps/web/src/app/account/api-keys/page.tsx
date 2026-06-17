@@ -95,7 +95,7 @@ export default function ApiKeysPage() {
         <div className="mb-8 flex items-end justify-between">
           <div>
             <p className="label">Enterprise</p>
-            <h1 className="mt-2 font-display text-4xl font-semibold tracking-tight text-white">
+            <h1 className="font-display mt-2 text-4xl font-semibold tracking-tight text-white">
               API Keys
             </h1>
           </div>
@@ -118,14 +118,14 @@ export default function ApiKeysPage() {
         ) : (
           <>
             {error && (
-              <div className="card mb-6 border-state-danger/40 bg-state-danger/10 text-sm text-state-danger">
+              <div className="card border-state-danger/40 bg-state-danger/10 text-state-danger mb-6 text-sm">
                 {error}
               </div>
             )}
 
             {revealed && (
-              <div className="card mb-6 border-state-success/40 bg-state-success/5">
-                <p className="label mb-2 text-state-success">New key — copy it now</p>
+              <div className="card border-state-success/40 bg-state-success/5 mb-6">
+                <p className="label text-state-success mb-2">New key — copy it now</p>
                 <p className="mb-3 text-xs text-slate-400">
                   This is the only time the full key is shown. Store it securely.
                 </p>
@@ -151,13 +151,13 @@ export default function ApiKeysPage() {
                   maxLength={80}
                   placeholder="Key name (e.g. production-server)"
                   onChange={(e) => setNewName(e.currentTarget.value)}
-                  className="flex-1 rounded-sm border border-white/10 bg-white/5 px-3 py-2 text-sm text-white placeholder:text-slate-500 focus:border-accent-blue focus:outline-none"
+                  className="focus:border-accent-blue flex-1 rounded-sm border border-white/10 bg-white/5 px-3 py-2 text-sm text-white placeholder:text-slate-500 focus:outline-none"
                 />
                 <button
                   type="button"
                   onClick={create}
                   disabled={creating || !newName.trim()}
-                  className="rounded-sm border border-accent-blue bg-accent-blue/20 px-5 py-2 text-sm font-semibold text-white transition hover:bg-accent-blue/30 disabled:opacity-40"
+                  className="border-accent-blue bg-accent-blue/20 hover:bg-accent-blue/30 rounded-sm border px-5 py-2 text-sm font-semibold text-white transition disabled:opacity-40"
                 >
                   {creating ? 'Creating…' : 'Create'}
                 </button>
@@ -192,7 +192,7 @@ export default function ApiKeysPage() {
                         <button
                           type="button"
                           onClick={() => revoke(k.id)}
-                          className="text-xs text-state-danger hover:underline"
+                          className="text-state-danger text-xs hover:underline"
                         >
                           Revoke
                         </button>
@@ -204,9 +204,9 @@ export default function ApiKeysPage() {
             </div>
 
             <p className="mt-6 text-xs text-slate-500">
-              API docs:{' '}
-              <code className="font-mono">GET /api/public/v1/openapi.json</code>. Authenticate with{' '}
-              <code className="font-mono">Authorization: Bearer &lt;key&gt;</code>.
+              API docs: <code className="font-mono">GET /api/public/v1/openapi.json</code>.
+              Authenticate with <code className="font-mono">Authorization: Bearer &lt;key&gt;</code>
+              .
             </p>
           </>
         )}

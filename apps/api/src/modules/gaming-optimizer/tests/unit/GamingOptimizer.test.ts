@@ -10,7 +10,13 @@ const rtx4090: ProcessorSnapshot = {
   tdpWatts: 450,
   msrpUsd: 1599,
   generation: 40,
-  gpu: { shaderUnits: 16384, vramGb: 24, memoryBandwidthGbps: 1008, baseClockMhz: 2235, boostClockMhz: 2520 },
+  gpu: {
+    shaderUnits: 16384,
+    vramGb: 24,
+    memoryBandwidthGbps: 1008,
+    baseClockMhz: 2235,
+    boostClockMhz: 2520,
+  },
   benchmarks: { passmark_g3d_mark: 38000 },
 };
 

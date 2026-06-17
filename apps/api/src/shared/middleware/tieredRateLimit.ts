@@ -1,8 +1,8 @@
 import rateLimit, { type RateLimitRequestHandler } from 'express-rate-limit';
 import RedisStore, { type RedisReply } from 'rate-limit-redis';
 
-import { redis } from '../cache/redis.js';
 import { getLimits } from '../../modules/subscriptions/domain/TierPolicy.js';
+import { redis } from '../cache/redis.js';
 
 // Per-tier rate limit. Key = userId for authenticated requests, IP otherwise.
 // Stored in Redis so it works across horizontally-scaled API instances.
@@ -26,7 +26,8 @@ export function tieredRateLimiter(): RateLimitRequestHandler {
     message: {
       error: {
         code: 'RATE_LIMITED',
-        message: 'Too many requests for your current tier. Upgrade or wait for the window to reset.',
+        message:
+          'Too many requests for your current tier. Upgrade or wait for the window to reset.',
       },
     },
   });

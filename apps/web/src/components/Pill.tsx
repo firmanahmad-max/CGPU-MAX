@@ -17,7 +17,7 @@ export function Pill({ children, variant = 'default', className }: PillProps) {
   return (
     <span
       className={cn(
-        'inline-flex items-center rounded-pill border px-3 py-1 text-xs font-medium uppercase tracking-label',
+        'rounded-pill tracking-label inline-flex items-center border px-3 py-1 text-xs font-medium uppercase',
         VARIANT_CLASSES[variant],
         className,
       )}

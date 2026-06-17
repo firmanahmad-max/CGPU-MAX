@@ -1,4 +1,5 @@
 # CGPU-MAX: Free CPU/GPU Data Sources & Integration Guide
+
 **Complete Reference for Data Collection Strategies**
 
 ---
@@ -7,17 +8,18 @@
 
 Untuk CGPU-MAX, ada **3 strategi optimal** pengambilan data spesifikasi processor gratis:
 
-| Strategi | Kelebihan | Kekurangan | Rekomendasi |
-|----------|-----------|-----------|------------|
+| Strategi                  | Kelebihan                  | Kekurangan           | Rekomendasi |
+| ------------------------- | -------------------------- | -------------------- | ----------- |
 | **Web Scraping + Hybrid** | Data terlengkap, terupdate | Development overhead | ⭐⭐⭐ BEST |
-| **Free API Only** | Easy integration, reliable | Data terbatas | ⭐⭐ GOOD |
-| **Local JSON Database** | Cepat, offline-first | Manual maintenance | ⭐ Basic |
+| **Free API Only**         | Easy integration, reliable | Data terbatas        | ⭐⭐ GOOD   |
+| **Local JSON Database**   | Cepat, offline-first       | Manual maintenance   | ⭐ Basic    |
 
 ---
 
 ## 1. FREE API SOURCES (TANPA API KEY)
 
 ### 1.1 GEEKBENCH FREE API ⭐⭐⭐⭐⭐
+
 **Status:** Gratis, undocumented API, no auth required
 
 #### Endpoints
@@ -89,7 +91,7 @@ class GeekbenchAPI {
     try {
       const response = await axios.get('https://browser.geekbench.com/search', {
         params: { q: query },
-        headers: { Accept: 'application/json' }
+        headers: { Accept: 'application/json' },
       });
       return response.data;
     } catch (error) {
@@ -102,7 +104,7 @@ class GeekbenchAPI {
     try {
       const endpoint = `https://browser.geekbench.com/v6/cpu/${type}`;
       const response = await axios.get(endpoint, {
-        headers: { Accept: 'application/json' }
+        headers: { Accept: 'application/json' },
       });
       return response.data;
     } catch (error) {
@@ -114,7 +116,7 @@ class GeekbenchAPI {
   static async getCPUDetails(cpuId) {
     try {
       const response = await axios.get(`https://browser.geekbench.com/v6/cpu/${cpuId}`, {
-        headers: { Accept: 'application/json' }
+        headers: { Accept: 'application/json' },
       });
       return response.data;
     } catch (error) {
@@ -126,7 +128,7 @@ class GeekbenchAPI {
   static async getGPUBenchmarks() {
     try {
       const response = await axios.get('https://browser.geekbench.com/gpu-benchmarks', {
-        headers: { Accept: 'application/json' }
+        headers: { Accept: 'application/json' },
       });
       return response.data;
     } catch (error) {
@@ -140,6 +142,7 @@ export default GeekbenchAPI;
 ```
 
 #### Kelebihan:
+
 - ✅ Completely free, no authentication
 - ✅ Real-world benchmark data
 - ✅ Extensive CPU & GPU coverage
@@ -147,6 +150,7 @@ export default GeekbenchAPI;
 - ✅ Cross-platform support (mobile, desktop)
 
 #### Kekurangan:
+
 - ❌ Undocumented API (subject to changes)
 - ❌ Rate limiting mungkin berlaku
 - ❌ Tidak punya data spesifikasi lengkap (hanya benchmark)
@@ -154,6 +158,7 @@ export default GeekbenchAPI;
 ---
 
 ### 1.2 TECHPOWERUP FREE API ⭐⭐⭐⭐
+
 **Status:** Gratis untuk flagships & current-gen, no API key needed
 
 #### Endpoints
@@ -210,7 +215,7 @@ class TechPowerUpAPI {
     try {
       const response = await axios.get('https://api.techpowerup.com/cpu/v1/search', {
         params: { name: query },
-        headers: { Accept: 'application/json' }
+        headers: { Accept: 'application/json' },
       });
       return response.data.data;
     } catch (error) {
@@ -222,7 +227,7 @@ class TechPowerUpAPI {
   static async getCPUSpecs(cpuId) {
     try {
       const response = await axios.get(`https://api.techpowerup.com/cpu/v1/specs/${cpuId}`, {
-        headers: { Accept: 'application/json' }
+        headers: { Accept: 'application/json' },
       });
       return response.data.data;
     } catch (error) {
@@ -235,7 +240,7 @@ class TechPowerUpAPI {
     try {
       const response = await axios.get('https://api.techpowerup.com/gpu/v1/search', {
         params: { name: query },
-        headers: { Accept: 'application/json' }
+        headers: { Accept: 'application/json' },
       });
       return response.data.data;
     } catch (error) {
@@ -247,7 +252,7 @@ class TechPowerUpAPI {
   static async getGPUDatabase() {
     try {
       const response = await axios.get('https://api.techpowerup.com/gpu/v1/database', {
-        headers: { Accept: 'application/json' }
+        headers: { Accept: 'application/json' },
       });
       return response.data.data;
     } catch (error) {
@@ -261,12 +266,14 @@ export default TechPowerUpAPI;
 ```
 
 #### Kelebihan:
+
 - ✅ Comprehensive specs database
 - ✅ Trusted source (most technical sites use TechPowerUp)
 - ✅ Free API untuk flagship & current-gen
 - ✅ GPU-Z & CPU-Z data validation built-in
 
 #### Kekurangan:
+
 - ❌ Free tier limited to recent processors
 - ❌ Tidak punya API dokumentasi publik
 - ❌ Untuk database lengkap perlu license
@@ -274,6 +281,7 @@ export default TechPowerUpAPI;
 ---
 
 ### 1.3 PASSMARK / USERBENCHMARK ⭐⭐⭐
+
 **Status:** Gratis untuk browsing, API terbatas
 
 #### Web Scraping Option (Data tersedia public)
@@ -286,7 +294,7 @@ class PassmarkScraper {
     try {
       const response = await axios.get('https://www.cpubenchmark.net/');
       const $ = cheerio.load(response.data);
-      
+
       const cpus = [];
       $('table tbody tr').each((i, row) => {
         const cells = $(row).find('td');
@@ -295,10 +303,10 @@ class PassmarkScraper {
           name: $(cells[1]).text().trim(),
           score: $(cells[2]).text().trim(),
           tdp: $(cells[3]).text().trim(),
-          price: $(cells[4]).text().trim()
+          price: $(cells[4]).text().trim(),
         });
       });
-      
+
       return cpus;
     } catch (error) {
       console.error('Passmark scrape error:', error.message);
@@ -310,7 +318,7 @@ class PassmarkScraper {
     try {
       const response = await axios.get('https://www.videocardbenchmark.net/');
       const $ = cheerio.load(response.data);
-      
+
       const gpus = [];
       $('table tbody tr').each((i, row) => {
         const cells = $(row).find('td');
@@ -318,10 +326,10 @@ class PassmarkScraper {
           rank: $(cells[0]).text().trim(),
           name: $(cells[1]).text().trim(),
           score: $(cells[2]).text().trim(),
-          price: $(cells[3]).text().trim()
+          price: $(cells[3]).text().trim(),
         });
       });
-      
+
       return gpus;
     } catch (error) {
       console.error('Passmark GPU scrape error:', error.message);
@@ -334,11 +342,13 @@ export default PassmarkScraper;
 ```
 
 #### Kelebihan:
+
 - ✅ Real benchmark scores dari jutaan users
 - ✅ Price tracking built-in
 - ✅ Data comprehensive (>1M processors)
 
 #### Kekurangan:
+
 - ❌ Tidak punya official API
 - ❌ Perlu web scraping (brittle)
 - ❌ Bisa di-block kalau aggressive scraping
@@ -357,15 +367,16 @@ class TechPowerUpScraper {
   static async scrapeCPUSpecs(brand = 'intel') {
     // Intel: https://www.techpowerup.com/cpu-specs/
     // AMD: https://www.techpowerup.com/cpu-specs/?mfgr=amd
-    
-    const url = brand === 'amd' 
-      ? 'https://www.techpowerup.com/cpu-specs/?mfgr=amd'
-      : 'https://www.techpowerup.com/cpu-specs/';
-    
+
+    const url =
+      brand === 'amd'
+        ? 'https://www.techpowerup.com/cpu-specs/?mfgr=amd'
+        : 'https://www.techpowerup.com/cpu-specs/';
+
     try {
       const response = await axios.get(url);
       const $ = cheerio.load(response.data);
-      
+
       const cpus = [];
       $('table tbody tr').each((i, row) => {
         const cells = $(row).find('td');
@@ -378,10 +389,10 @@ class TechPowerUpScraper {
           tdp: $(cells[5]).text().trim(),
           socket: $(cells[6]).text().trim(),
           architecture: $(cells[7]).text().trim(),
-          releaseDate: $(cells[8]).text().trim()
+          releaseDate: $(cells[8]).text().trim(),
         });
       });
-      
+
       return cpus;
     } catch (error) {
       console.error(`TechPowerUp scrape error for ${brand}:`, error.message);
@@ -391,13 +402,13 @@ class TechPowerUpScraper {
 
   static async scrapeGPUSpecs() {
     // https://www.techpowerup.com/gpu-specs/
-    
+
     const url = 'https://www.techpowerup.com/gpu-specs/';
-    
+
     try {
       const response = await axios.get(url);
       const $ = cheerio.load(response.data);
-      
+
       const gpus = [];
       $('table tbody tr').each((i, row) => {
         const cells = $(row).find('td');
@@ -411,10 +422,10 @@ class TechPowerUpScraper {
           roCount: $(cells[6]).text().trim(),
           memBandwidth: $(cells[7]).text().trim(),
           tdp: $(cells[8]).text().trim(),
-          releaseDate: $(cells[9]).text().trim()
+          releaseDate: $(cells[9]).text().trim(),
         });
       });
-      
+
       return gpus;
     } catch (error) {
       console.error('TechPowerUp GPU scrape error:', error.message);
@@ -432,13 +443,13 @@ export default TechPowerUpScraper;
 class WikipediaScraper {
   static async scrapeIntelCPUList() {
     // https://en.wikipedia.org/wiki/List_of_Intel_Core_processors
-    
+
     const url = 'https://en.wikipedia.org/wiki/List_of_Intel_Core_processors';
-    
+
     try {
       const response = await axios.get(url);
       const $ = cheerio.load(response.data);
-      
+
       const cpus = [];
       $('table.wikitable tbody tr').each((i, row) => {
         const cells = $(row).find('td');
@@ -446,10 +457,10 @@ class WikipediaScraper {
           model: $(cells[0]).text().trim(),
           cores: $(cells[1]).text().trim(),
           tdp: $(cells[2]).text().trim(),
-          releaseDate: $(cells[3]).text().trim()
+          releaseDate: $(cells[3]).text().trim(),
         });
       });
-      
+
       return cpus;
     } catch (error) {
       console.error('Wikipedia Intel scrape error:', error.message);
@@ -459,13 +470,13 @@ class WikipediaScraper {
 
   static async scrapeAMDCPUList() {
     // https://en.wikipedia.org/wiki/List_of_AMD_processors
-    
+
     const url = 'https://en.wikipedia.org/wiki/List_of_AMD_processors';
-    
+
     try {
       const response = await axios.get(url);
       const $ = cheerio.load(response.data);
-      
+
       const cpus = [];
       $('table.wikitable tbody tr').each((i, row) => {
         const cells = $(row).find('td');
@@ -473,10 +484,10 @@ class WikipediaScraper {
           model: $(cells[0]).text().trim(),
           cores: $(cells[1]).text().trim(),
           tdp: $(cells[2]).text().trim(),
-          releaseDate: $(cells[3]).text().trim()
+          releaseDate: $(cells[3]).text().trim(),
         });
       });
-      
+
       return cpus;
     } catch (error) {
       console.error('Wikipedia AMD scrape error:', error.message);
@@ -545,13 +556,12 @@ const prisma = new PrismaClient();
 const redis = Redis.createClient();
 
 class DataCollectionService {
-  
   /**
    * Main orchestration method - runs all data sources
    */
   static async collectAllProcessorData() {
     console.log('🚀 Starting multi-source data collection...');
-    
+
     try {
       // 1. Get from TechPowerUp API (primary, most authoritative)
       console.log('📥 Fetching from TechPowerUp API...');
@@ -559,47 +569,55 @@ class DataCollectionService {
       const amdFromAPI = await TechPowerUpAPI.getCPUs('AMD');
       const nvidiaGPUs = await TechPowerUpAPI.getGPUs('Nvidia');
       const amdGPUs = await TechPowerUpAPI.getGPUs('AMD');
-      
+
       // 2. Get from Geekbench (for benchmark data)
       console.log('📥 Fetching from Geekbench API...');
       const cpuBenchmarks = await GeekbenchAPI.getTopCPUScores('multicore');
       const gpuBenchmarks = await GeekbenchAPI.getGPUBenchmarks();
-      
+
       // 3. Scrape TechPowerUp for historical data
       console.log('📥 Scraping TechPowerUp for historical data...');
       const intelHistorical = await TechPowerUpScraper.scrapeCPUSpecs('intel');
       const amdHistorical = await TechPowerUpScraper.scrapeCPUSpecs('amd');
       const gpuHistorical = await TechPowerUpScraper.scrapeGPUSpecs();
-      
+
       // 4. Get pricing & market data from Passmark
       console.log('📥 Scraping Passmark for pricing & market data...');
       const cpuMarketData = await PassmarkScraper.getCPUBenchmarks();
       const gpuMarketData = await PassmarkScraper.getGPUBenchmarks();
-      
+
       // 5. Merge and deduplicate data
       console.log('🔄 Merging and deduplicating data...');
       const mergedCPUs = this.mergeCPUData(
-        intelFromAPI, amdFromAPI, intelHistorical, amdHistorical, cpuBenchmarks, cpuMarketData
+        intelFromAPI,
+        amdFromAPI,
+        intelHistorical,
+        amdHistorical,
+        cpuBenchmarks,
+        cpuMarketData,
       );
       const mergedGPUs = this.mergeGPUData(
-        nvidiaGPUs, amdGPUs, gpuHistorical, gpuBenchmarks, gpuMarketData
+        nvidiaGPUs,
+        amdGPUs,
+        gpuHistorical,
+        gpuBenchmarks,
+        gpuMarketData,
       );
-      
+
       // 6. Store in database
       console.log('💾 Storing in database...');
       await this.storeProcessorsInDB(mergedCPUs, mergedGPUs);
-      
+
       // 7. Cache in Redis
       console.log('⚡ Caching in Redis...');
       await this.cacheProcessorData(mergedCPUs, mergedGPUs);
-      
+
       console.log('✅ Data collection complete!');
       return {
         cpuCount: mergedCPUs.length,
         gpuCount: mergedGPUs.length,
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
       };
-      
     } catch (error) {
       console.error('❌ Data collection failed:', error.message);
       throw error;
@@ -611,54 +629,50 @@ class DataCollectionService {
    */
   static mergeCPUData(apiIntel, apiAMD, histIntel, histAMD, benchmarks, marketData) {
     const cpus = new Map();
-    
+
     // Start with API data (most authoritative)
-    [...apiIntel, ...apiAMD].forEach(cpu => {
+    [...apiIntel, ...apiAMD].forEach((cpu) => {
       const key = `${cpu.manufacturer}-${cpu.model}`.toLowerCase();
       cpus.set(key, {
         ...cpu,
         source: 'api',
-        dataQuality: 95
+        dataQuality: 95,
       });
     });
-    
+
     // Add historical/missing data from scraper
-    [...histIntel, ...histAMD].forEach(cpu => {
+    [...histIntel, ...histAMD].forEach((cpu) => {
       const key = `${cpu.manufacturer}-${cpu.model}`.toLowerCase();
       if (!cpus.has(key)) {
         cpus.set(key, {
           ...cpu,
           source: 'scraper',
-          dataQuality: 85
+          dataQuality: 85,
         });
       }
     });
-    
+
     // Enrich with benchmark scores
-    benchmarks.forEach(bench => {
+    benchmarks.forEach((bench) => {
       const key = bench.processor_model.toLowerCase();
-      const cpu = Array.from(cpus.values()).find(c => 
-        c.model.toLowerCase().includes(key)
-      );
+      const cpu = Array.from(cpus.values()).find((c) => c.model.toLowerCase().includes(key));
       if (cpu) {
         cpu.benchmarkScore = bench.score;
         cpu.benchmarkSingleCore = bench.single_core_score;
         cpu.benchmarkMultiCore = bench.multi_core_score;
       }
     });
-    
+
     // Add market data (pricing, sentiment)
-    marketData.forEach(market => {
+    marketData.forEach((market) => {
       const key = market.name.toLowerCase();
-      const cpu = Array.from(cpus.values()).find(c => 
-        c.model.toLowerCase().includes(key)
-      );
+      const cpu = Array.from(cpus.values()).find((c) => c.model.toLowerCase().includes(key));
       if (cpu) {
         cpu.benchmarkScore = market.score;
         cpu.priceUSD = market.price ? parseFloat(market.price) : null;
       }
     });
-    
+
     return Array.from(cpus.values());
   }
 
@@ -667,52 +681,48 @@ class DataCollectionService {
    */
   static mergeGPUData(apiNvidia, apiAMD, histGPU, benchmarks, marketData) {
     const gpus = new Map();
-    
+
     // API data first
-    [...apiNvidia, ...apiAMD].forEach(gpu => {
+    [...apiNvidia, ...apiAMD].forEach((gpu) => {
       const key = `${gpu.manufacturer}-${gpu.model}`.toLowerCase();
       gpus.set(key, {
         ...gpu,
         source: 'api',
-        dataQuality: 95
+        dataQuality: 95,
       });
     });
-    
+
     // Add historical
-    histGPU.forEach(gpu => {
+    histGPU.forEach((gpu) => {
       const key = `${gpu.manufacturer}-${gpu.model}`.toLowerCase();
       if (!gpus.has(key)) {
         gpus.set(key, {
           ...gpu,
           source: 'scraper',
-          dataQuality: 85
+          dataQuality: 85,
         });
       }
     });
-    
+
     // Enrich with benchmarks
-    benchmarks.forEach(bench => {
+    benchmarks.forEach((bench) => {
       const key = bench.name.toLowerCase();
-      const gpu = Array.from(gpus.values()).find(g => 
-        g.model.toLowerCase().includes(key)
-      );
+      const gpu = Array.from(gpus.values()).find((g) => g.model.toLowerCase().includes(key));
       if (gpu) {
         gpu.benchmarkScore = bench.score;
       }
     });
-    
+
     // Add market data
-    marketData.forEach(market => {
+    marketData.forEach((market) => {
       const key = market.name.toLowerCase();
-      const gpu = Array.from(gpus.values()).find(g => 
-        g.model.toLowerCase().includes(key)
-      );
+      const gpu = Array.from(gpus.values()).find((g) => g.model.toLowerCase().includes(key));
       if (gpu) {
         gpu.benchmarkScore = market.score;
         gpu.priceUSD = market.price ? parseFloat(market.price) : null;
       }
     });
-    
+
     return Array.from(gpus.values());
   }
 
@@ -723,8 +733,8 @@ class DataCollectionService {
     // Store CPUs
     for (const cpu of cpus) {
       await prisma.processor.upsert({
-        where: { 
-          unique_key: `${cpu.manufacturer}-${cpu.model}` 
+        where: {
+          unique_key: `${cpu.manufacturer}-${cpu.model}`,
         },
         create: {
           type: 'CPU',
@@ -740,22 +750,22 @@ class DataCollectionService {
           processNm: cpu.processNm,
           benchmarkScore: cpu.benchmarkScore,
           currentPrice: cpu.priceUSD,
-          dataQualityScore: cpu.dataQuality
+          dataQualityScore: cpu.dataQuality,
         },
         update: {
           benchmarkScore: cpu.benchmarkScore,
           currentPrice: cpu.priceUSD,
           dataQualityScore: cpu.dataQuality,
-          updatedAt: new Date()
-        }
+          updatedAt: new Date(),
+        },
       });
     }
-    
+
     // Store GPUs
     for (const gpu of gpus) {
       await prisma.processor.upsert({
-        where: { 
-          unique_key: `${gpu.manufacturer}-${gpu.model}` 
+        where: {
+          unique_key: `${gpu.manufacturer}-${gpu.model}`,
         },
         create: {
           type: 'GPU',
@@ -769,14 +779,14 @@ class DataCollectionService {
           tdp: gpu.tdp,
           benchmarkScore: gpu.benchmarkScore,
           currentPrice: gpu.priceUSD,
-          dataQualityScore: gpu.dataQuality
+          dataQualityScore: gpu.dataQuality,
         },
         update: {
           benchmarkScore: gpu.benchmarkScore,
           currentPrice: gpu.priceUSD,
           dataQualityScore: gpu.dataQuality,
-          updatedAt: new Date()
-        }
+          updatedAt: new Date(),
+        },
       });
     }
   }
@@ -788,20 +798,20 @@ class DataCollectionService {
     // Cache by type
     await redis.set('processors:cpu:all', JSON.stringify(cpus), { EX: 86400 });
     await redis.set('processors:gpu:all', JSON.stringify(gpus), { EX: 86400 });
-    
+
     // Cache by manufacturer
-    const intelCPUs = cpus.filter(c => c.manufacturer === 'Intel');
-    const amdCPUs = cpus.filter(c => c.manufacturer === 'AMD');
-    
+    const intelCPUs = cpus.filter((c) => c.manufacturer === 'Intel');
+    const amdCPUs = cpus.filter((c) => c.manufacturer === 'AMD');
+
     await redis.set('processors:cpu:intel', JSON.stringify(intelCPUs), { EX: 86400 });
     await redis.set('processors:cpu:amd', JSON.stringify(amdCPUs), { EX: 86400 });
-    
+
     // Cache search index
     const searchIndex = {
-      cpus: cpus.map(c => ({ id: c.id, name: c.modelName, type: 'CPU' })),
-      gpus: gpus.map(g => ({ id: g.id, name: g.modelName, type: 'GPU' }))
+      cpus: cpus.map((c) => ({ id: c.id, name: c.modelName, type: 'CPU' })),
+      gpus: gpus.map((g) => ({ id: g.id, name: g.modelName, type: 'GPU' })),
     };
-    
+
     await redis.set('search:index', JSON.stringify(searchIndex), { EX: 604800 });
   }
 }
@@ -818,8 +828,8 @@ import DataCollectionService from './services/dataCollectionService.js';
 const dataCollectionQueue = new Queue('data-collection', {
   redis: {
     host: process.env.REDIS_HOST,
-    port: process.env.REDIS_PORT
-  }
+    port: process.env.REDIS_PORT,
+  },
 });
 
 // Run every 6 hours
@@ -829,11 +839,14 @@ dataCollectionQueue.process(async (job) => {
 });
 
 // Schedule job
-dataCollectionQueue.add({}, {
-  repeat: {
-    cron: '0 */6 * * *' // Every 6 hours
-  }
-});
+dataCollectionQueue.add(
+  {},
+  {
+    repeat: {
+      cron: '0 */6 * * *', // Every 6 hours
+    },
+  },
+);
 
 export default dataCollectionQueue;
 ```
@@ -958,24 +971,28 @@ export default dataCollectionQueue;
 ## 5. RECOMMENDED IMPLEMENTATION ROADMAP
 
 ### Phase 1: MVP (Week 1-2)
+
 1. ✅ Integrate Geekbench API (benchmark data)
 2. ✅ Create static JSON database (initial processor list)
 3. ✅ Build basic specs viewer & search
 4. ✅ Simple comparison engine
 
 ### Phase 2: Enhanced Data (Week 3-4)
+
 1. ✅ Add TechPowerUp web scraper
 2. ✅ Implement PostgreSQL database
 3. ✅ Setup Redis caching
 4. ✅ Improve specs completeness
 
 ### Phase 3: Market Integration (Week 5-6)
+
 1. ✅ Add Passmark scraper (pricing, market sentiment)
 2. ✅ Price-to-performance calculator
 3. ✅ Market trend analysis
 4. ✅ Scheduled data updates (Bull queue)
 
 ### Phase 4: Advanced Features (Week 7-8)
+
 1. ✅ Bottleneck calculator with real data
 2. ✅ Community sentiment analysis
 3. ✅ Build recommendations engine
@@ -992,7 +1009,7 @@ import RateLimit from 'express-rate-limit';
 const apiLimiter = RateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
   max: 100, // Limit each IP to 100 requests per windowMs
-  message: 'Too many requests, please try again later'
+  message: 'Too many requests, please try again later',
 });
 
 // Scraper rate limiting (be respectful!)
@@ -1000,7 +1017,7 @@ const scraperConfig = {
   delayBetweenRequests: 1000, // 1 second between requests
   userAgent: 'CGPU-MAX/1.0 (Data Collection Bot)',
   respectRobotsTxt: true,
-  maxConcurrent: 2 // Only 2 concurrent requests
+  maxConcurrent: 2, // Only 2 concurrent requests
 };
 
 // API call wrapper with retry logic
@@ -1010,10 +1027,10 @@ async function callAPIWithRetry(apiCall, maxRetries = 3) {
       return await apiCall();
     } catch (error) {
       if (attempt === maxRetries) throw error;
-      
+
       const delayMs = Math.pow(2, attempt) * 1000; // Exponential backoff
       console.log(`Retry ${attempt}/${maxRetries} after ${delayMs}ms`);
-      await new Promise(resolve => setTimeout(resolve, delayMs));
+      await new Promise((resolve) => setTimeout(resolve, delayMs));
     }
   }
 }
@@ -1025,14 +1042,14 @@ export { apiLimiter, scraperConfig, callAPIWithRetry };
 
 ## 7. COMPARISON TABLE: DATA SOURCES
 
-| Sumber | Tipe Data | Update | Cakupan | Auth | Kualitas | Saran |
-|--------|-----------|--------|---------|------|----------|-------|
-| **Geekbench API** | Benchmark | Real-time | Lengkap | ❌ | ⭐⭐⭐⭐⭐ | Prioritas 1 |
-| **TechPowerUp API** | Specs | Daily | Comprehensive | ❌ | ⭐⭐⭐⭐⭐ | Prioritas 1 |
-| **TechPowerUp Scraper** | Specs | Daily | Historical | ❌ | ⭐⭐⭐⭐ | Prioritas 2 |
-| **Passmark** | Benchmark + Price | Daily | 1M+ procs | ❌ | ⭐⭐⭐ | Prioritas 3 |
-| **UserBenchmark** | Benchmark | Real-time | User-based | ❌ | ⭐⭐⭐ | Prioritas 3 |
-| **Local JSON** | Static | Manual | Limited | ❌ | ⭐⭐ | Backup only |
+| Sumber                  | Tipe Data         | Update    | Cakupan       | Auth | Kualitas   | Saran       |
+| ----------------------- | ----------------- | --------- | ------------- | ---- | ---------- | ----------- |
+| **Geekbench API**       | Benchmark         | Real-time | Lengkap       | ❌   | ⭐⭐⭐⭐⭐ | Prioritas 1 |
+| **TechPowerUp API**     | Specs             | Daily     | Comprehensive | ❌   | ⭐⭐⭐⭐⭐ | Prioritas 1 |
+| **TechPowerUp Scraper** | Specs             | Daily     | Historical    | ❌   | ⭐⭐⭐⭐   | Prioritas 2 |
+| **Passmark**            | Benchmark + Price | Daily     | 1M+ procs     | ❌   | ⭐⭐⭐     | Prioritas 3 |
+| **UserBenchmark**       | Benchmark         | Real-time | User-based    | ❌   | ⭐⭐⭐     | Prioritas 3 |
+| **Local JSON**          | Static            | Manual    | Limited       | ❌   | ⭐⭐       | Backup only |
 
 ---
 

@@ -64,7 +64,9 @@ export class GamingOptimizer {
     // CPU sets a frame ceiling that matters most at low resolution / esports.
     const cpuCeiling =
       cpuPower !== null
-        ? baseHigh * (cpuPower / 100) * (resolution === '1080p' ? 1.5 : resolution === '1440p' ? 2.0 : 3.0)
+        ? baseHigh *
+          (cpuPower / 100) *
+          (resolution === '1080p' ? 1.5 : resolution === '1440p' ? 2.0 : 3.0)
         : Infinity;
 
     const presets: PresetFps[] = PRESETS.map((preset) => {
@@ -75,7 +77,9 @@ export class GamingOptimizer {
 
     const cpuLimited =
       cpuPower !== null &&
-      presets.some((p) => baseHigh * (gpuPower / 100) * PRESET_MULTIPLIER[p.preset] > cpuCeiling + 1);
+      presets.some(
+        (p) => baseHigh * (gpuPower / 100) * PRESET_MULTIPLIER[p.preset] > cpuCeiling + 1,
+      );
 
     return {
       gpuPower,

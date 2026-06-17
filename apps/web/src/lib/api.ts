@@ -17,10 +17,7 @@ export interface ListProcessorsQuery {
   offset?: number;
 }
 
-function buildUrl(
-  path: string,
-  params?: Record<string, string | number | undefined>,
-): string {
+function buildUrl(path: string, params?: Record<string, string | number | undefined>): string {
   const url = new URL(`${API_BASE_URL}${path}`);
   for (const [k, v] of Object.entries(params ?? {})) {
     if (v !== undefined && v !== '') url.searchParams.set(k, String(v));

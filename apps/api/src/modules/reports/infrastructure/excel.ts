@@ -17,7 +17,9 @@ export async function renderComparisonXlsx(data: ComparisonReportData): Promise<
   ws.addRow([`${BRAND} — Comparison Report`]);
   ws.getRow(1).font = { bold: true, size: 16 };
   ws.addRow([`${data.a.modelName}  vs  ${data.b.modelName}`]);
-  ws.addRow([`Generated ${new Date(data.generatedAt).toUTCString()} · algorithm ${data.algorithmVersion}`]);
+  ws.addRow([
+    `Generated ${new Date(data.generatedAt).toUTCString()} · algorithm ${data.algorithmVersion}`,
+  ]);
   ws.addRow([]);
 
   const header = ws.addRow(['Metric', data.a.modelName, data.b.modelName, 'Winner', 'Delta %']);

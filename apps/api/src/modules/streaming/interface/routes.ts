@@ -1,7 +1,6 @@
+import type { Manufacturer } from '@cgpu-max/types';
 import { Router } from 'express';
 import { z } from 'zod';
-
-import type { Manufacturer } from '@cgpu-max/types';
 
 import { requireAuth } from '../../../shared/auth/middleware.js';
 import { requireFeature } from '../../../shared/auth/requireFeature.js';

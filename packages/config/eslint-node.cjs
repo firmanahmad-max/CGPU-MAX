@@ -3,6 +3,8 @@ module.exports = {
   extends: [require.resolve('./eslint-base.cjs')],
   env: { node: true, es2022: true },
   rules: {
-    'no-process-exit': 'error',
+    // Service/CLI entrypoints legitimately call process.exit() with explicit
+    // exit codes in bootstrap and signal-shutdown handlers.
+    'no-process-exit': 'off',
   },
 };

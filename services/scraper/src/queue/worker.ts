@@ -21,9 +21,7 @@ export function startWorker(): Worker {
   );
 
   worker.on('completed', (job) => logger.info({ jobId: job.id }, 'Pipeline job completed'));
-  worker.on('failed', (job, err) =>
-    logger.error({ jobId: job?.id, err }, 'Pipeline job failed'),
-  );
+  worker.on('failed', (job, err) => logger.error({ jobId: job?.id, err }, 'Pipeline job failed'));
 
   return worker;
 }

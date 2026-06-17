@@ -35,18 +35,21 @@ export default function BottleneckPage() {
       <div className="mb-10 flex items-end justify-between">
         <div>
           <p className="label">Calculator</p>
-          <h1 className="mt-2 font-display text-4xl font-semibold tracking-tight text-white">
+          <h1 className="font-display mt-2 text-4xl font-semibold tracking-tight text-white">
             Bottleneck Analysis
           </h1>
           <p className="mt-2 max-w-2xl text-sm text-slate-400">
-            Pair a CPU with a GPU to see balance across resolutions and game profiles.
-            Algorithm is deterministic and the weights are auditable in
+            Pair a CPU with a GPU to see balance across resolutions and game profiles. Algorithm is
+            deterministic and the weights are auditable in
             <code className="ml-1 font-mono text-xs text-slate-300">
               apps/api/src/modules/bottleneck/domain/BottleneckAlgorithm.ts
-            </code>.
+            </code>
+            .
           </p>
         </div>
-        <Link href="/" className="text-sm text-slate-400 hover:text-white">← Back</Link>
+        <Link href="/" className="text-sm text-slate-400 hover:text-white">
+          ← Back
+        </Link>
       </div>
 
       <div className="grid gap-6 sm:grid-cols-2">
@@ -59,11 +62,11 @@ export default function BottleneckPage() {
           type="button"
           onClick={onCalculate}
           disabled={!canCalculate || loading}
-          className="rounded-sm border border-accent-purple bg-accent-purple/20 px-6 py-2 text-sm font-semibold text-white transition hover:bg-accent-purple/30 disabled:cursor-not-allowed disabled:opacity-40"
+          className="border-accent-purple bg-accent-purple/20 hover:bg-accent-purple/30 rounded-sm border px-6 py-2 text-sm font-semibold text-white transition disabled:cursor-not-allowed disabled:opacity-40"
         >
           {loading ? 'Analyzing…' : 'Analyze bottleneck'}
         </button>
-        {error && <p className="text-sm text-state-danger">{error}</p>}
+        {error && <p className="text-state-danger text-sm">{error}</p>}
       </div>
 
       {result && <BottleneckResult result={result} />}

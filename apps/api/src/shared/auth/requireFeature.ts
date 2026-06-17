@@ -15,12 +15,9 @@ export function requireFeature(feature: FeatureFlag): RequestHandler {
     const limits = getLimits(req.auth.tier);
     if (!limits.features[feature]) {
       return next(
-        new AppError(
-          'FEATURE_NOT_IN_TIER',
-          `"${feature}" requires an upgraded plan`,
-          402,
-          { details: { feature, tier: req.auth.tier, upgradeTo: 'PRO' } },
-        ),
+        new AppError('FEATURE_NOT_IN_TIER', `"${feature}" requires an upgraded plan`, 402, {
+          details: { feature, tier: req.auth.tier, upgradeTo: 'PRO' },
+        }),
       );
     }
     return next();

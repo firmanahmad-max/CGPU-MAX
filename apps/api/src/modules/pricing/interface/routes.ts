@@ -6,12 +6,7 @@ import { prisma } from '../../../shared/persistence/prisma.js';
 import { GetPriceHistory } from '../application/GetPriceHistory.js';
 import { ManagePriceAlerts } from '../application/ManagePriceAlerts.js';
 
-import {
-  alertIdParam,
-  createAlertBody,
-  historyQuery,
-  slugParam,
-} from './validators.js';
+import { alertIdParam, createAlertBody, historyQuery, slugParam } from './validators.js';
 
 const history = new GetPriceHistory(prisma);
 const alerts = new ManagePriceAlerts(prisma);
@@ -30,13 +25,18 @@ pricingRouter.get('/history/:slug', async (req, res, next) => {
 });
 
 // Alerts are a Pro feature.
-pricingRouter.get('/alerts', requireAuth, requireFeature('priceTracking'), async (req, res, next) => {
-  try {
-    res.json({ alerts: await alerts.list(req.auth!) });
-  } catch (err) {
-    next(err);
-  }
-});
+pricingRouter.get(
+  '/alerts',
+  requireAuth,
+  requireFeature('priceTracking'),
+  async (req, res, next) => {
+    try {
+      res.json({ alerts: await alerts.list(req.auth!) });
+    } catch (err) {
+      next(err);
+    }
+  },
+);
 
 pricingRouter.post(
   '/alerts',

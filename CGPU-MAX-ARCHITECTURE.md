@@ -1,4 +1,5 @@
 # CGPU-MAX: CPU/GPU Comparison Application
+
 ## Complete Architecture & Implementation Guide
 
 ---
@@ -9,6 +10,7 @@
 **Purpose:** Comprehensive CPU/GPU specification viewer & comparator  
 **Target Users:** Tech enthusiasts, PC builders, gamers, system administrators  
 **Key Features:**
+
 - CPU/GPU specification database (Intel, AMD, Nvidia)
 - Side-by-side comparison engine
 - Bottleneck calculator
@@ -66,6 +68,7 @@
 ## 3. RECOMMENDED TECH STACK
 
 ### Frontend
+
 ```
 ├── Framework: Next.js 14+ (React 18+)
 ├── UI Library: Tailwind CSS + shadcn/ui
@@ -77,6 +80,7 @@
 ```
 
 ### Backend
+
 ```
 ├── Runtime: Node.js (LTS)
 ├── Framework: Express.js / Fastify / Hono
@@ -88,6 +92,7 @@
 ```
 
 ### Data Sources
+
 ```
 ├── CPU/GPU Specs: Internal JSON + TechPowerUp Scraper
 ├── Benchmarks: CPU-Z, Geekbench, 3DMark (API/scraper)
@@ -103,6 +108,7 @@
 ### Core Tables
 
 #### `processors` (CPU/GPU)
+
 ```sql
 CREATE TABLE processors (
   id UUID PRIMARY KEY,
@@ -112,7 +118,7 @@ CREATE TABLE processors (
   code_name VARCHAR(100),
   generation INT,
   release_date DATE,
-  
+
   -- Core Specs
   cores INT,
   threads INT,
@@ -122,25 +128,25 @@ CREATE TABLE processors (
   tdp INT,
   architecture VARCHAR(100),
   process_nm INT,
-  
+
   -- GPU Specific
   vram_gb INT,
   vram_type VARCHAR(50),
   memory_bandwidth INT,
   shader_units INT,
-  
+
   -- Pricing & Market
   msrp_usd DECIMAL(10,2),
   current_price_usd DECIMAL(10,2),
   price_updated_at TIMESTAMP,
   market_sentiment DECIMAL(3,2), -- 0-5 score
   sentiment_sources INT,
-  
+
   -- Metadata
   created_at TIMESTAMP,
   updated_at TIMESTAMP,
   data_quality_score INT, -- 0-100
-  
+
   UNIQUE(manufacturer, model_name, generation)
 );
 
@@ -149,6 +155,7 @@ CREATE INDEX idx_model_search ON processors USING GIN(model_name gin_trgm_ops);
 ```
 
 #### `benchmarks`
+
 ```sql
 CREATE TABLE benchmarks (
   id UUID PRIMARY KEY,
@@ -160,7 +167,7 @@ CREATE TABLE benchmarks (
   percentile INT,
   tested_at DATE,
   source_url TEXT,
-  
+
   UNIQUE(processor_id, benchmark_type, workload),
   FOREIGN KEY(processor_id) REFERENCES processors(id)
 );
@@ -169,6 +176,7 @@ CREATE INDEX idx_processor_benchmark ON benchmarks(processor_id, benchmark_type)
 ```
 
 #### `market_data`
+
 ```sql
 CREATE TABLE market_data (
   id UUID PRIMARY KEY,
@@ -178,7 +186,7 @@ CREATE TABLE market_data (
   retailer VARCHAR(100),
   url TEXT,
   recorded_at TIMESTAMP,
-  
+
   FOREIGN KEY(processor_id) REFERENCES processors(id)
 );
 
@@ -186,6 +194,7 @@ CREATE INDEX idx_processor_market ON market_data(processor_id, recorded_at DESC)
 ```
 
 #### `comparisons`
+
 ```sql
 CREATE TABLE comparisons (
   id UUID PRIMARY KEY,
@@ -197,7 +206,7 @@ CREATE TABLE comparisons (
   bottleneck_percentage INT,
   created_at TIMESTAMP,
   view_count INT DEFAULT 0,
-  
+
   UNIQUE(processor_1_id, processor_2_id)
 );
 ```
@@ -441,35 +450,35 @@ src/
  */
 
 class BottleneckCalculator {
-  
+
   calculate(cpu: Processor, gpu: Processor, resolution: string): BottleneckResult {
     // Normalisasi scores
     const cpuPerformance = this.normalizeCPUPerformance(cpu);
     const gpuPerformance = this.normalizeGPUPerformance(gpu);
-    
+
     // Faktor resolusi
     const resolutionFactor = {
       '1080p': 1.0,
       '1440p': 1.3,
       '4k': 1.8
     }[resolution];
-    
+
     // Hitung adjusted GPU performance
     const adjustedGPUPerformance = gpuPerformance * resolutionFactor;
-    
+
     // Calculate bottleneck
     const bottleneckPercentage = this.calculateBottleneck(
       cpuPerformance,
       adjustedGPUPerformance
     );
-    
+
     // Determine limiting component
-    const limitingComponent = bottleneckPercentage > 10 
-      ? 'CPU' 
-      : bottleneckPercentage < -10 
-      ? 'GPU' 
+    const limitingComponent = bottleneckPercentage > 10
+      ? 'CPU'
+      : bottleneckPercentage < -10
+      ? 'GPU'
       : 'Balanced';
-    
+
     return {
       bottleneckPercentage: Math.abs(bottleneckPercentage),
       limitingComponent,
@@ -477,28 +486,28 @@ class BottleneckCalculator {
       recommendations: this.getRecommendations(bottleneckPercentage)
     };
   }
-  
+
   normalizeCPUPerformance(cpu: Processor): number {
     // Formula: (cores × base_clock + threads × boost_clock) / reference_value
     const coreScore = cpu.cores * cpu.base_clock;
     const boostScore = (cpu.threads - cpu.cores) * cpu.boost_clock;
     return (coreScore + boostScore) / 100; // Normalisasi
   }
-  
+
   normalizeGPUPerformance(gpu: Processor): number {
     // Formula: (shader_units × clock_speed × memory_bandwidth) / reference_value
     const computeScore = gpu.shader_units * gpu.boost_clock;
     const memoryScore = gpu.memory_bandwidth / 100;
     return (computeScore + memoryScore) / 1000;
   }
-  
+
   calculateBottleneck(cpuScore: number, gpuScore: number): number {
     // Jika GPU >> CPU, bottleneck positif (CPU menjadi hambatan)
     // Jika CPU >> GPU, bottleneck negatif (GPU menjadi hambatan)
     const ratio = (gpuScore - cpuScore) / cpuScore;
     return ratio * 100;
   }
-  
+
   getSeverity(percentage: number): string {
     if (percentage <= 5) return 'Optimal';
     if (percentage <= 10) return 'Minor';
@@ -513,13 +522,13 @@ class BottleneckCalculator {
 
 ```javascript
 class PerformanceScorer {
-  
+
   /**
    * Generate comprehensive performance score (0-100)
    */
   scoreProcessor(processor: Processor, category: 'gaming'|'productivity'|'workstation'): number {
     let score = 0;
-    
+
     if (category === 'gaming') {
       // GPU-centric scoring
       score += this.scoreGPUGaming(processor) * 0.5;
@@ -531,25 +540,25 @@ class PerformanceScorer {
       score += this.scoreMemory(processor) * 0.3;
       score += this.scorePower(processor) * 0.1;
     }
-    
+
     return Math.round(score);
   }
-  
+
   scoreCPUProductivity(cpu: Processor): number {
     // Threads × clock speed relative to top CPU
     const topThreadClock = 64 * 5.7; // Max known spec
     const threadClockScore = (cpu.threads * cpu.boost_clock) / topThreadClock;
-    
+
     const cacheScore = cpu.cache_l3 / 96; // Normalized to 96MB
-    
+
     return (threadClockScore * 0.7 + cacheScore * 0.3) * 100;
   }
-  
+
   scoreGPUGaming(gpu: Processor): number {
     // VRAM × shader units × clock speed
     const topGPUScore = 24 * 18176 * 2.5; // RTX 4090 specs
     const gpuScore = gpu.vram_gb * gpu.shader_units * gpu.boost_clock;
-    
+
     return (gpuScore / topGPUScore) * 100;
   }
 }
@@ -559,22 +568,22 @@ class PerformanceScorer {
 
 ```javascript
 class PricePerformanceCalculator {
-  
+
   calculate(processor: Processor, performanceScore: number): number {
     // $ per performance point
     if (!processor.current_price_usd || processor.current_price_usd === 0) {
       return null;
     }
-    
+
     return (processor.current_price_usd / performanceScore).toFixed(2);
   }
-  
+
   getValueRating(processor: Processor, performanceScore: number, category: string): string {
     const ppp = this.calculate(processor, performanceScore);
-    
+
     // Bandingkan dengan average dalam kategori
     const categoryAverage = this.getCategoryAverage(category);
-    
+
     if (ppp < categoryAverage * 0.8) return 'Excellent';
     if (ppp < categoryAverage) return 'Good';
     if (ppp < categoryAverage * 1.2) return 'Average';
@@ -594,32 +603,32 @@ const cacheConfig = {
   // Specs: update monthly
   'processor:*': {
     ttl: 2592000, // 30 days
-    tags: ['processor', 'specs']
+    tags: ['processor', 'specs'],
   },
-  
+
   // Benchmarks: update weekly
   'benchmark:*': {
     ttl: 604800, // 7 days
-    tags: ['benchmark']
+    tags: ['benchmark'],
   },
-  
+
   // Market data: update daily
   'market:*': {
     ttl: 86400, // 24 hours
-    tags: ['market']
+    tags: ['market'],
   },
-  
+
   // Comparisons: cache user searches for 12 hours
   'comparison:*': {
     ttl: 43200, // 12 hours
-    tags: ['comparison']
+    tags: ['comparison'],
   },
-  
+
   // Search index: update weekly
   'search:index': {
     ttl: 604800,
-    tags: ['search']
-  }
+    tags: ['search'],
+  },
 };
 ```
 
@@ -628,24 +637,28 @@ const cacheConfig = {
 ## 9. ADVANCED FEATURES ROADMAP
 
 ### Phase 1 (MVP)
+
 - ✅ CPU/GPU specs viewer
 - ✅ Basic comparison
 - ✅ Bottleneck calculator (simple formula)
 - ✅ Dashboard
 
 ### Phase 2 (Q2)
+
 - Build recommendations engine
 - Market sentiment analysis
 - Price history tracking
 - Advanced filtering
 
 ### Phase 3 (Q3)
+
 - User accounts & saved comparisons
 - Custom benchmark suite
 - AI-powered recommendations
 - API for third-party integrations
 
 ### Phase 4 (Q4)
+
 - Real-time stock tracking
 - Community reviews & ratings
 - Thermal analysis
@@ -684,7 +697,7 @@ services:
   frontend:
     build: ./frontend
     ports:
-      - "3000:3000"
+      - '3000:3000'
     environment:
       - NEXT_PUBLIC_API_URL=http://backend:3001
     depends_on:
@@ -693,7 +706,7 @@ services:
   backend:
     build: ./backend
     ports:
-      - "3001:3001"
+      - '3001:3001'
     environment:
       - DATABASE_URL=postgresql://user:pass@postgres:5432/cgpu_max
       - REDIS_URL=redis://redis:6379
@@ -712,7 +725,7 @@ services:
   redis:
     image: redis:7-alpine
     ports:
-      - "6379:6379"
+      - '6379:6379'
 
 volumes:
   postgres_data:
@@ -833,4 +846,3 @@ Metrics to Track:
 **Last Updated:** May 2026  
 **Status:** Ready for Implementation  
 **Estimated Dev Time:** 8-12 weeks (MVP)
-

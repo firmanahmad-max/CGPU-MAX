@@ -69,14 +69,14 @@ export default function AccountPage() {
       <main className="mx-auto max-w-4xl px-6 py-12">
         <header className="mb-10">
           <p className="label">Account</p>
-          <h1 className="mt-2 font-display text-4xl font-semibold tracking-tight text-white">
+          <h1 className="font-display mt-2 text-4xl font-semibold tracking-tight text-white">
             {user?.firstName ?? user?.username ?? 'Your'} dashboard
           </h1>
           <p className="mt-2 text-sm text-slate-400">{user?.primaryEmailAddress?.emailAddress}</p>
         </header>
 
         {error && (
-          <div className="card mb-6 border-state-danger/40 bg-state-danger/10 text-sm text-state-danger">
+          <div className="card border-state-danger/40 bg-state-danger/10 text-state-danger mb-6 text-sm">
             {error}
           </div>
         )}
@@ -87,9 +87,7 @@ export default function AccountPage() {
               <div className="mb-4 flex items-center justify-between">
                 <div>
                   <p className="label">Current plan</p>
-                  <p className="mt-2 font-display text-3xl font-semibold text-white">
-                    {data.tier}
-                  </p>
+                  <p className="font-display mt-2 text-3xl font-semibold text-white">{data.tier}</p>
                 </div>
                 <Pill variant={data.tier === 'PRO' ? 'intel' : 'default'}>
                   {data.subscription?.status ?? 'No active subscription'}
@@ -97,9 +95,8 @@ export default function AccountPage() {
               </div>
               {data.subscription && (
                 <p className="text-sm text-slate-400">
-                  Renews{' '}
-                  {new Date(data.subscription.currentPeriodEnd).toLocaleDateString()} · billed{' '}
-                  {data.subscription.interval.toLowerCase()}
+                  Renews {new Date(data.subscription.currentPeriodEnd).toLocaleDateString()} ·
+                  billed {data.subscription.interval.toLowerCase()}
                   {data.subscription.cancelAtPeriodEnd && ' · cancels at period end'}
                 </p>
               )}
@@ -116,7 +113,7 @@ export default function AccountPage() {
                 ) : (
                   <a
                     href="/pricing"
-                    className="rounded-sm border border-accent-blue bg-accent-blue/20 px-4 py-2 text-sm font-semibold text-white transition hover:bg-accent-blue/30"
+                    className="border-accent-blue bg-accent-blue/20 hover:bg-accent-blue/30 rounded-sm border px-4 py-2 text-sm font-semibold text-white transition"
                   >
                     Upgrade to Pro
                   </a>
@@ -176,7 +173,7 @@ function UsageRow({ label, used, limit }: { label: string; used: number; limit: 
       </div>
       <div className="h-1.5 overflow-hidden rounded-full bg-white/5">
         <div
-          className="h-full rounded-full bg-accent-blue transition-all"
+          className="bg-accent-blue h-full rounded-full transition-all"
           style={{ width: `${pct}%` }}
         />
       </div>

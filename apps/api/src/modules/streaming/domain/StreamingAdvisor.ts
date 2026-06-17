@@ -49,13 +49,15 @@ export function recommendEncoder(gpuManufacturer: Manufacturer | null): EncoderC
       return {
         encoder: 'AMF',
         hardware: true,
-        reason: 'AMD AMF/VCE hardware encoding frees the CPU; use the latest drivers for best quality.',
+        reason:
+          'AMD AMF/VCE hardware encoding frees the CPU; use the latest drivers for best quality.',
       };
     case 'INTEL':
       return {
         encoder: 'QuickSync',
         hardware: true,
-        reason: 'Intel Quick Sync provides efficient hardware encoding, ideal for single-PC setups.',
+        reason:
+          'Intel Quick Sync provides efficient hardware encoding, ideal for single-PC setups.',
       };
     default:
       return {

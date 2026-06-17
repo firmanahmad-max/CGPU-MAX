@@ -74,16 +74,16 @@ pnpm dev
 
 ### Scripts
 
-| Command | What |
-|---|---|
-| `pnpm dev` | Run all apps in watch mode (Turbo) |
-| `pnpm build` | Build all apps |
-| `pnpm lint` | ESLint across workspace |
-| `pnpm type-check` | TypeScript no-emit check |
-| `pnpm test` | Jest across workspace |
-| `pnpm format` | Prettier write |
-| `pnpm db:migrate` | Prisma migrate dev |
-| `pnpm db:seed` | Seed sample data |
+| Command           | What                               |
+| ----------------- | ---------------------------------- |
+| `pnpm dev`        | Run all apps in watch mode (Turbo) |
+| `pnpm build`      | Build all apps                     |
+| `pnpm lint`       | ESLint across workspace            |
+| `pnpm type-check` | TypeScript no-emit check           |
+| `pnpm test`       | Jest across workspace              |
+| `pnpm format`     | Prettier write                     |
+| `pnpm db:migrate` | Prisma migrate dev                 |
+| `pnpm db:seed`    | Seed sample data                   |
 
 ### Scraper
 
@@ -99,40 +99,40 @@ pnpm --filter @cgpu-max/scraper dev
 
 ### API endpoints (current)
 
-| Endpoint | Auth | Purpose |
-|---|---|---|
-| `GET /health` | — | Liveness + Postgres + Redis checks |
-| `GET /api/v1/processors` | optional | List w/ `type`, `manufacturer`, `search`, `limit`, `offset` |
-| `GET /api/v1/processors/:slug` | optional | Detail |
-| `POST /api/v1/comparisons` | optional | `{ aSlug, bSlug, persist? }` → side-by-side analysis; counted against monthly FREE quota when authenticated |
-| `GET /api/v1/comparisons/:shareSlug` | optional | Saved comparison retrieval |
-| `POST /api/v1/bottleneck/calculate` | optional | `{ cpuSlug, gpuSlug, persist? }` → 12-scenario matrix |
-| `GET /api/v1/bottleneck/:shareSlug` | optional | Saved bottleneck retrieval |
-| `GET /api/v1/subscriptions/tiers` | — | Public tier limits table |
-| `GET /api/v1/subscriptions/me` | required | Current tier, active subscription, monthly usage |
-| `POST /api/v1/billing/checkout` | required | `{ plan: pro_monthly \| pro_yearly }` → Stripe Checkout URL |
-| `POST /api/v1/billing/portal` | required | Stripe Customer Portal URL |
-| `POST /api/v1/billing/webhook` | Stripe sig | Stripe event ingestion (idempotent) |
-| `POST /api/v1/advisor/build` | Pro | `{ budgetUsd, purpose, resolution, preferences? }` → Claude-generated CPU+GPU recommendation (counts against AI quota) |
-| `GET /api/v1/advisor/build/:shareSlug` | required | Owner's saved build |
-| `GET /api/v1/pricing/history/:slug` | optional | Price history (cached) |
-| `GET/POST/DELETE /api/v1/pricing/alerts` | Pro | Price-drop alerts |
-| `POST /api/v1/gaming/optimize` | Pro | Per-preset FPS prediction + settings |
-| `POST /api/v1/streaming/plan` | Pro | Encoder + bitrate/bandwidth plan |
-| `GET /api/v1/reports/{comparison,bottleneck}/:shareSlug?format=pdf\|xlsx` | Pro | PDF/Excel export |
-| `GET/POST/DELETE /api/v1/api-keys` | Enterprise | Manage API keys (dashboard, Clerk-authed) |
+| Endpoint                                                                  | Auth       | Purpose                                                                                                                |
+| ------------------------------------------------------------------------- | ---------- | ---------------------------------------------------------------------------------------------------------------------- |
+| `GET /health`                                                             | —          | Liveness + Postgres + Redis checks                                                                                     |
+| `GET /api/v1/processors`                                                  | optional   | List w/ `type`, `manufacturer`, `search`, `limit`, `offset`                                                            |
+| `GET /api/v1/processors/:slug`                                            | optional   | Detail                                                                                                                 |
+| `POST /api/v1/comparisons`                                                | optional   | `{ aSlug, bSlug, persist? }` → side-by-side analysis; counted against monthly FREE quota when authenticated            |
+| `GET /api/v1/comparisons/:shareSlug`                                      | optional   | Saved comparison retrieval                                                                                             |
+| `POST /api/v1/bottleneck/calculate`                                       | optional   | `{ cpuSlug, gpuSlug, persist? }` → 12-scenario matrix                                                                  |
+| `GET /api/v1/bottleneck/:shareSlug`                                       | optional   | Saved bottleneck retrieval                                                                                             |
+| `GET /api/v1/subscriptions/tiers`                                         | —          | Public tier limits table                                                                                               |
+| `GET /api/v1/subscriptions/me`                                            | required   | Current tier, active subscription, monthly usage                                                                       |
+| `POST /api/v1/billing/checkout`                                           | required   | `{ plan: pro_monthly \| pro_yearly }` → Stripe Checkout URL                                                            |
+| `POST /api/v1/billing/portal`                                             | required   | Stripe Customer Portal URL                                                                                             |
+| `POST /api/v1/billing/webhook`                                            | Stripe sig | Stripe event ingestion (idempotent)                                                                                    |
+| `POST /api/v1/advisor/build`                                              | Pro        | `{ budgetUsd, purpose, resolution, preferences? }` → Claude-generated CPU+GPU recommendation (counts against AI quota) |
+| `GET /api/v1/advisor/build/:shareSlug`                                    | required   | Owner's saved build                                                                                                    |
+| `GET /api/v1/pricing/history/:slug`                                       | optional   | Price history (cached)                                                                                                 |
+| `GET/POST/DELETE /api/v1/pricing/alerts`                                  | Pro        | Price-drop alerts                                                                                                      |
+| `POST /api/v1/gaming/optimize`                                            | Pro        | Per-preset FPS prediction + settings                                                                                   |
+| `POST /api/v1/streaming/plan`                                             | Pro        | Encoder + bitrate/bandwidth plan                                                                                       |
+| `GET /api/v1/reports/{comparison,bottleneck}/:shareSlug?format=pdf\|xlsx` | Pro        | PDF/Excel export                                                                                                       |
+| `GET/POST/DELETE /api/v1/api-keys`                                        | Enterprise | Manage API keys (dashboard, Clerk-authed)                                                                              |
 
 ### Public Enterprise API (API-key auth)
 
 Mounted at `/api/public/v1`, authenticated with `Authorization: Bearer cgpu_live_…`, gated to the Enterprise tier, rate-limited per key.
 
-| Endpoint | Purpose |
-|---|---|
-| `GET /api/public/v1/openapi.json` | OpenAPI 3.1 spec (public, no key) |
-| `GET /api/public/v1/processors` | List w/ filters |
-| `GET /api/public/v1/processors/:slug` | Detail |
-| `POST /api/public/v1/comparisons` | Compare |
-| `POST /api/public/v1/bottleneck/calculate` | Bottleneck matrix |
+| Endpoint                                   | Purpose                           |
+| ------------------------------------------ | --------------------------------- |
+| `GET /api/public/v1/openapi.json`          | OpenAPI 3.1 spec (public, no key) |
+| `GET /api/public/v1/processors`            | List w/ filters                   |
+| `GET /api/public/v1/processors/:slug`      | Detail                            |
+| `POST /api/public/v1/comparisons`          | Compare                           |
+| `POST /api/public/v1/bottleneck/calculate` | Bottleneck matrix                 |
 
 The official Node client lives in [`packages/sdk`](./packages/sdk) (`@cgpu-max/sdk`).
 

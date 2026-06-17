@@ -58,7 +58,7 @@ export function BottleneckGauge({ percentage, severity, label }: BottleneckGauge
         </p>
         <p className="label mt-1">{severity}</p>
       </div>
-      {label && <p className="mt-2 text-xs uppercase tracking-label text-slate-400">{label}</p>}
+      {label && <p className="tracking-label mt-2 text-xs uppercase text-slate-400">{label}</p>}
     </div>
   );
 }

@@ -11,12 +11,5 @@
     }
   },
   "include": ["src/**/*"],
-  "exclude": [
-    "node_modules",
-    "dist",
-    "coverage",
-    "**/*.test.ts",
-    "**/tests/**",
-    "**/__tests__/**"
-  ]
+  "exclude": ["node_modules", "dist", "coverage", "**/*.test.ts", "**/tests/**", "**/__tests__/**"]
 }

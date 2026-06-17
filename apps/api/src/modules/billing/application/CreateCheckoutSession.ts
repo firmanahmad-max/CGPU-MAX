@@ -1,7 +1,7 @@
 import type { PrismaClient } from '@prisma/client';
 
-import { AppError } from '../../../shared/errors/AppError.js';
 import { env } from '../../../shared/config/env.js';
+import { AppError } from '../../../shared/errors/AppError.js';
 import { stripe } from '../domain/StripeClient.js';
 
 export type CheckoutPlan = 'pro_monthly' | 'pro_yearly';

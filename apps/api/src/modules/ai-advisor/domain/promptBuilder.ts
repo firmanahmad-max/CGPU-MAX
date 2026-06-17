@@ -39,15 +39,7 @@ export function buildCatalogContext(parts: CatalogPart[]): string {
     `- ${p.modelName} [slug:${p.slug}] mfr:${p.manufacturer} msrp:${
       p.msrpUsd ? `$${p.msrpUsd}` : 'n/a'
     } tdp:${p.tdpWatts ? `${p.tdpWatts}W` : 'n/a'}`;
-  return [
-    'CATALOG',
-    '',
-    'CPUs:',
-    ...cpus.map(fmt),
-    '',
-    'GPUs:',
-    ...gpus.map(fmt),
-  ].join('\n');
+  return ['CATALOG', '', 'CPUs:', ...cpus.map(fmt), '', 'GPUs:', ...gpus.map(fmt)].join('\n');
 }
 
 export function buildUserMessage(req: AdvisorRequest, catalog: string): string {

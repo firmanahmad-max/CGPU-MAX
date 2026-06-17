@@ -22,7 +22,8 @@ function parseQuery(searchParams: PageProps['searchParams']): ListProcessorsQuer
 } {
   const page = Math.max(1, parseInt(searchParams.page ?? '1', 10) || 1);
   return {
-    type: searchParams.type === 'CPU' || searchParams.type === 'GPU' ? searchParams.type : undefined,
+    type:
+      searchParams.type === 'CPU' || searchParams.type === 'GPU' ? searchParams.type : undefined,
     manufacturer:
       searchParams.manufacturer === 'INTEL' ||
       searchParams.manufacturer === 'AMD' ||
@@ -59,7 +60,7 @@ export default async function ProcessorsPage({ searchParams }: PageProps) {
       <div className="mb-10 flex items-end justify-between">
         <div>
           <p className="label">Database</p>
-          <h1 className="mt-2 font-display text-4xl font-semibold tracking-tight text-white">
+          <h1 className="font-display mt-2 text-4xl font-semibold tracking-tight text-white">
             Processors
           </h1>
         </div>
@@ -75,7 +76,8 @@ export default async function ProcessorsPage({ searchParams }: PageProps) {
           <p className="label mb-1">API error</p>
           <p className="text-sm">{error}</p>
           <p className="mt-2 text-xs text-slate-400">
-            Make sure the API is running: <code className="font-mono">pnpm --filter @cgpu-max/api dev</code>
+            Make sure the API is running:{' '}
+            <code className="font-mono">pnpm --filter @cgpu-max/api dev</code>
           </p>
         </div>
       )}

@@ -20,8 +20,8 @@ export class GeekbenchService {
     try {
       const response = await axios.get(`${this.BASE_URL}/search`, {
         params: { q: query },
-        headers: { 'Accept': 'application/json' },
-        timeout: this.TIMEOUT
+        headers: { Accept: 'application/json' },
+        timeout: this.TIMEOUT,
       });
 
       return response.data.results || [];
@@ -37,8 +37,8 @@ export class GeekbenchService {
   static async getTopSingleCoreScores(limit = 20) {
     try {
       const response = await axios.get(`${this.BASE_URL}/v6/cpu/singlecore`, {
-        headers: { 'Accept': 'application/json' },
-        timeout: this.TIMEOUT
+        headers: { Accept: 'application/json' },
+        timeout: this.TIMEOUT,
       });
 
       const results = response.data.results || [];
@@ -55,8 +55,8 @@ export class GeekbenchService {
   static async getTopMultiCoreScores(limit = 20) {
     try {
       const response = await axios.get(`${this.BASE_URL}/v6/cpu/multicore`, {
-        headers: { 'Accept': 'application/json' },
-        timeout: this.TIMEOUT
+        headers: { Accept: 'application/json' },
+        timeout: this.TIMEOUT,
       });
 
       const results = response.data.results || [];
@@ -73,8 +73,8 @@ export class GeekbenchService {
   static async getGPUBenchmarks(limit = 20) {
     try {
       const response = await axios.get(`${this.BASE_URL}/gpu-benchmarks`, {
-        headers: { 'Accept': 'application/json' },
-        timeout: this.TIMEOUT
+        headers: { Accept: 'application/json' },
+        timeout: this.TIMEOUT,
       });
 
       const results = response.data.results || [];
@@ -91,8 +91,8 @@ export class GeekbenchService {
   static async getVulkanScores(limit = 20) {
     try {
       const response = await axios.get(`${this.BASE_URL}/vulkan-benchmarks`, {
-        headers: { 'Accept': 'application/json' },
-        timeout: this.TIMEOUT
+        headers: { Accept: 'application/json' },
+        timeout: this.TIMEOUT,
       });
 
       const results = response.data.results || [];
@@ -109,7 +109,7 @@ export class GeekbenchService {
   static transformCPUData(geekbenchData) {
     if (!Array.isArray(geekbenchData)) return [];
 
-    return geekbenchData.map(item => ({
+    return geekbenchData.map((item) => ({
       id: `gb-cpu-${item.id}`,
       source: 'geekbench',
       type: 'CPU',
@@ -121,7 +121,7 @@ export class GeekbenchService {
       cores: item.number_of_cores,
       threads: item.number_of_threads,
       ram: item.primary_memory_gb,
-      lastUpdated: new Date()
+      lastUpdated: new Date(),
     }));
   }
 
@@ -131,7 +131,7 @@ export class GeekbenchService {
   static transformGPUData(geekbenchData) {
     if (!Array.isArray(geekbenchData)) return [];
 
-    return geekbenchData.map(item => ({
+    return geekbenchData.map((item) => ({
       id: `gb-gpu-${item.id}`,
       source: 'geekbench',
       type: 'GPU',
@@ -139,7 +139,7 @@ export class GeekbenchService {
       model: item.name,
       benchmarkGeekbenchScore: item.score,
       benchmarkAPI: item.api,
-      lastUpdated: new Date()
+      lastUpdated: new Date(),
     }));
   }
 
@@ -185,9 +185,9 @@ export class TechPowerUpScraper {
 
       const response = await axios.get(url, {
         headers: {
-          'User-Agent': 'CGPU-MAX/1.0 (Data Collection)'
+          'User-Agent': 'CGPU-MAX/1.0 (Data Collection)',
         },
-        timeout: this.TIMEOUT
+        timeout: this.TIMEOUT,
       });
 
       const $ = cheerio.load(response.data);
@@ -197,7 +197,7 @@ export class TechPowerUpScraper {
       $('table.processor tbody tr').each((index, row) => {
         try {
           const cells = $(row).find('td');
-          
+
           // Extract data from table cells
           const cpu = {
             id: `tp-cpu-${index}-${Date.now()}`,
@@ -214,7 +214,7 @@ export class TechPowerUpScraper {
             socket: $(cells[7]).text().trim(),
             architecture: $(cells[8]).text().trim(),
             releaseDate: $(cells[9]).text().trim(),
-            lastUpdated: new Date()
+            lastUpdated: new Date(),
           };
 
           if (cpu.model) {
@@ -243,9 +243,9 @@ export class TechPowerUpScraper {
 
       const response = await axios.get(this.GPU_URL, {
         headers: {
-          'User-Agent': 'CGPU-MAX/1.0 (Data Collection)'
+          'User-Agent': 'CGPU-MAX/1.0 (Data Collection)',
         },
-        timeout: this.TIMEOUT
+        timeout: this.TIMEOUT,
       });
 
       const $ = cheerio.load(response.data);
@@ -254,7 +254,7 @@ export class TechPowerUpScraper {
       $('table.gputable tbody tr').each((index, row) => {
         try {
           const cells = $(row).find('td');
-          
+
           const gpu = {
             id: `tp-gpu-${index}-${Date.now()}`,
             source: 'techpowerup',
@@ -269,7 +269,7 @@ export class TechPowerUpScraper {
             memoryBandwidth: parseInt($(cells[6]).text().trim()) || null,
             tdp: parseInt($(cells[7]).text().trim()) || null,
             releaseDate: $(cells[8]).text().trim(),
-            lastUpdated: new Date()
+            lastUpdated: new Date(),
           };
 
           if (gpu.model) {
@@ -300,14 +300,15 @@ export class TechPowerUpScraper {
   }
 
   static extractGPUManufacturer(model) {
-    if (model.includes('NVIDIA') || model.includes('GeForce') || model.includes('RTX')) return 'Nvidia';
+    if (model.includes('NVIDIA') || model.includes('GeForce') || model.includes('RTX'))
+      return 'Nvidia';
     if (model.includes('AMD') || model.includes('Radeon')) return 'AMD';
     if (model.includes('Intel') || model.includes('Arc')) return 'Intel';
     return 'Unknown';
   }
 
   static delay(ms) {
-    return new Promise(resolve => setTimeout(resolve, ms));
+    return new Promise((resolve) => setTimeout(resolve, ms));
   }
 }
 
@@ -329,9 +330,9 @@ export class PassmarkScraper {
 
       const response = await axios.get(this.CPU_URL, {
         headers: {
-          'User-Agent': 'CGPU-MAX/1.0 (Data Collection)'
+          'User-Agent': 'CGPU-MAX/1.0 (Data Collection)',
         },
-        timeout: this.TIMEOUT
+        timeout: this.TIMEOUT,
       });
 
       const $ = cheerio.load(response.data);
@@ -343,17 +344,22 @@ export class PassmarkScraper {
 
         try {
           const cells = $(row).find('td');
-          
+
           const cpu = {
             id: `pm-cpu-${index}-${Date.now()}`,
             source: 'passmark',
             rank: parseInt($(cells[0]).text()) || null,
             model: $(cells[1]).text().trim(),
             manufacturer: this.extractManufacturer($(cells[1]).text()),
-            benchmarkScore: parseInt($(cells[2]).text().replace(/[^0-9]/g, '')) || null,
+            benchmarkScore:
+              parseInt(
+                $(cells[2])
+                  .text()
+                  .replace(/[^0-9]/g, ''),
+              ) || null,
             tdp: parseInt($(cells[3]).text()) || null,
             price: this.parsePrice($(cells[4]).text()),
-            lastUpdated: new Date()
+            lastUpdated: new Date(),
           };
 
           if (cpu.model) {
@@ -382,9 +388,9 @@ export class PassmarkScraper {
 
       const response = await axios.get(this.GPU_URL, {
         headers: {
-          'User-Agent': 'CGPU-MAX/1.0 (Data Collection)'
+          'User-Agent': 'CGPU-MAX/1.0 (Data Collection)',
         },
-        timeout: this.TIMEOUT
+        timeout: this.TIMEOUT,
       });
 
       const $ = cheerio.load(response.data);
@@ -396,16 +402,21 @@ export class PassmarkScraper {
 
         try {
           const cells = $(row).find('td');
-          
+
           const gpu = {
             id: `pm-gpu-${index}-${Date.now()}`,
             source: 'passmark',
             rank: parseInt($(cells[0]).text()) || null,
             model: $(cells[1]).text().trim(),
             manufacturer: this.extractGPUManufacturer($(cells[1]).text()),
-            benchmarkScore: parseInt($(cells[2]).text().replace(/[^0-9]/g, '')) || null,
+            benchmarkScore:
+              parseInt(
+                $(cells[2])
+                  .text()
+                  .replace(/[^0-9]/g, ''),
+              ) || null,
             price: this.parsePrice($(cells[3]).text()),
-            lastUpdated: new Date()
+            lastUpdated: new Date(),
           };
 
           if (gpu.model) {
@@ -436,14 +447,15 @@ export class PassmarkScraper {
   }
 
   static extractGPUManufacturer(model) {
-    if (model.includes('NVIDIA') || model.includes('GeForce') || model.includes('RTX')) return 'Nvidia';
+    if (model.includes('NVIDIA') || model.includes('GeForce') || model.includes('RTX'))
+      return 'Nvidia';
     if (model.includes('AMD') || model.includes('Radeon')) return 'AMD';
     if (model.includes('Intel') || model.includes('Arc')) return 'Intel';
     return 'Unknown';
   }
 
   static delay(ms) {
-    return new Promise(resolve => setTimeout(resolve, ms));
+    return new Promise((resolve) => setTimeout(resolve, ms));
   }
 }
 
@@ -465,17 +477,11 @@ export class DataAggregator {
         GeekbenchService.getTopSingleCoreScores(20),
         GeekbenchService.getTopMultiCoreScores(20),
         GeekbenchService.getGPUBenchmarks(20),
-        GeekbenchService.getVulkanScores(20)
+        GeekbenchService.getVulkanScores(20),
       ]);
 
-      const geekbenchCPUs = GeekbenchService.transformCPUData([
-        ...singleCore,
-        ...multiCore
-      ]);
-      const geekbenchGPUs = GeekbenchService.transformGPUData([
-        ...gpuScores,
-        ...vulkanScores
-      ]);
+      const geekbenchCPUs = GeekbenchService.transformCPUData([...singleCore, ...multiCore]);
+      const geekbenchGPUs = GeekbenchService.transformGPUData([...gpuScores, ...vulkanScores]);
 
       console.log(`   ✅ Got ${geekbenchCPUs.length} CPUs`);
       console.log(`   ✅ Got ${geekbenchGPUs.length} GPUs\n`);
@@ -485,11 +491,11 @@ export class DataAggregator {
       const [intelCPUs, amdCPUs, allGPUs] = await Promise.all([
         TechPowerUpScraper.scrapeCPUSpecs('intel'),
         TechPowerUpScraper.scrapeCPUSpecs('amd'),
-        TechPowerUpScraper.scrapeGPUSpecs()
+        TechPowerUpScraper.scrapeGPUSpecs(),
       ]);
 
       const techpowerupCPUs = [...intelCPUs, ...amdCPUs];
-      
+
       console.log(`   ✅ Got ${techpowerupCPUs.length} CPUs`);
       console.log(`   ✅ Got ${allGPUs.length} GPUs\n`);
 
@@ -497,7 +503,7 @@ export class DataAggregator {
       console.log('📡 SOURCE 3: Passmark Web Scraper');
       const [passmarkCPUs, passmarkGPUs] = await Promise.all([
         PassmarkScraper.scrapeCPUBenchmarks(100),
-        PassmarkScraper.scrapeGPUBenchmarks(100)
+        PassmarkScraper.scrapeGPUBenchmarks(100),
       ]);
 
       console.log(`   ✅ Got ${passmarkCPUs.length} CPUs`);
@@ -522,20 +528,20 @@ export class DataAggregator {
           sources: {
             geekbench: { cpus: geekbenchCPUs.length, gpus: geekbenchGPUs.length },
             techpowerup: { cpus: techpowerupCPUs.length, gpus: allGPUs.length },
-            passmark: { cpus: passmarkCPUs.length, gpus: passmarkGPUs.length }
-          }
+            passmark: { cpus: passmarkCPUs.length, gpus: passmarkGPUs.length },
+          },
         },
         stats: {
           totalCPUs: mergedCPUs.length,
           totalGPUs: mergedGPUs.length,
-          durationSeconds: parseFloat(duration)
-        }
+          durationSeconds: parseFloat(duration),
+        },
       };
     } catch (error) {
       console.error('❌ Data aggregation failed:', error.message);
       return {
         success: false,
-        error: error.message
+        error: error.message,
       };
     }
   }
@@ -546,19 +552,19 @@ export class DataAggregator {
   static mergeCPUData(...sources) {
     const cpuMap = new Map();
 
-    sources.forEach(sourceArray => {
-      sourceArray.forEach(cpu => {
+    sources.forEach((sourceArray) => {
+      sourceArray.forEach((cpu) => {
         const key = `${cpu.manufacturer}-${cpu.model}`.toLowerCase();
-        
+
         if (cpuMap.has(key)) {
           // Merge data, preferring non-null values
           const existing = cpuMap.get(key);
           cpuMap.set(key, {
             ...existing,
             ...Object.fromEntries(
-              Object.entries(cpu).filter(([_, v]) => v !== null && v !== undefined)
+              Object.entries(cpu).filter(([_, v]) => v !== null && v !== undefined),
             ),
-            sources: [...new Set([...(existing.sources || []), cpu.source])]
+            sources: [...new Set([...(existing.sources || []), cpu.source])],
           });
         } else {
           cpuMap.set(key, { ...cpu, sources: [cpu.source] });
@@ -580,18 +586,18 @@ export class DataAggregator {
   static mergeGPUData(...sources) {
     const gpuMap = new Map();
 
-    sources.forEach(sourceArray => {
-      sourceArray.forEach(gpu => {
+    sources.forEach((sourceArray) => {
+      sourceArray.forEach((gpu) => {
         const key = `${gpu.manufacturer}-${gpu.model}`.toLowerCase();
-        
+
         if (gpuMap.has(key)) {
           const existing = gpuMap.get(key);
           gpuMap.set(key, {
             ...existing,
             ...Object.fromEntries(
-              Object.entries(gpu).filter(([_, v]) => v !== null && v !== undefined)
+              Object.entries(gpu).filter(([_, v]) => v !== null && v !== undefined),
             ),
-            sources: [...new Set([...(existing.sources || []), gpu.source])]
+            sources: [...new Set([...(existing.sources || []), gpu.source])],
           });
         } else {
           gpuMap.set(key, { ...gpu, sources: [gpu.source] });

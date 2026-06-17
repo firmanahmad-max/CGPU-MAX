@@ -49,11 +49,7 @@ const TIERS = [
     cadence: 'per year · 20% off',
     cta: 'Save 20%',
     accent: 'border-accent-purple/60 bg-accent-purple/5',
-    features: [
-      'Everything in Pro',
-      'Save 20% vs monthly',
-      'Priority email support',
-    ],
+    features: ['Everything in Pro', 'Save 20% vs monthly', 'Priority email support'],
     plan: 'pro_yearly' as Plan,
   },
 ];
@@ -96,7 +92,7 @@ export default function PricingPage() {
       <main className="mx-auto max-w-6xl px-6 py-16">
         <header className="mb-12 text-center">
           <p className="label">Pricing</p>
-          <h1 className="mt-3 font-display text-5xl font-semibold tracking-tight text-white">
+          <h1 className="font-display mt-3 text-5xl font-semibold tracking-tight text-white">
             Built for builders who need more than guesswork.
           </h1>
           <p className="mx-auto mt-4 max-w-2xl text-slate-400">
@@ -106,7 +102,7 @@ export default function PricingPage() {
         </header>
 
         {error && (
-          <div className="card mb-6 border-state-danger/40 bg-state-danger/10 text-sm text-state-danger">
+          <div className="card border-state-danger/40 bg-state-danger/10 text-state-danger mb-6 text-sm">
             {error}
           </div>
         )}
@@ -115,7 +111,11 @@ export default function PricingPage() {
           {TIERS.map((tier) => (
             <div
               key={tier.name}
-              className={cn('card flex flex-col', tier.accent, tier.highlight && 'ring-1 ring-accent-blue/30')}
+              className={cn(
+                'card flex flex-col',
+                tier.accent,
+                tier.highlight && 'ring-accent-blue/30 ring-1',
+              )}
             >
               <div className="mb-4 flex items-center justify-between">
                 <p className="label">{tier.name}</p>
@@ -124,11 +124,11 @@ export default function PricingPage() {
               <p className="font-display text-4xl font-semibold tracking-tight text-white">
                 {tier.price}
               </p>
-              <p className="mt-1 text-xs uppercase tracking-label text-slate-500">{tier.cadence}</p>
+              <p className="tracking-label mt-1 text-xs uppercase text-slate-500">{tier.cadence}</p>
               <ul className="my-6 space-y-2 text-sm text-slate-300">
                 {tier.features.map((f) => (
                   <li key={f} className="flex gap-2">
-                    <span className="mt-1.5 inline-block h-1.5 w-1.5 flex-shrink-0 rounded-full bg-accent-blue" />
+                    <span className="bg-accent-blue mt-1.5 inline-block h-1.5 w-1.5 flex-shrink-0 rounded-full" />
                     <span>{f}</span>
                   </li>
                 ))}

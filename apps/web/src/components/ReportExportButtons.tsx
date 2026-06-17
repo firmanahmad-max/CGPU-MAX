@@ -61,7 +61,7 @@ export function ReportExportButtons({ kind, shareSlug }: ReportExportButtonsProp
         >
           {busy === 'xlsx' ? 'Generating…' : 'Excel'}
         </button>
-        {error && <span className="text-xs text-state-danger">{error}</span>}
+        {error && <span className="text-state-danger text-xs">{error}</span>}
       </div>
     </SignedIn>
   );

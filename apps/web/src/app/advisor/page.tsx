@@ -68,8 +68,8 @@ export default function AdvisorPage() {
             Build Advisor
           </h1>
           <p className="mt-2 max-w-2xl text-sm text-slate-400">
-            Tell us your budget and goals. Our advisor recommends a balanced CPU + GPU pairing
-            from the live catalog, with rationale, PSU sizing, and an upgrade path.
+            Tell us your budget and goals. Our advisor recommends a balanced CPU + GPU pairing from
+            the live catalog, with rationale, PSU sizing, and an upgrade path.
           </p>
         </header>
 
@@ -78,7 +78,10 @@ export default function AdvisorPage() {
             <p className="label mb-2">Sign in required</p>
             <p className="text-sm text-slate-400">
               The Build Advisor is a Pro feature.{' '}
-              <Link href="/sign-in?redirect_url=/advisor" className="text-accent-blue hover:underline">
+              <Link
+                href="/sign-in?redirect_url=/advisor"
+                className="text-accent-blue hover:underline"
+              >
                 Sign in
               </Link>{' '}
               or{' '}
@@ -104,7 +107,7 @@ export default function AdvisorPage() {
                 step={50}
                 value={budget}
                 onChange={(e) => setBudget(Number(e.currentTarget.value))}
-                className="w-full accent-accent-blue"
+                className="accent-accent-blue w-full"
               />
             </div>
 
@@ -117,7 +120,7 @@ export default function AdvisorPage() {
                     type="button"
                     onClick={() => setPurpose(p.value)}
                     className={
-                      'rounded-pill border px-3 py-1 text-xs font-medium uppercase tracking-label transition ' +
+                      'rounded-pill tracking-label border px-3 py-1 text-xs font-medium uppercase transition ' +
                       (purpose === p.value
                         ? 'border-white/40 bg-white/15 text-white'
                         : 'border-white/10 bg-white/5 text-slate-400 hover:text-slate-200')
@@ -138,7 +141,7 @@ export default function AdvisorPage() {
                     type="button"
                     onClick={() => setResolution(r)}
                     className={
-                      'rounded-pill border px-4 py-1 text-xs font-medium uppercase tracking-label transition ' +
+                      'rounded-pill tracking-label border px-4 py-1 text-xs font-medium uppercase transition ' +
                       (resolution === r
                         ? 'border-white/40 bg-white/15 text-white'
                         : 'border-white/10 bg-white/5 text-slate-400 hover:text-slate-200')
@@ -158,7 +161,7 @@ export default function AdvisorPage() {
                 maxLength={500}
                 placeholder="e.g. prefer AMD, quiet build, room for future GPU upgrade"
                 onChange={(e) => setPreferences(e.currentTarget.value)}
-                className="w-full rounded-sm border border-white/10 bg-white/5 px-3 py-2 text-sm text-white placeholder:text-slate-500 focus:border-accent-blue focus:outline-none"
+                className="focus:border-accent-blue w-full rounded-sm border border-white/10 bg-white/5 px-3 py-2 text-sm text-white placeholder:text-slate-500 focus:outline-none"
               />
             </div>
 
@@ -166,11 +169,11 @@ export default function AdvisorPage() {
               type="button"
               onClick={onGenerate}
               disabled={loading}
-              className="rounded-sm border border-accent-purple bg-accent-purple/20 px-6 py-2 text-sm font-semibold text-white transition hover:bg-accent-purple/30 disabled:opacity-50"
+              className="border-accent-purple bg-accent-purple/20 hover:bg-accent-purple/30 rounded-sm border px-6 py-2 text-sm font-semibold text-white transition disabled:opacity-50"
             >
               {loading ? 'Consulting advisor…' : 'Generate recommendation'}
             </button>
-            {error && <p className="text-sm text-state-danger">{error}</p>}
+            {error && <p className="text-state-danger text-sm">{error}</p>}
           </div>
 
           {advice && <BuildAdviceResult advice={advice} />}

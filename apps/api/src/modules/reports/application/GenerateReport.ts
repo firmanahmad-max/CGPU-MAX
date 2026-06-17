@@ -1,11 +1,7 @@
 import type { PrismaClient } from '@prisma/client';
 
 import { NotFoundError } from '../../../shared/errors/AppError.js';
-import type {
-  BottleneckReportData,
-  ComparisonReportData,
-  ReportFormat,
-} from '../domain/types.js';
+import type { BottleneckReportData, ComparisonReportData, ReportFormat } from '../domain/types.js';
 import { renderBottleneckXlsx, renderComparisonXlsx } from '../infrastructure/excel.js';
 import { renderBottleneckPdf, renderComparisonPdf } from '../infrastructure/pdf.js';
 

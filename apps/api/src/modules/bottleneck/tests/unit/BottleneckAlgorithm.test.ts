@@ -27,7 +27,13 @@ const refGpu: ProcessorSnapshot = {
   tdpWatts: 450,
   msrpUsd: 1599,
   generation: 40,
-  gpu: { shaderUnits: 16384, vramGb: 24, memoryBandwidthGbps: 1008, baseClockMhz: 2235, boostClockMhz: 2520 },
+  gpu: {
+    shaderUnits: 16384,
+    vramGb: 24,
+    memoryBandwidthGbps: 1008,
+    baseClockMhz: 2235,
+    boostClockMhz: 2520,
+  },
   benchmarks: { passmark_g3d_mark: 38000 },
 };
 
@@ -38,7 +44,13 @@ const weakGpu: ProcessorSnapshot = {
   modelName: 'RTX 3060',
   tdpWatts: 170,
   msrpUsd: 329,
-  gpu: { shaderUnits: 3584, vramGb: 12, memoryBandwidthGbps: 360, baseClockMhz: 1320, boostClockMhz: 1777 },
+  gpu: {
+    shaderUnits: 3584,
+    vramGb: 12,
+    memoryBandwidthGbps: 360,
+    baseClockMhz: 1320,
+    boostClockMhz: 1777,
+  },
   benchmarks: { passmark_g3d_mark: 17500 },
 };
 

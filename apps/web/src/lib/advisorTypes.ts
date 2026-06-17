@@ -1,9 +1,4 @@
-export type BuildPurpose =
-  | 'gaming'
-  | 'streaming'
-  | 'workstation'
-  | 'budget'
-  | 'content_creation';
+export type BuildPurpose = 'gaming' | 'streaming' | 'workstation' | 'budget' | 'content_creation';
 export type Resolution = '1080p' | '1440p' | '4K';
 
 export interface ComponentPick {

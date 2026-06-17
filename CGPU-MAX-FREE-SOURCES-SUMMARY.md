@@ -4,11 +4,11 @@
 
 Untuk aplikasi **CGPU-MAX**, Anda memiliki **TIGA sumber data GRATIS berkualitas tinggi** yang dapat diintegrasikan tanpa biaya:
 
-| No | Sumber | Type | Coverage | Update | Implementasi | Rating |
-|:--:|:-------|:-----|:---------|:-------|:-------------|:------:|
-| 1️⃣ | **Geekbench API** | Benchmark | Intel, AMD, Nvidia, Apple | Real-time | REST API | ⭐⭐⭐⭐⭐ |
-| 2️⃣ | **TechPowerUp Scraper** | Specs Detail | Intel, AMD, Nvidia | Daily | Web Scraping | ⭐⭐⭐⭐⭐ |
-| 3️⃣ | **Passmark Scraper** | Pricing + Score | All | Daily | Web Scraping | ⭐⭐⭐⭐ |
+| No  | Sumber                  | Type            | Coverage                  | Update    | Implementasi |   Rating   |
+| :-: | :---------------------- | :-------------- | :------------------------ | :-------- | :----------- | :--------: |
+| 1️⃣  | **Geekbench API**       | Benchmark       | Intel, AMD, Nvidia, Apple | Real-time | REST API     | ⭐⭐⭐⭐⭐ |
+| 2️⃣  | **TechPowerUp Scraper** | Specs Detail    | Intel, AMD, Nvidia        | Daily     | Web Scraping | ⭐⭐⭐⭐⭐ |
+| 3️⃣  | **Passmark Scraper**    | Pricing + Score | All                       | Daily     | Web Scraping |  ⭐⭐⭐⭐  |
 
 ---
 
@@ -19,6 +19,7 @@ Untuk aplikasi **CGPU-MAX**, Anda memiliki **TIGA sumber data GRATIS berkualitas
 **URL:** `https://browser.geekbench.com`
 
 #### Kelebihan ✅
+
 - Completely FREE, no authentication required
 - Real-world benchmark data dari jutaan tests
 - Cross-platform (Windows, Mac, Linux, iOS, Android)
@@ -27,12 +28,14 @@ Untuk aplikasi **CGPU-MAX**, Anda memiliki **TIGA sumber data GRATIS berkualitas
 - Frequently updated dengan hasil terbaru
 
 #### Kekurangan ❌
+
 - Tidak punya data spesifikasi hardware detail (hanya benchmark scores)
 - API undocumented (bisa berubah tanpa notifikasi)
 - Terbatas pada processor yang sudah di-benchmark oleh users
 - Rate limiting mungkin berlaku untuk aggressive requests
 
 #### Sample Request:
+
 ```bash
 # Search CPU
 curl -s "https://browser.geekbench.com/search?q=Intel+Core+i9" \
@@ -48,6 +51,7 @@ curl -s "https://browser.geekbench.com/vulkan-benchmarks" \
 ```
 
 #### Data Returned:
+
 ```json
 {
   "results": [
@@ -65,9 +69,10 @@ curl -s "https://browser.geekbench.com/vulkan-benchmarks" \
 ```
 
 #### Best For:
+
 ✅ Performance benchmarking data  
 ✅ Comparison scoring  
-✅ Real-world performance metrics  
+✅ Real-world performance metrics
 
 ---
 
@@ -76,6 +81,7 @@ curl -s "https://browser.geekbench.com/vulkan-benchmarks" \
 **URL:** `https://www.techpowerup.com/cpu-specs/` & `/gpu-specs/`
 
 #### Kelebihan ✅
+
 - Most authoritative processor specifications
 - Comprehensive coverage (semua generasi dari awal)
 - Detail specifications lengkap (cores, threads, clock, TDP, cache, socket, dll)
@@ -85,6 +91,7 @@ curl -s "https://browser.geekbench.com/vulkan-benchmarks" \
 - Trusted oleh semua tech enthusiasts & reviewers
 
 #### Kekurangan ❌
+
 - Perlu web scraping (tidak punya official API gratis)
 - HTML structure mungkin berubah
 - Rate limiting - perlu respectful scraping (delay antar requests)
@@ -104,6 +111,7 @@ curl -s "https://browser.geekbench.com/vulkan-benchmarks" \
 ```
 
 #### Data Structure:
+
 ```
 Intel Core i9-14900KS
 ├─ Cores: 24
@@ -118,19 +126,22 @@ Intel Core i9-14900KS
 ```
 
 #### Best For:
+
 ✅ Complete hardware specifications  
 ✅ Technical details (cache, socket, architecture)  
-✅ Historical processor data  
+✅ Historical processor data
 
 ---
 
 ### 3️⃣ PASSMARK BENCHMARKS (TERBAIK UNTUK PRICING & MARKET)
 
 **URLs:**
+
 - CPUs: `https://www.cpubenchmark.net/`
 - GPUs: `https://www.videocardbenchmark.net/`
 
 #### Kelebihan ✅
+
 - Real-time benchmark scores dari 1M+ systems
 - Pricing data integrated
 - Market ranking & sentiment
@@ -139,12 +150,14 @@ Intel Core i9-14900KS
 - Comprehensive coverage
 
 #### Kekurangan ❌
+
 - Juga perlu web scraping
 - Benchmark methodology kontroversial (berbeda dengan Geekbench)
 - Rate limiting ketat
 - HTML scraping brittle
 
 #### Data Structure:
+
 ```
 Intel Core i9-14900KS
 ├─ Benchmark Score: 56,500
@@ -154,9 +167,10 @@ Intel Core i9-14900KS
 ```
 
 #### Best For:
+
 ✅ Price-to-performance ratio  
 ✅ Market pricing data  
-✅ User sentiment analysis  
+✅ User sentiment analysis
 
 ---
 
@@ -181,27 +195,27 @@ class DataCollectionService {
   static async getAllProcessorData() {
     // 1. Get from Geekbench (quick, API-based)
     const geekbenchData = await GeekbenchService.getTopCPUScores();
-    
+
     // 2. Get from TechPowerUp (comprehensive, scraping)
     const tpSpecs = await TechPowerUpScraper.scrapeCPUSpecs();
-    
+
     // 3. Get from Passmark (pricing, market data)
     const pmData = await PassmarkScraper.scrapeCPUBenchmarks();
-    
+
     // 4. Merge all sources
     return this.mergeProcessorData(geekbenchData, tpSpecs, pmData);
   }
-  
+
   static mergeProcessorData(geekbench, specs, market) {
     // Combine data, avoiding duplicates
     const map = new Map();
-    
-    [...geekbench, ...specs, ...market].forEach(item => {
+
+    [...geekbench, ...specs, ...market].forEach((item) => {
       const key = `${item.manufacturer}-${item.model}`;
       const existing = map.get(key) || {};
       map.set(key, { ...existing, ...item });
     });
-    
+
     return Array.from(map.values());
   }
 }
@@ -222,17 +236,17 @@ const router = express.Router();
 router.get('/api/v1/processors', async (req, res) => {
   try {
     const data = await DataCollectionService.getAllProcessorData();
-    
+
     res.json({
       success: true,
       data: data,
       count: data.length,
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
     });
   } catch (error) {
     res.status(500).json({
       success: false,
-      error: error.message
+      error: error.message,
     });
   }
 });
@@ -266,6 +280,7 @@ cron.schedule('0 */6 * * *', async () => {
 ## 💡 REKOMENDASI IMPLEMENTASI
 
 ### Opsi 1: API-First Approach (Recommended) ⭐⭐⭐⭐⭐
+
 ```
 ┌─────────────────────────────┐
 │   Frontend (React)          │
@@ -292,11 +307,12 @@ cron.schedule('0 */6 * * *', async () => {
 **Pros:**
 ✅ Data freshness (real-time)  
 ✅ Bandwidth optimization (cache)  
-✅ Scalable untuk production  
+✅ Scalable untuk production
 
 ---
 
 ### Opsi 2: Static Fallback (Untuk MVP) ⭐⭐⭐
+
 ```javascript
 // Jika API down, gunakan local JSON cache
 
@@ -315,15 +331,15 @@ const getCachedProcessors = () => {
 
 ## 📈 TRAFFIC & PERFORMANCE EXPECTATIONS
 
-| Operasi | Waktu | Catatan |
-|---------|-------|---------|
-| **Geekbench API Search** | 0.5-1s | Cepat, server reliable |
-| **TechPowerUp CPU Scrape** | 5-10s | Tergantung jumlah halaman |
-| **TechPowerUp GPU Scrape** | 5-10s | Tergantung jumlah halaman |
-| **Passmark CPU Scrape** | 3-5s | Table parsing |
-| **Passmark GPU Scrape** | 3-5s | Table parsing |
-| **Total Merge & Process** | 1-2s | In-memory operations |
-| **Total Runtime** | 15-30s | All sources sequentially |
+| Operasi                    | Waktu  | Catatan                   |
+| -------------------------- | ------ | ------------------------- |
+| **Geekbench API Search**   | 0.5-1s | Cepat, server reliable    |
+| **TechPowerUp CPU Scrape** | 5-10s  | Tergantung jumlah halaman |
+| **TechPowerUp GPU Scrape** | 5-10s  | Tergantung jumlah halaman |
+| **Passmark CPU Scrape**    | 3-5s   | Table parsing             |
+| **Passmark GPU Scrape**    | 3-5s   | Table parsing             |
+| **Total Merge & Process**  | 1-2s   | In-memory operations      |
+| **Total Runtime**          | 15-30s | All sources sequentially  |
 
 ### Optimization Tips:
 
@@ -443,24 +459,28 @@ setTimeout(() => scrapeNextPage(), DELAY_MS);
 ## 🚀 LAUNCH STRATEGY
 
 ### Week 1: MVP Setup
+
 - [ ] Integrate Geekbench API
 - [ ] Create basic specs viewer
 - [ ] Setup React frontend
 - [ ] Deploy basic application
 
 ### Week 2: Data Enhancement
+
 - [ ] Add TechPowerUp scraper
 - [ ] Setup PostgreSQL database
 - [ ] Implement caching
 - [ ] Improve specs completeness
 
 ### Week 3: Market Features
+
 - [ ] Add Passmark integration
 - [ ] Create comparison engine
 - [ ] Build market analysis
 - [ ] Add pricing data
 
 ### Week 4: Advanced Features
+
 - [ ] Bottleneck calculator
 - [ ] Performance scoring
 - [ ] Scheduled data updates
@@ -471,15 +491,19 @@ setTimeout(() => scrapeNextPage(), DELAY_MS);
 ## 📞 SUPPORT & TROUBLESHOOTING
 
 ### Issue: Geekbench API returns 503
+
 **Solution:** API mungkin overloaded. Add retry logic dengan exponential backoff.
 
 ### Issue: TechPowerUp scraper returns wrong data
+
 **Solution:** HTML selectors berubah. Update selectors sesuai current structure.
 
 ### Issue: Passmark blocking requests
+
 **Solution:** Increase delay between requests, rotate User-Agent headers.
 
 ### Issue: Database getting too large
+
 **Solution:** Implement data retention policy, archive old records.
 
 ---
@@ -509,7 +533,7 @@ setTimeout(() => scrapeNextPage(), DELAY_MS);
 ✅ **Geekbench**, **TechPowerUp**, & **Passmark** semua tersedia gratis  
 ✅ Implementasi hybrid approach untuk data paling lengkap  
 ✅ Setup scheduled jobs untuk automatic updates  
-✅ CGPU-MAX akan memiliki database yang comprehensive dan selalu fresh  
+✅ CGPU-MAX akan memiliki database yang comprehensive dan selalu fresh
 
 Estimasi biaya data: **$0 USD** 🎉
 

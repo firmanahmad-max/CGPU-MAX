@@ -8,9 +8,11 @@ import { logger } from '../../../shared/logging/logger.js';
 export class SyncSubscriptionFromStripe {
   constructor(private readonly prisma: PrismaClient) {}
 
-  async execute(sub: Stripe.Subscription, opts: { tierFromPriceId: (priceId: string) => 'PRO' | 'ENTERPRISE' | null }) {
-    const customerId =
-      typeof sub.customer === 'string' ? sub.customer : sub.customer.id;
+  async execute(
+    sub: Stripe.Subscription,
+    opts: { tierFromPriceId: (priceId: string) => 'PRO' | 'ENTERPRISE' | null },
+  ) {
+    const customerId = typeof sub.customer === 'string' ? sub.customer : sub.customer.id;
 
     const user = await this.prisma.user.findUnique({
       where: { stripeCustomerId: customerId },
@@ -67,9 +69,7 @@ export class SyncSubscriptionFromStripe {
         where: { id: user.id },
         data: {
           tier:
-            status === 'ACTIVE' || status === 'TRIALING' || status === 'PAST_DUE'
-              ? tier
-              : 'FREE',
+            status === 'ACTIVE' || status === 'TRIALING' || status === 'PAST_DUE' ? tier : 'FREE',
         },
       }),
     ]);

@@ -28,7 +28,7 @@ export default async function ProcessorDetailPage({ params }: PageProps) {
         ← All processors
       </Link>
 
-      <header className="mt-6 mb-10">
+      <header className="mb-10 mt-6">
         <div className="mb-4 flex gap-2">
           <Pill
             variant={

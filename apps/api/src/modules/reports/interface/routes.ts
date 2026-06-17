@@ -1,4 +1,4 @@
-import { Router } from 'express';
+import { Router, type Response } from 'express';
 import { z } from 'zod';
 
 import { requireAuth } from '../../../shared/auth/middleware.js';
@@ -44,12 +44,7 @@ reportsRouter.get('/bottleneck/:shareSlug', async (req, res, next) => {
   }
 });
 
-function send(
-  res: import('express').Response,
-  buffer: Buffer,
-  filename: string,
-  format: 'pdf' | 'xlsx',
-) {
+function send(res: Response, buffer: Buffer, filename: string, format: 'pdf' | 'xlsx') {
   res.setHeader('Content-Type', CONTENT_TYPE[format]);
   res.setHeader('Content-Disposition', `attachment; filename="${filename}"`);
   res.send(buffer);

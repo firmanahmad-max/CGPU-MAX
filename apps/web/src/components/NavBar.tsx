@@ -3,7 +3,7 @@ import Link from 'next/link';
 
 export function NavBar() {
   return (
-    <header className="border-b border-white/5 bg-surface-dark/80 backdrop-blur">
+    <header className="bg-surface-dark/80 border-b border-white/5 backdrop-blur">
       <nav className="mx-auto flex max-w-7xl items-center justify-between px-6 py-4">
         <Link href="/" className="font-display text-lg font-semibold tracking-tight text-white">
           CGPU-MAX
@@ -23,7 +23,7 @@ export function NavBar() {
           <SignedOut>
             <Link
               href="/sign-in"
-              className="rounded-sm border border-white/15 bg-white/5 px-3 py-1 text-xs uppercase tracking-label transition hover:border-white/30"
+              className="tracking-label rounded-sm border border-white/15 bg-white/5 px-3 py-1 text-xs uppercase transition hover:border-white/30"
             >
               Sign in
             </Link>
