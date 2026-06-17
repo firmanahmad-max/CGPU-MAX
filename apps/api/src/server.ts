@@ -14,6 +14,7 @@ import { billingRouter, billingWebhookRouter } from './modules/billing/interface
 import { bottleneckRouter } from './modules/bottleneck/interface/routes.js';
 import { comparisonsRouter } from './modules/comparisons/interface/routes.js';
 import { gamingRouter } from './modules/gaming-optimizer/interface/routes.js';
+import { brandingRouter, organizationsRouter } from './modules/organizations/interface/routes.js';
 import { pricingRouter } from './modules/pricing/interface/routes.js';
 import { processorsRouter } from './modules/processors/interface/routes.js';
 import { publicApiRouter } from './modules/public-api/interface/router.js';
@@ -94,6 +95,8 @@ export function createServer(): Express {
   app.use('/api/v1/streaming', streamingRouter);
   app.use('/api/v1/reports', reportsRouter);
   app.use('/api/v1/analytics', analyticsRouter);
+  app.use('/api/v1/orgs', organizationsRouter);
+  app.use('/api/v1/branding', brandingRouter);
 
   app.use(errorHandler);
   return app;

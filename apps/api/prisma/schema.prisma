@@ -59,6 +59,12 @@ enum AlertChannel {
   PUSH
 }
 
+enum OrgRole {
+  OWNER
+  ADMIN
+  MEMBER
+}
+
 model Processor {
   id            String        @id @default(uuid()) @db.Uuid
   type          ProcessorType
@@ -171,6 +177,7 @@ model User {
   usageCounters    UsageCounter[]
   apiKeys          ApiKey[]
   priceAlerts      PriceAlert[]
+  orgMemberships   OrganizationMember[]
   stripeCustomerId String?  @unique @map("stripe_customer_id")
 
   @@index([email])
@@ -255,6 +262,42 @@ model PriceAlert {
   @@index([ownerId, active])
   @@index([processorId, active])
   @@map("price_alerts")
+}
+
+// White-label tenant. Branding fields drive the themed frontend; `customDomain`
+// (unique) lets a white-label deployment resolve its theme by hostname.
+model Organization {
+  id                String   @id @default(uuid()) @db.Uuid
+  name              String
+  slug              String   @unique
+  customDomain      String?  @unique @map("custom_domain")
+  brandName         String?  @map("brand_name")
+  logoUrl           String?  @map("logo_url")
+  primaryColorHex   String?  @map("primary_color_hex")
+  secondaryColorHex String?  @map("secondary_color_hex")
+  createdAt         DateTime @default(now()) @map("created_at")
+  updatedAt         DateTime @updatedAt @map("updated_at")
+
+  members OrganizationMember[]
+
+  @@index([slug])
+  @@index([customDomain])
+  @@map("organizations")
+}
+
+model OrganizationMember {
+  id        String   @id @default(uuid()) @db.Uuid
+  orgId     String   @map("org_id") @db.Uuid
+  userId    String   @map("user_id") @db.Uuid
+  role      OrgRole  @default(MEMBER)
+  createdAt DateTime @default(now()) @map("created_at")
+
+  organization Organization @relation(fields: [orgId], references: [id], onDelete: Cascade)
+  user         User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([orgId, userId])
+  @@index([userId])
+  @@map("organization_members")
 }
 
 // Enterprise REST API credential. We store only the SHA-256 hash of the key;

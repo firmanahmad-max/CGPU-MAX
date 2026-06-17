@@ -145,12 +145,22 @@ export default function AccountPage() {
                     Manage API keys for the public REST API.
                   </p>
                 </div>
-                <a
-                  href="/account/api-keys"
-                  className="rounded-sm border border-white/20 bg-white/10 px-4 py-2 text-sm font-semibold text-white transition hover:bg-white/20"
-                >
-                  API keys →
-                </a>
+                <div className="flex gap-2">
+                  <a
+                    href="/account/api-keys"
+                    className="rounded-sm border border-white/20 bg-white/10 px-4 py-2 text-sm font-semibold text-white transition hover:bg-white/20"
+                  >
+                    API keys →
+                  </a>
+                  {data.limits.features.whiteLabel && (
+                    <a
+                      href="/account/organization"
+                      className="rounded-sm border border-white/20 bg-white/10 px-4 py-2 text-sm font-semibold text-white transition hover:bg-white/20"
+                    >
+                      Organization →
+                    </a>
+                  )}
+                </div>
               </section>
             )}
           </div>

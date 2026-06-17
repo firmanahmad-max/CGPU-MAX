@@ -6,6 +6,13 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) 
 
 ## [Unreleased]
 
+### Added — White-label foundation (Feature 12)
+
+- **`organizations` module (DDD)** — multi-tenant foundation. Pure `branding` domain (hex-color + hostname validation, domain normalization, org slugify, theme merge over platform defaults) with unit tests. `OrganizationService` covers create (creator becomes OWNER), list-mine, update-branding (OWNER/ADMIN, validates colors + unique custom domain), add-member by email (OWNER), and public theme resolution by custom domain.
+- **Routes** — Enterprise-gated management at `/api/v1/orgs` (`requireFeature('whiteLabel')`): create, `GET /me`, `PATCH /:id/branding`, `POST /:id/members`. Public `GET /api/v1/branding/by-domain/:domain` (cached) so a white-label frontend can theme itself by hostname.
+- **Prisma** — `Organization` (brand name/logo/colors + unique `customDomain`) and `OrganizationMember` (OrgRole OWNER/ADMIN/MEMBER) + `User.orgMemberships`.
+- **Web** — Enterprise-gated `/account/organization`: create org and edit brand name, logo, primary/secondary colors (with swatch preview), and custom domain; link surfaced on the account page when the tier has white-label.
+
 ### Added — Phase 7 (Observability, Analytics, Edge caching)
 
 - **Observability** — `prom-client` registry with default Node metrics plus an `http_request_duration_seconds` histogram and `http_requests_total` counter; metrics middleware labels by matched route _pattern_ (not concrete path) to bound cardinality; `GET /metrics` Prometheus scrape endpoint.
