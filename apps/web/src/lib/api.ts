@@ -1,6 +1,6 @@
 import type { Processor } from '@cgpu-max/types';
 
-import { API_BASE_URL } from './env.js';
+import { API_BASE_URL } from './env';
 
 export interface ListResponse<T> {
   items: T[];
