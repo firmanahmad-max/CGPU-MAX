@@ -1,23 +1,25 @@
 'use client';
 
 import { useRouter, useSearchParams } from 'next/navigation';
+import { useTranslations } from 'next-intl';
 import { useTransition } from 'react';
 
 const TYPES = ['CPU', 'GPU'] as const;
 const MANUFACTURERS = ['ALL', 'INTEL', 'AMD', 'NVIDIA'] as const;
 const SORTS = [
-  { value: 'performance', label: 'Performance' },
-  { value: 'value', label: 'Best value' },
+  { value: 'performance', labelKey: 'sortPerformance' },
+  { value: 'value', labelKey: 'sortValue' },
 ] as const;
 // Price brackets mirror the prior version's pills.
 const BRACKETS = [
-  { key: 'all', label: 'All prices' },
-  { key: 'budget', label: 'Budget (<$300)' },
-  { key: 'mid', label: 'Mid ($300–700)' },
-  { key: 'high', label: 'High-end (>$700)' },
+  { key: 'all', labelKey: 'priceAll' },
+  { key: 'budget', labelKey: 'priceBudget' },
+  { key: 'mid', labelKey: 'priceMid' },
+  { key: 'high', labelKey: 'priceHigh' },
 ] as const;
 
 export function RankingsFilters() {
+  const t = useTranslations('rankings');
   const router = useRouter();
   const params = useSearchParams();
   const [isPending, startTransition] = useTransition();
@@ -41,14 +43,14 @@ export function RankingsFilters() {
 
   return (
     <div className="card mb-8 flex flex-wrap gap-6">
-      <Group label="Type">
-        {TYPES.map((t) => (
-          <Toggle key={t} active={current.type === t} onClick={() => push({ type: t })}>
-            {t}
+      <Group label={t('filterType')}>
+        {TYPES.map((ty) => (
+          <Toggle key={ty} active={current.type === ty} onClick={() => push({ type: ty })}>
+            {ty}
           </Toggle>
         ))}
       </Group>
-      <Group label="Manufacturer">
+      <Group label={t('filterManufacturer')}>
         {MANUFACTURERS.map((m) => (
           <Toggle
             key={m}
@@ -59,29 +61,29 @@ export function RankingsFilters() {
           </Toggle>
         ))}
       </Group>
-      <Group label="Sort by">
+      <Group label={t('filterSort')}>
         {SORTS.map((s) => (
           <Toggle
             key={s.value}
             active={current.sort === s.value}
             onClick={() => push({ sort: s.value })}
           >
-            {s.label}
+            {t(s.labelKey)}
           </Toggle>
         ))}
       </Group>
-      <Group label="Price">
+      <Group label={t('filterPrice')}>
         {BRACKETS.map((b) => (
           <Toggle
             key={b.key}
             active={current.bracket === b.key}
             onClick={() => push({ bracket: b.key })}
           >
-            {b.label}
+            {t(b.labelKey)}
           </Toggle>
         ))}
       </Group>
-      {isPending && <span className="self-end text-xs text-slate-500">Updating…</span>}
+      {isPending && <span className="self-end text-xs text-slate-500">{t('updating')}</span>}
     </div>
   );
 }

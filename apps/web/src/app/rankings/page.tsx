@@ -1,4 +1,6 @@
 import Link from 'next/link';
+import { useTranslations } from 'next-intl';
+import { getTranslations } from 'next-intl/server';
 
 import { NavBar } from '@/components/NavBar';
 import { Pill } from '@/components/Pill';
@@ -32,7 +34,10 @@ export default async function RankingsPage({ searchParams }: PageProps) {
   const sort = searchParams.sort === 'value' ? 'value' : 'performance';
   const range = BRACKET_RANGE[searchParams.bracket ?? 'all'] ?? {};
 
-  const data = await getRankings({ type, manufacturer, sort, limit: 100, ...range });
+  const [t, data] = await Promise.all([
+    getTranslations('rankings'),
+    getRankings({ type, manufacturer, sort, limit: 100, ...range }),
+  ]);
   const best = data?.items[0]?.performance ?? 100;
 
   return (
@@ -43,25 +48,19 @@ export default async function RankingsPage({ searchParams }: PageProps) {
           <span className="text-3xl">🏆</span>
           <div>
             <h1 className="font-display text-4xl font-semibold tracking-tight text-white">
-              Peringkat Performa
+              {t('title')}
             </h1>
-            <p className="mt-1 text-sm text-slate-400">
-              Best {type}s ranked by performance index{sort === 'value' ? ' value' : ''}.
-            </p>
+            <p className="mt-1 text-sm text-slate-400">{t('subtitle', { type, sort })}</p>
           </div>
         </header>
 
         <RankingsFilters />
 
         {!data || data.items.length === 0 ? (
-          <div className="card text-center text-sm text-slate-400">
-            No ranked {type}s match these filters.
-          </div>
+          <div className="card text-center text-sm text-slate-400">{t('empty', { type })}</div>
         ) : (
           <>
-            <p className="label mb-4">
-              {type} · {sort === 'value' ? 'best value' : 'top performance'} · {data.total} results
-            </p>
+            <p className="label mb-4">{t('summary', { type, sort, total: data.total })}</p>
             <ul className="space-y-3">
               {data.items.map((p) => (
                 <RankRow key={p.slug} p={p} best={best} />
@@ -75,6 +74,7 @@ export default async function RankingsPage({ searchParams }: PageProps) {
 }
 
 function RankRow({ p, best }: { p: RankedProcessor; best: number }) {
+  const t = useTranslations('rankings');
   const barPct = Math.max(3, Math.min(100, (p.performance / best) * 100));
   const isGold = p.rank === 1;
   const costPerScore = p.msrpUsd && p.performance > 0 ? p.msrpUsd / p.performance : null;
@@ -112,7 +112,7 @@ function RankRow({ p, best }: { p: RankedProcessor; best: number }) {
             {p.msrpUsd ? `$${p.msrpUsd.toLocaleString()}` : '—'}
           </p>
           <p className="text-xs text-slate-500">
-            {costPerScore !== null ? `$${costPerScore.toFixed(2)}/score` : '—'}
+            {costPerScore !== null ? t('perScore', { value: costPerScore.toFixed(2) }) : '—'}
           </p>
         </div>
         <span className="text-slate-600">›</span>

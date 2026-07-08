@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import { useTranslations } from 'next-intl';
 import { useState } from 'react';
 
 import { CompareResult } from '@/components/CompareResult';
@@ -10,6 +11,7 @@ import { compareProcessors, type ComparisonPayload } from '@/lib/api';
 type Type = 'CPU' | 'GPU';
 
 export default function ComparePage() {
+  const t = useTranslations('compare');
   const [type, setType] = useState<Type>('CPU');
   const [aSlug, setASlug] = useState<string | null>(null);
   const [bSlug, setBSlug] = useState<string | null>(null);
@@ -37,13 +39,13 @@ export default function ComparePage() {
     <main className="mx-auto max-w-6xl px-6 py-12">
       <div className="mb-10 flex items-end justify-between">
         <div>
-          <p className="label">Engine</p>
+          <p className="label">{t('label')}</p>
           <h1 className="font-display mt-2 text-4xl font-semibold tracking-tight text-white">
-            Comparison
+            {t('title')}
           </h1>
         </div>
         <Link href="/" className="text-sm text-slate-400 hover:text-white">
-          ← Back
+          ← {t('back')}
         </Link>
       </div>
 
@@ -72,14 +74,14 @@ export default function ComparePage() {
 
       <div className="grid gap-6 sm:grid-cols-2">
         <ProcessorPicker
-          label="Side A"
+          label={t('sideA')}
           type={type}
           value={aSlug}
           onChange={setASlug}
           excludeSlug={bSlug}
         />
         <ProcessorPicker
-          label="Side B"
+          label={t('sideB')}
           type={type}
           value={bSlug}
           onChange={setBSlug}
@@ -94,7 +96,7 @@ export default function ComparePage() {
           disabled={!canCompare || loading}
           className="border-accent-blue bg-accent-blue/20 hover:bg-accent-blue/30 rounded-sm border px-6 py-2 text-sm font-semibold text-white transition disabled:cursor-not-allowed disabled:opacity-40"
         >
-          {loading ? 'Comparing…' : 'Compare'}
+          {loading ? t('buttonLoading') : t('button')}
         </button>
         {error && <p className="text-state-danger text-sm">{error}</p>}
       </div>

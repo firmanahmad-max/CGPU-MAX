@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import { getTranslations } from 'next-intl/server';
 
 import { NavBar } from '@/components/NavBar';
 import { Pill } from '@/components/Pill';
@@ -20,7 +21,8 @@ async function countOf(type?: 'CPU' | 'GPU'): Promise<number | null> {
 }
 
 export default async function HomePage() {
-  const [cpuCount, gpuCount, top] = await Promise.all([
+  const [t, cpuCount, gpuCount, top] = await Promise.all([
+    getTranslations('home'),
     countOf('CPU'),
     countOf('GPU'),
     getRankings({ sort: 'performance', limit: 6 }),
@@ -33,16 +35,13 @@ export default async function HomePage() {
       <main className="mx-auto max-w-6xl px-6 py-16">
         {/* Hero */}
         <section className="mb-12">
-          <p className="label mb-4">Hardware Intelligence Platform</p>
+          <p className="label mb-4">{t('tagline')}</p>
           <h1 className="font-display text-5xl font-semibold leading-tight tracking-tight text-white sm:text-6xl">
-            Compare CPUs &amp; GPUs.
+            {t('titleLine1')}
             <br />
-            <span className="text-accent-blue">Know your bottleneck.</span>
+            <span className="text-accent-blue">{t('titleLine2')}</span>
           </h1>
-          <p className="mt-6 max-w-2xl text-lg text-slate-400">
-            The most complete CPU &amp; GPU spec database — compare performance, calculate
-            bottlenecks, and find the best hardware for your needs.
-          </p>
+          <p className="mt-6 max-w-2xl text-lg text-slate-400">{t('subtitle')}</p>
 
           {/* Quick search — progressive, works without JS (navigates to /processors). */}
           <form action="/processors" method="get" className="mt-8 max-w-xl">
@@ -51,7 +50,7 @@ export default async function HomePage() {
               <input
                 type="search"
                 name="search"
-                placeholder="Search by processor name, architecture, or brand…"
+                placeholder={t('searchPlaceholder')}
                 className="w-full bg-transparent text-sm text-white placeholder:text-slate-500 focus:outline-none"
               />
             </div>
@@ -60,9 +59,9 @@ export default async function HomePage() {
 
         {/* Real stat counters */}
         <section className="mb-12 grid gap-4 sm:grid-cols-3">
-          <StatCard icon="🧠" label="Total CPU" value={cpuCount} />
-          <StatCard icon="🎮" label="Total GPU" value={gpuCount} />
-          <StatCard icon="📊" label="Total Processors" value={total} />
+          <StatCard icon="🧠" label={t('totalCpu')} value={cpuCount} />
+          <StatCard icon="🎮" label={t('totalGpu')} value={gpuCount} />
+          <StatCard icon="📊" label={t('totalProcessors')} value={total} />
         </section>
 
         {/* Feature navigation cards */}
@@ -70,20 +69,20 @@ export default async function HomePage() {
           <FeatureCard
             href="/compare"
             icon="🔄"
-            title="Compare"
-            desc="Side-by-side comparison of two processors with detailed analysis."
+            title={t('featureCompareTitle')}
+            desc={t('featureCompareDesc')}
           />
           <FeatureCard
             href="/bottleneck"
             icon="⚙️"
-            title="Bottleneck Calculator"
-            desc="CPU + GPU pairing analysis across resolutions and game profiles."
+            title={t('featureBottleneckTitle')}
+            desc={t('featureBottleneckDesc')}
           />
           <FeatureCard
             href="/rankings"
             icon="🏆"
-            title="Rankings"
-            desc="Top CPUs & GPUs ranked by performance and value."
+            title={t('featureRankingsTitle')}
+            desc={t('featureRankingsDesc')}
           />
         </section>
 
@@ -91,9 +90,11 @@ export default async function HomePage() {
         {top && top.items.length > 0 && (
           <section>
             <div className="mb-4 flex items-center justify-between">
-              <h2 className="font-display text-2xl font-semibold text-white">Top performers</h2>
+              <h2 className="font-display text-2xl font-semibold text-white">
+                {t('topPerformers')}
+              </h2>
               <Link href="/rankings" className="text-accent-blue text-sm hover:underline">
-                View all →
+                {t('viewAll')} →
               </Link>
             </div>
             <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">

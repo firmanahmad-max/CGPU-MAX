@@ -1,4 +1,6 @@
 import type { Metadata } from 'next';
+import { NextIntlClientProvider } from 'next-intl';
+import { getLocale, getMessages } from 'next-intl/server';
 
 import { AppAuthProvider } from '@/lib/auth';
 
@@ -13,11 +15,15 @@ export const metadata: Metadata = {
     'Professional CPU & GPU comparison, bottleneck analysis, and AI-driven build recommendations.',
 };
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
+export default async function RootLayout({ children }: { children: React.ReactNode }) {
+  const [locale, messages] = await Promise.all([getLocale(), getMessages()]);
+
   return (
-    <html lang="en" className="dark">
+    <html lang={locale} className="dark">
       <body className="bg-surface-dark min-h-screen font-sans text-slate-100 antialiased">
-        <AppAuthProvider>{children}</AppAuthProvider>
+        <NextIntlClientProvider locale={locale} messages={messages}>
+          <AppAuthProvider>{children}</AppAuthProvider>
+        </NextIntlClientProvider>
       </body>
     </html>
   );

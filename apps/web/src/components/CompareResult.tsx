@@ -1,3 +1,5 @@
+import { useTranslations } from 'next-intl';
+
 import type { ComparisonPayload } from '@/lib/api';
 import { cn } from '@/lib/cn';
 
@@ -8,6 +10,7 @@ interface CompareResultProps {
 }
 
 export function CompareResult({ result }: CompareResultProps) {
+  const t = useTranslations('compare');
   const aWins = result.metrics.filter((m) => m.winner === 'a').length;
   const bWins = result.metrics.filter((m) => m.winner === 'b').length;
   const winnerName =
@@ -43,24 +46,26 @@ export function CompareResult({ result }: CompareResultProps) {
         <p className="text-sm text-slate-200">
           {winnerName ? (
             <>
-              <span className="font-semibold text-white">{winnerName}</span> wins in more categories
+              <span className="font-semibold text-white">{winnerName}</span> {t('winnerSuffix')}
               <span className="text-slate-400">
                 {' '}
-                ({winnerCats} of {result.metrics.length} metrics)
+                {t('winnerCount', { won: winnerCats, total: result.metrics.length })}
               </span>
             </>
           ) : (
-            <>Evenly matched — neither leads in more categories.</>
+            <>{t('evenlyMatched')}</>
           )}
         </p>
-        <span className="ml-auto text-xs text-slate-500">algorithm {result.algorithmVersion}</span>
+        <span className="ml-auto text-xs text-slate-500">
+          {t('algorithm', { version: result.algorithmVersion })}
+        </span>
       </div>
 
       <div className="card overflow-hidden p-0">
         <table className="w-full text-sm">
           <thead className="tracking-label bg-white/[0.03] text-left text-xs uppercase text-slate-400">
             <tr>
-              <th className="px-4 py-3">Metric</th>
+              <th className="px-4 py-3">{t('metric')}</th>
               <th className="px-4 py-3 text-right">{result.a.modelName}</th>
               <th className="px-4 py-3 text-right">{result.b.modelName}</th>
               <th className="px-4 py-3 text-right">Δ</th>
@@ -100,7 +105,7 @@ export function CompareResult({ result }: CompareResultProps) {
       {/* Price-to-performance (adopted from the prior version): cost per
           performance point, computed from real MSRP + performance index. */}
       <div>
-        <p className="label mb-3">Price-to-performance analysis</p>
+        <p className="label mb-3">{t('priceToPerformance')}</p>
         <div className="grid gap-4 sm:grid-cols-2">
           <ValueCard
             processor={result.a}
@@ -115,7 +120,7 @@ export function CompareResult({ result }: CompareResultProps) {
         </div>
         {result.shareSlug && (
           <p className="mt-3 font-mono text-xs text-slate-500">
-            share: <span className="text-slate-300">{result.shareSlug}</span>
+            {t('share')}: <span className="text-slate-300">{result.shareSlug}</span>
           </p>
         )}
       </div>
@@ -132,6 +137,7 @@ function ValueCard({
   score: number;
   bestValue: boolean;
 }) {
+  const t = useTranslations('compare');
   const costPerScore = processor.msrpUsd && score > 0 ? processor.msrpUsd / score : null;
   return (
     <div className={cn('card', bestValue && 'border-state-success/40 bg-state-success/5')}>
@@ -140,9 +146,13 @@ function ValueCard({
         {processor.msrpUsd ? `$${processor.msrpUsd.toLocaleString()}` : '—'}
       </p>
       <p className="mt-1 text-xs text-slate-500">
-        {costPerScore !== null ? `$${costPerScore.toFixed(2)} / score` : 'no price data'}
+        {costPerScore !== null
+          ? t('perScore', { value: costPerScore.toFixed(2) })
+          : t('noPriceData')}
       </p>
-      {bestValue && <p className="text-state-success mt-2 text-sm font-medium">✓ Better value</p>}
+      {bestValue && (
+        <p className="text-state-success mt-2 text-sm font-medium">✓ {t('betterValue')}</p>
+      )}
     </div>
   );
 }
@@ -158,13 +168,14 @@ function Side({
   winner: boolean;
   side: 'A' | 'B';
 }) {
+  const t = useTranslations('compare');
   return (
     <div className={cn('card', winner && 'border-state-success/40 bg-state-success/5')}>
       <div className="mb-2 flex items-center justify-between">
-        <p className="label">Side {side}</p>
+        <p className="label">{side === 'A' ? t('sideA') : t('sideB')}</p>
         {winner && (
           <Pill className="border-state-success/50 bg-state-success/15 text-state-success">
-            Winner
+            {t('winner')}
           </Pill>
         )}
       </div>
@@ -173,7 +184,7 @@ function Side({
         {processor.manufacturer} · {processor.type}
       </p>
       <p className="metric mt-4">{score.toFixed(1)}</p>
-      <p className="label mt-1">Performance index</p>
+      <p className="label mt-1">{t('performanceIndex')}</p>
     </div>
   );
 }

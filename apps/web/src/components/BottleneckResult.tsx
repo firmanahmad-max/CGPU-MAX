@@ -1,3 +1,5 @@
+import { useTranslations } from 'next-intl';
+
 import type { BottleneckPayload } from '@/lib/api';
 import { cn } from '@/lib/cn';
 
@@ -20,6 +22,7 @@ const SEVERITY_BG: Record<BottleneckPayload['scenarios'][number]['severity'], st
 };
 
 export function BottleneckResult({ result }: BottleneckResultProps) {
+  const t = useTranslations('bottleneck');
   // Use 1440p AAA as headline scenario.
   const headline =
     result.scenarios.find((s) => s.resolution === '1440p' && s.profile === 'aaa') ??
@@ -37,12 +40,13 @@ export function BottleneckResult({ result }: BottleneckResultProps) {
             label={`${headline.resolution} · ${headline.profile}`}
           />
           <p className="mt-2 text-sm text-slate-400">
-            Limiting: <span className="font-mono uppercase">{headline.limitingComponent}</span>
+            {t('limiting')}:{' '}
+            <span className="font-mono uppercase">{headline.limitingComponent}</span>
           </p>
         </div>
 
         <div className="card flex flex-col justify-center">
-          <p className="label mb-4">Power index (0–100)</p>
+          <p className="label mb-4">{t('powerIndex')}</p>
           <PowerBar
             label={`CPU: ${result.cpu.modelName}`}
             value={result.cpuPower}
@@ -118,22 +122,22 @@ export function BottleneckResult({ result }: BottleneckResultProps) {
 
       <div className="grid gap-4 sm:grid-cols-3">
         <Stat
-          label="Thermal estimate"
+          label={t('thermalEstimate')}
           value={result.thermalEstimateC ? `${result.thermalEstimateC} °C` : '—'}
         />
         <Stat
-          label="Power draw"
+          label={t('powerDraw')}
           value={result.totalPowerDrawW ? `${result.totalPowerDrawW} W` : '—'}
         />
         <Stat
-          label="Recommended PSU"
+          label={t('recommendedPsu')}
           value={result.recommendedPsuW ? `${result.recommendedPsuW} W` : '—'}
         />
       </div>
 
       {result.recommendations.length > 0 && (
         <div className="card">
-          <p className="label mb-3">Recommendations</p>
+          <p className="label mb-3">{t('recommendations')}</p>
           <ul className="space-y-2 text-sm text-slate-300">
             {result.recommendations.map((r, i) => (
               <li key={i} className="flex gap-2">
@@ -146,10 +150,10 @@ export function BottleneckResult({ result }: BottleneckResultProps) {
       )}
 
       <div className="flex flex-wrap items-center gap-3 text-xs text-slate-500">
-        <Pill>algorithm {result.algorithmVersion}</Pill>
+        <Pill>{t('algorithm', { version: result.algorithmVersion })}</Pill>
         {result.shareSlug && (
           <span className="font-mono">
-            share: <span className="text-slate-300">{result.shareSlug}</span>
+            {t('share')}: <span className="text-slate-300">{result.shareSlug}</span>
           </span>
         )}
       </div>

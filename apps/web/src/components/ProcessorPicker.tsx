@@ -1,5 +1,6 @@
 'use client';
 
+import { useTranslations } from 'next-intl';
 import { useEffect, useState } from 'react';
 
 import type { Processor } from '@cgpu-max/types';
@@ -26,6 +27,7 @@ export function ProcessorPicker({
   onChange,
   excludeSlug,
 }: ProcessorPickerProps) {
+  const t = useTranslations('picker');
   const [search, setSearch] = useState('');
   const [results, setResults] = useState<Processor[]>([]);
   const [loading, setLoading] = useState(false);
@@ -65,7 +67,7 @@ export function ProcessorPicker({
             onClick={() => setEditing(true)}
             className="text-accent-blue text-xs font-medium hover:underline"
           >
-            Change
+            {t('change')}
           </button>
         </div>
         <div className="flex items-center gap-2">
@@ -90,15 +92,17 @@ export function ProcessorPicker({
       <p className="label mb-3">{label}</p>
       <input
         type="search"
-        placeholder={`Search ${type}…`}
+        placeholder={t('searchPlaceholder', { type })}
         value={search}
         onChange={(e) => setSearch(e.currentTarget.value)}
         className="focus:border-accent-blue w-full rounded-sm border border-white/10 bg-white/5 px-3 py-2 text-sm text-white placeholder:text-slate-500 focus:outline-none"
       />
 
       <div className="mt-3 max-h-64 space-y-1 overflow-y-auto">
-        {loading && <p className="text-xs text-slate-500">Loading…</p>}
-        {!loading && results.length === 0 && <p className="text-xs text-slate-500">No matches.</p>}
+        {loading && <p className="text-xs text-slate-500">{t('loading')}</p>}
+        {!loading && results.length === 0 && (
+          <p className="text-xs text-slate-500">{t('noMatches')}</p>
+        )}
         {results.map((p) => (
           <button
             key={p.id}
