@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import { useTranslations } from 'next-intl';
 import { useEffect, useState } from 'react';
 
 import { NavBar } from '@/components/NavBar';
@@ -22,6 +23,7 @@ interface CreatedKey extends ApiKeyMeta {
 }
 
 export default function ApiKeysPage() {
+  const t = useTranslations('apiKeys');
   const authedFetch = useAuthedFetch();
   const [keys, setKeys] = useState<ApiKeyMeta[]>([]);
   const [loading, setLoading] = useState(true);
@@ -94,23 +96,23 @@ export default function ApiKeysPage() {
       <main className="mx-auto max-w-4xl px-6 py-12">
         <div className="mb-8 flex items-end justify-between">
           <div>
-            <p className="label">Enterprise</p>
+            <p className="label">{t('label')}</p>
             <h1 className="font-display mt-2 text-4xl font-semibold tracking-tight text-white">
-              API Keys
+              {t('title')}
             </h1>
           </div>
           <Link href="/account" className="text-sm text-slate-400 hover:text-white">
-            ← Account
+            ← {t('backAccount')}
           </Link>
         </div>
 
         {gated ? (
           <div className="card text-center">
-            <p className="label mb-2">Enterprise feature</p>
+            <p className="label mb-2">{t('gatedTitle')}</p>
             <p className="text-sm text-slate-400">
-              The public REST API and API keys are available on the Enterprise plan.{' '}
+              {t('gatedBody')}{' '}
               <a href="mailto:sales@cgpu-max.app" className="text-accent-blue hover:underline">
-                Contact sales
+                {t('contactSales')}
               </a>
               .
             </p>
@@ -125,10 +127,8 @@ export default function ApiKeysPage() {
 
             {revealed && (
               <div className="card border-state-success/40 bg-state-success/5 mb-6">
-                <p className="label text-state-success mb-2">New key — copy it now</p>
-                <p className="mb-3 text-xs text-slate-400">
-                  This is the only time the full key is shown. Store it securely.
-                </p>
+                <p className="label text-state-success mb-2">{t('newKeyTitle')}</p>
+                <p className="mb-3 text-xs text-slate-400">{t('newKeyBody')}</p>
                 <code className="block break-all rounded-sm bg-black/40 px-3 py-2 font-mono text-sm text-white">
                   {revealed.key}
                 </code>
@@ -137,19 +137,19 @@ export default function ApiKeysPage() {
                   onClick={() => setRevealed(null)}
                   className="mt-3 text-xs text-slate-400 hover:text-white"
                 >
-                  I&apos;ve saved it — dismiss
+                  {t('dismiss')}
                 </button>
               </div>
             )}
 
             <div className="card mb-6">
-              <p className="label mb-3">Create a key</p>
+              <p className="label mb-3">{t('createTitle')}</p>
               <div className="flex gap-3">
                 <input
                   type="text"
                   value={newName}
                   maxLength={80}
-                  placeholder="Key name (e.g. production-server)"
+                  placeholder={t('namePlaceholder')}
                   onChange={(e) => setNewName(e.currentTarget.value)}
                   className="focus:border-accent-blue flex-1 rounded-sm border border-white/10 bg-white/5 px-3 py-2 text-sm text-white placeholder:text-slate-500 focus:outline-none"
                 />
@@ -159,17 +159,17 @@ export default function ApiKeysPage() {
                   disabled={creating || !newName.trim()}
                   className="border-accent-blue bg-accent-blue/20 hover:bg-accent-blue/30 rounded-sm border px-5 py-2 text-sm font-semibold text-white transition disabled:opacity-40"
                 >
-                  {creating ? 'Creating…' : 'Create'}
+                  {creating ? t('creating') : t('create')}
                 </button>
               </div>
             </div>
 
             <div className="card">
-              <p className="label mb-4">Active keys</p>
+              <p className="label mb-4">{t('activeKeys')}</p>
               {loading ? (
-                <p className="text-sm text-slate-500">Loading…</p>
+                <p className="text-sm text-slate-500">{t('loading')}</p>
               ) : keys.length === 0 ? (
-                <p className="text-sm text-slate-500">No keys yet.</p>
+                <p className="text-sm text-slate-500">{t('noKeys')}</p>
               ) : (
                 <ul className="divide-y divide-white/5">
                   {keys.map((k) => (
@@ -180,8 +180,8 @@ export default function ApiKeysPage() {
                           {k.keyPrefix}…
                           <span className="ml-2">
                             {k.lastUsedAt
-                              ? `last used ${new Date(k.lastUsedAt).toLocaleDateString()}`
-                              : 'never used'}
+                              ? t('lastUsed', { date: new Date(k.lastUsedAt).toLocaleDateString() })
+                              : t('neverUsed')}
                           </span>
                         </p>
                       </div>
@@ -194,7 +194,7 @@ export default function ApiKeysPage() {
                           onClick={() => revoke(k.id)}
                           className="text-state-danger text-xs hover:underline"
                         >
-                          Revoke
+                          {t('revoke')}
                         </button>
                       </div>
                     </li>
@@ -204,9 +204,8 @@ export default function ApiKeysPage() {
             </div>
 
             <p className="mt-6 text-xs text-slate-500">
-              API docs: <code className="font-mono">GET /api/public/v1/openapi.json</code>.
-              Authenticate with <code className="font-mono">Authorization: Bearer &lt;key&gt;</code>
-              .
+              {t('docsPrefix')} <code className="font-mono">GET /api/public/v1/openapi.json</code>.{' '}
+              {t('authWith')} <code className="font-mono">Authorization: Bearer &lt;key&gt;</code>.
             </p>
           </>
         )}

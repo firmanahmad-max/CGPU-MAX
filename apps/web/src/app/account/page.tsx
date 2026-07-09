@@ -1,5 +1,6 @@
 'use client';
 
+import { useTranslations } from 'next-intl';
 import { useEffect, useState } from 'react';
 
 import { useCurrentUser } from '@/lib/auth';
@@ -27,6 +28,7 @@ interface SubscriptionResponse {
 }
 
 export default function AccountPage() {
+  const t = useTranslations('account');
   const user = useCurrentUser();
   const authedFetch = useAuthedFetch();
   const [data, setData] = useState<SubscriptionResponse | null>(null);
@@ -69,9 +71,12 @@ export default function AccountPage() {
       <NavBar />
       <main className="mx-auto max-w-4xl px-6 py-12">
         <header className="mb-10">
-          <p className="label">Account</p>
+          <p className="label">{t('label')}</p>
           <h1 className="font-display mt-2 text-4xl font-semibold tracking-tight text-white">
-            {user?.firstName ?? user?.username ?? 'Your'} dashboard
+            {(() => {
+              const name = user?.firstName ?? user?.username;
+              return name ? t('dashboardTitle', { name }) : t('dashboardFallback');
+            })()}
           </h1>
           <p className="mt-2 text-sm text-slate-400">{user.email}</p>
         </header>
@@ -87,18 +92,20 @@ export default function AccountPage() {
             <section className="card">
               <div className="mb-4 flex items-center justify-between">
                 <div>
-                  <p className="label">Current plan</p>
+                  <p className="label">{t('currentPlan')}</p>
                   <p className="font-display mt-2 text-3xl font-semibold text-white">{data.tier}</p>
                 </div>
                 <Pill variant={data.tier === 'PRO' ? 'intel' : 'default'}>
-                  {data.subscription?.status ?? 'No active subscription'}
+                  {data.subscription?.status ?? t('noSubscription')}
                 </Pill>
               </div>
               {data.subscription && (
                 <p className="text-sm text-slate-400">
-                  Renews {new Date(data.subscription.currentPeriodEnd).toLocaleDateString()} ·
-                  billed {data.subscription.interval.toLowerCase()}
-                  {data.subscription.cancelAtPeriodEnd && ' · cancels at period end'}
+                  {t('renews', {
+                    date: new Date(data.subscription.currentPeriodEnd).toLocaleDateString(),
+                    interval: data.subscription.interval.toLowerCase(),
+                  })}
+                  {data.subscription.cancelAtPeriodEnd && t('cancelsSuffix')}
                 </p>
               )}
               <div className="mt-6 flex gap-3">
@@ -109,29 +116,29 @@ export default function AccountPage() {
                     disabled={portalLoading}
                     className="rounded-sm border border-white/20 bg-white/10 px-4 py-2 text-sm font-semibold text-white transition hover:bg-white/20 disabled:opacity-50"
                   >
-                    {portalLoading ? 'Opening…' : 'Manage billing'}
+                    {portalLoading ? t('opening') : t('manageBilling')}
                   </button>
                 ) : (
                   <a
                     href="/pricing"
                     className="border-accent-blue bg-accent-blue/20 hover:bg-accent-blue/30 rounded-sm border px-4 py-2 text-sm font-semibold text-white transition"
                   >
-                    Upgrade to Pro
+                    {t('upgrade')}
                   </a>
                 )}
               </div>
             </section>
 
             <section className="card">
-              <p className="label mb-4">Usage · {data.period}</p>
+              <p className="label mb-4">{t('usagePeriod', { period: data.period })}</p>
               <dl className="grid gap-4 sm:grid-cols-2">
                 <UsageRow
-                  label="Comparisons"
+                  label={t('comparisons')}
                   used={data.usage.comparisons ?? 0}
                   limit={data.limits.comparisonsPerMonth}
                 />
                 <UsageRow
-                  label="AI recommendations"
+                  label={t('aiRecommendations')}
                   used={data.usage.aiRecommendations ?? 0}
                   limit={data.limits.aiRecommendationsPerMonth}
                 />
@@ -141,24 +148,22 @@ export default function AccountPage() {
             {data.limits.features.apiAccess && (
               <section className="card flex items-center justify-between">
                 <div>
-                  <p className="label">Developer</p>
-                  <p className="mt-1 text-sm text-slate-300">
-                    Manage API keys for the public REST API.
-                  </p>
+                  <p className="label">{t('developer')}</p>
+                  <p className="mt-1 text-sm text-slate-300">{t('developerDesc')}</p>
                 </div>
                 <div className="flex gap-2">
                   <a
                     href="/account/api-keys"
                     className="rounded-sm border border-white/20 bg-white/10 px-4 py-2 text-sm font-semibold text-white transition hover:bg-white/20"
                   >
-                    API keys →
+                    {t('apiKeysLink')} →
                   </a>
                   {data.limits.features.whiteLabel && (
                     <a
                       href="/account/organization"
                       className="rounded-sm border border-white/20 bg-white/10 px-4 py-2 text-sm font-semibold text-white transition hover:bg-white/20"
                     >
-                      Organization →
+                      {t('organizationLink')} →
                     </a>
                   )}
                 </div>

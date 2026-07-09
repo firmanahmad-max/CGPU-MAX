@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import { useTranslations } from 'next-intl';
 import { useEffect, useState } from 'react';
 
 import { NavBar } from '@/components/NavBar';
@@ -23,6 +24,7 @@ interface Org {
 }
 
 export default function OrganizationPage() {
+  const t = useTranslations('organization');
   const authedFetch = useAuthedFetch();
   const [orgs, setOrgs] = useState<Org[]>([]);
   const [active, setActive] = useState<Org | null>(null);
@@ -122,21 +124,21 @@ export default function OrganizationPage() {
       <main className="mx-auto max-w-3xl px-6 py-12">
         <div className="mb-8 flex items-end justify-between">
           <div>
-            <p className="label">Enterprise · White-label</p>
+            <p className="label">{t('label')}</p>
             <h1 className="font-display mt-2 text-4xl font-semibold tracking-tight text-white">
-              Organization
+              {t('title')}
             </h1>
           </div>
           <Link href="/account" className="text-sm text-slate-400 hover:text-white">
-            ← Account
+            ← {t('backAccount')}
           </Link>
         </div>
 
         {gated ? (
           <div className="card text-center text-sm text-slate-400">
-            White-label organizations are an Enterprise feature.{' '}
+            {t('gatedBody')}{' '}
             <a href="mailto:sales@cgpu-max.app" className="text-accent-blue hover:underline">
-              Contact sales
+              {t('contactSales')}
             </a>
             .
           </div>
@@ -150,12 +152,12 @@ export default function OrganizationPage() {
 
             {!loading && orgs.length === 0 && (
               <div className="card mb-6">
-                <p className="label mb-3">Create organization</p>
+                <p className="label mb-3">{t('createTitle')}</p>
                 <div className="flex gap-3">
                   <input
                     value={newName}
                     onChange={(e) => setNewName(e.currentTarget.value)}
-                    placeholder="Organization name"
+                    placeholder={t('namePlaceholder')}
                     className="focus:border-accent-blue flex-1 rounded-sm border border-white/10 bg-white/5 px-3 py-2 text-sm text-white placeholder:text-slate-500 focus:outline-none"
                   />
                   <button
@@ -163,7 +165,7 @@ export default function OrganizationPage() {
                     onClick={create}
                     className="border-accent-blue bg-accent-blue/20 hover:bg-accent-blue/30 rounded-sm border px-5 py-2 text-sm font-semibold text-white"
                   >
-                    Create
+                    {t('create')}
                   </button>
                 </div>
               </div>
@@ -172,37 +174,37 @@ export default function OrganizationPage() {
             {active && (
               <div className="card space-y-4">
                 <div className="flex items-center justify-between">
-                  <p className="label">Branding · {active.name}</p>
+                  <p className="label">{t('branding', { name: active.name })}</p>
                   {active.role && <Pill>{active.role}</Pill>}
                 </div>
 
                 <Field
-                  label="Brand name"
+                  label={t('brandName')}
                   value={form.brandName}
                   onChange={(v) => setForm({ ...form, brandName: v })}
                 />
                 <Field
-                  label="Logo URL"
+                  label={t('logoUrl')}
                   value={form.logoUrl}
                   onChange={(v) => setForm({ ...form, logoUrl: v })}
                   placeholder="https://…"
                 />
                 <div className="grid grid-cols-2 gap-4">
                   <Field
-                    label="Primary color"
+                    label={t('primaryColor')}
                     value={form.primaryColorHex}
                     onChange={(v) => setForm({ ...form, primaryColorHex: v })}
                     placeholder="#042C53"
                   />
                   <Field
-                    label="Secondary color"
+                    label={t('secondaryColor')}
                     value={form.secondaryColorHex}
                     onChange={(v) => setForm({ ...form, secondaryColorHex: v })}
                     placeholder="#185FA5"
                   />
                 </div>
                 <Field
-                  label="Custom domain"
+                  label={t('customDomain')}
                   value={form.customDomain}
                   onChange={(v) => setForm({ ...form, customDomain: v })}
                   placeholder="shop.example.com"
@@ -214,9 +216,9 @@ export default function OrganizationPage() {
                     onClick={save}
                     className="border-accent-blue bg-accent-blue/20 hover:bg-accent-blue/30 rounded-sm border px-5 py-2 text-sm font-semibold text-white"
                   >
-                    Save branding
+                    {t('save')}
                   </button>
-                  {saved && <span className="text-state-success text-sm">Saved ✓</span>}
+                  {saved && <span className="text-state-success text-sm">{t('savedMark')}</span>}
                   <span className="ml-auto flex gap-2">
                     <span
                       className="h-6 w-6 rounded-sm border border-white/20"
@@ -230,7 +232,7 @@ export default function OrganizationPage() {
                 </div>
                 {active.customDomain && (
                   <p className="text-xs text-slate-500">
-                    Resolve theme:{' '}
+                    {t('resolveTheme')}{' '}
                     <code className="font-mono">
                       GET /api/v1/branding/by-domain/{active.customDomain}
                     </code>
