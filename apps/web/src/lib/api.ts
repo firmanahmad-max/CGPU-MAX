@@ -57,12 +57,15 @@ export interface RankedProcessor {
   value: number | null;
 }
 
+export type RankingCategory = 'overall' | 'gaming' | 'productivity' | 'workstation';
+
 export interface RankingsResponse {
   items: RankedProcessor[];
   total: number;
   limit: number;
   offset: number;
   sort: 'performance' | 'value';
+  category: RankingCategory;
 }
 
 export async function getRankings(
@@ -70,6 +73,7 @@ export async function getRankings(
     type?: 'CPU' | 'GPU';
     manufacturer?: 'INTEL' | 'AMD' | 'NVIDIA';
     sort?: 'performance' | 'value';
+    category?: RankingCategory;
     minPrice?: number;
     maxPrice?: number;
     limit?: number;
@@ -79,6 +83,7 @@ export async function getRankings(
     type: params.type,
     manufacturer: params.manufacturer,
     sort: params.sort,
+    category: params.category,
     minPrice: params.minPrice,
     maxPrice: params.maxPrice,
     limit: params.limit,

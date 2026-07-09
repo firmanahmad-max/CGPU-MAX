@@ -5,13 +5,21 @@ import { getTranslations } from 'next-intl/server';
 import { NavBar } from '@/components/NavBar';
 import { Pill } from '@/components/Pill';
 import { RankingsFilters } from '@/components/RankingsFilters';
-import { getRankings, type RankedProcessor } from '@/lib/api';
+import { getRankings, type RankedProcessor, type RankingCategory } from '@/lib/api';
 
 export const dynamic = 'force-dynamic';
 
 interface PageProps {
-  searchParams: { type?: string; manufacturer?: string; sort?: string; bracket?: string };
+  searchParams: {
+    type?: string;
+    manufacturer?: string;
+    sort?: string;
+    category?: string;
+    bracket?: string;
+  };
 }
+
+const CATEGORIES: RankingCategory[] = ['overall', 'gaming', 'productivity', 'workstation'];
 
 const manufacturerVariant = (m: string) =>
   m === 'INTEL' ? 'intel' : m === 'AMD' ? 'amd' : 'nvidia';
@@ -32,11 +40,14 @@ export default async function RankingsPage({ searchParams }: PageProps) {
       ? searchParams.manufacturer
       : undefined;
   const sort = searchParams.sort === 'value' ? 'value' : 'performance';
+  const category = CATEGORIES.includes(searchParams.category as RankingCategory)
+    ? (searchParams.category as RankingCategory)
+    : 'overall';
   const range = BRACKET_RANGE[searchParams.bracket ?? 'all'] ?? {};
 
   const [t, data] = await Promise.all([
     getTranslations('rankings'),
-    getRankings({ type, manufacturer, sort, limit: 100, ...range }),
+    getRankings({ type, manufacturer, sort, category, limit: 100, ...range }),
   ]);
   const best = data?.items[0]?.performance ?? 100;
 

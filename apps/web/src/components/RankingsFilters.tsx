@@ -6,6 +6,13 @@ import { useTransition } from 'react';
 
 const TYPES = ['CPU', 'GPU'] as const;
 const MANUFACTURERS = ['ALL', 'INTEL', 'AMD', 'NVIDIA'] as const;
+// Use-case tabs — weights live in apps/api rankings domain scoring.
+const CATEGORIES = [
+  { key: 'overall', labelKey: 'catOverall' },
+  { key: 'gaming', labelKey: 'catGaming' },
+  { key: 'productivity', labelKey: 'catProductivity' },
+  { key: 'workstation', labelKey: 'catWorkstation' },
+] as const;
 const SORTS = [
   { value: 'performance', labelKey: 'sortPerformance' },
   { value: 'value', labelKey: 'sortValue' },
@@ -28,6 +35,7 @@ export function RankingsFilters() {
     type: params.get('type') ?? 'CPU',
     manufacturer: params.get('manufacturer') ?? 'ALL',
     sort: params.get('sort') ?? 'performance',
+    category: params.get('category') ?? 'overall',
     bracket: params.get('bracket') ?? 'all',
   };
 
@@ -37,6 +45,7 @@ export function RankingsFilters() {
     url.set('type', merged.type);
     if (merged.manufacturer !== 'ALL') url.set('manufacturer', merged.manufacturer);
     if (merged.sort !== 'performance') url.set('sort', merged.sort);
+    if (merged.category !== 'overall') url.set('category', merged.category);
     if (merged.bracket !== 'all') url.set('bracket', merged.bracket);
     startTransition(() => router.push(`/rankings?${url.toString()}`));
   };
@@ -47,6 +56,17 @@ export function RankingsFilters() {
         {TYPES.map((ty) => (
           <Toggle key={ty} active={current.type === ty} onClick={() => push({ type: ty })}>
             {ty}
+          </Toggle>
+        ))}
+      </Group>
+      <Group label={t('filterCategory')}>
+        {CATEGORIES.map((c) => (
+          <Toggle
+            key={c.key}
+            active={current.category === c.key}
+            onClick={() => push({ category: c.key })}
+          >
+            {t(c.labelKey)}
           </Toggle>
         ))}
       </Group>

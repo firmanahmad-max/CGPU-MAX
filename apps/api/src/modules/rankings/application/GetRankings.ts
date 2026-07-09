@@ -1,7 +1,7 @@
 import type { Manufacturer, PrismaClient, ProcessorType } from '@prisma/client';
 
 import { CacheTTL, getOrSet } from '../../../shared/cache/cache.js';
-import { performanceScore, valueScore } from '../domain/scoring.js';
+import { categoryScore, valueScore, type RankingCategory } from '../domain/scoring.js';
 
 export type RankingSort = 'performance' | 'value';
 
@@ -9,6 +9,7 @@ export interface RankingsInput {
   type: ProcessorType;
   manufacturer?: Manufacturer;
   sort: RankingSort;
+  category: RankingCategory;
   minPrice?: number;
   maxPrice?: number;
   limit: number;
@@ -30,7 +31,7 @@ export class GetRankings {
   constructor(private readonly prisma: PrismaClient) {}
 
   async execute(input: RankingsInput) {
-    const key = `rankings:${input.type}:${input.manufacturer ?? '*'}:${input.sort}:${input.minPrice ?? 0}:${input.maxPrice ?? 0}:${input.limit}:${input.offset}`;
+    const key = `rankings:${input.type}:${input.manufacturer ?? '*'}:${input.sort}:${input.category}:${input.minPrice ?? 0}:${input.maxPrice ?? 0}:${input.limit}:${input.offset}`;
     return getOrSet(
       key,
       { ttlSeconds: CacheTTL.listShort, tags: ['processors:list'] },
@@ -51,14 +52,17 @@ export class GetRankings {
               const n = Number(b.score);
               if (Number.isFinite(n)) benchmarks[b.benchmarkType] = n;
             }
-            const performance = performanceScore({
-              type: r.type,
-              benchmarks,
-              cores: r.cpuSpecs?.cores,
-              boostClockGhz: r.cpuSpecs?.boostClockGhz ? Number(r.cpuSpecs.boostClockGhz) : null,
-              shaderUnits: r.gpuSpecs?.shaderUnits,
-              boostClockMhz: r.gpuSpecs?.boostClockMhz ?? null,
-            });
+            const performance = categoryScore(
+              {
+                type: r.type,
+                benchmarks,
+                cores: r.cpuSpecs?.cores,
+                boostClockGhz: r.cpuSpecs?.boostClockGhz ? Number(r.cpuSpecs.boostClockGhz) : null,
+                shaderUnits: r.gpuSpecs?.shaderUnits,
+                boostClockMhz: r.gpuSpecs?.boostClockMhz ?? null,
+              },
+              input.category,
+            );
             if (performance === null) return null;
             const msrpUsd = r.msrpUsd ? Number(r.msrpUsd) : null;
             return {
@@ -91,7 +95,14 @@ export class GetRankings {
           .slice(input.offset, input.offset + input.limit)
           .map((x, i) => ({ rank: input.offset + i + 1, ...x }));
 
-        return { items, total, limit: input.limit, offset: input.offset, sort: input.sort };
+        return {
+          items,
+          total,
+          limit: input.limit,
+          offset: input.offset,
+          sort: input.sort,
+          category: input.category,
+        };
       },
     );
   }
