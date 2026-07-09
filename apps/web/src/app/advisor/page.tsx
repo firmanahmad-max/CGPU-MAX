@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import { useTranslations } from 'next-intl';
 
 import { SignedIn, SignedOut } from '@/lib/auth';
 import { useState } from 'react';
@@ -10,16 +11,17 @@ import { NavBar } from '@/components/NavBar';
 import type { BuildAdvice, BuildPurpose, Resolution } from '@/lib/advisorTypes';
 import { useAuthedFetch } from '@/lib/useAuthedFetch';
 
-const PURPOSES: { value: BuildPurpose; label: string }[] = [
-  { value: 'gaming', label: 'Gaming' },
-  { value: 'streaming', label: 'Streaming' },
-  { value: 'content_creation', label: 'Content creation' },
-  { value: 'workstation', label: 'Workstation' },
-  { value: 'budget', label: 'Budget all-rounder' },
+const PURPOSES: { value: BuildPurpose; labelKey: string }[] = [
+  { value: 'gaming', labelKey: 'purposeGaming' },
+  { value: 'streaming', labelKey: 'purposeStreaming' },
+  { value: 'content_creation', labelKey: 'purposeContentCreation' },
+  { value: 'workstation', labelKey: 'purposeWorkstation' },
+  { value: 'budget', labelKey: 'purposeBudget' },
 ];
 const RESOLUTIONS: Resolution[] = ['1080p', '1440p', '4K'];
 
 export default function AdvisorPage() {
+  const t = useTranslations('advisor');
   const authedFetch = useAuthedFetch();
   const [budget, setBudget] = useState(1500);
   const [purpose, setPurpose] = useState<BuildPurpose>('gaming');
@@ -40,10 +42,10 @@ export default function AdvisorPage() {
         body: JSON.stringify({ budgetUsd: budget, purpose, resolution, preferences }),
       });
       if (res.status === 402) {
-        throw new Error('The AI Build Advisor is a Pro feature. Upgrade on the Pricing page.');
+        throw new Error(t('errProFeature'));
       }
       if (res.status === 429) {
-        throw new Error('Monthly AI recommendation limit reached for your plan.');
+        throw new Error(t('errLimit'));
       }
       if (!res.ok) throw new Error(await res.text());
       setAdvice((await res.json()) as BuildAdvice);
@@ -60,34 +62,31 @@ export default function AdvisorPage() {
       <main className="mx-auto max-w-4xl px-6 py-12">
         <header className="mb-10">
           <div className="mb-3 flex items-center gap-3">
-            <p className="label">Pro</p>
+            <p className="label">{t('pro')}</p>
             <span className="pill border-accent-purple/40 bg-accent-purple/10 text-purple-300">
-              AI-powered
+              {t('aiPowered')}
             </span>
           </div>
           <h1 className="font-display text-4xl font-semibold tracking-tight text-white">
-            Build Advisor
+            {t('title')}
           </h1>
-          <p className="mt-2 max-w-2xl text-sm text-slate-400">
-            Tell us your budget and goals. Our advisor recommends a balanced CPU + GPU pairing from
-            the live catalog, with rationale, PSU sizing, and an upgrade path.
-          </p>
+          <p className="mt-2 max-w-2xl text-sm text-slate-400">{t('subtitle')}</p>
         </header>
 
         <SignedOut>
           <div className="card text-center">
-            <p className="label mb-2">Sign in required</p>
+            <p className="label mb-2">{t('signInRequired')}</p>
             <p className="text-sm text-slate-400">
-              The Build Advisor is a Pro feature.{' '}
+              {t('proFeature')}{' '}
               <Link
                 href="/sign-in?redirect_url=/advisor"
                 className="text-accent-blue hover:underline"
               >
-                Sign in
+                {t('signIn')}
               </Link>{' '}
-              or{' '}
+              {t('or')}{' '}
               <Link href="/pricing" className="text-accent-blue hover:underline">
-                view pricing
+                {t('viewPricing')}
               </Link>
               .
             </p>
@@ -98,7 +97,7 @@ export default function AdvisorPage() {
           <div className="card space-y-6">
             <div>
               <div className="mb-2 flex items-center justify-between">
-                <p className="label">Budget (CPU + GPU)</p>
+                <p className="label">{t('budget')}</p>
                 <span className="font-mono text-lg text-white">${budget.toLocaleString()}</span>
               </div>
               <input
@@ -113,7 +112,7 @@ export default function AdvisorPage() {
             </div>
 
             <div>
-              <p className="label mb-2">Purpose</p>
+              <p className="label mb-2">{t('purpose')}</p>
               <div className="flex flex-wrap gap-2">
                 {PURPOSES.map((p) => (
                   <button
@@ -127,14 +126,14 @@ export default function AdvisorPage() {
                         : 'border-white/10 bg-white/5 text-slate-400 hover:text-slate-200')
                     }
                   >
-                    {p.label}
+                    {t(p.labelKey)}
                   </button>
                 ))}
               </div>
             </div>
 
             <div>
-              <p className="label mb-2">Target resolution</p>
+              <p className="label mb-2">{t('targetResolution')}</p>
               <div className="flex gap-2">
                 {RESOLUTIONS.map((r) => (
                   <button
@@ -155,12 +154,12 @@ export default function AdvisorPage() {
             </div>
 
             <div>
-              <p className="label mb-2">Preferences (optional)</p>
+              <p className="label mb-2">{t('preferences')}</p>
               <input
                 type="text"
                 value={preferences}
                 maxLength={500}
-                placeholder="e.g. prefer AMD, quiet build, room for future GPU upgrade"
+                placeholder={t('preferencesPlaceholder')}
                 onChange={(e) => setPreferences(e.currentTarget.value)}
                 className="focus:border-accent-blue w-full rounded-sm border border-white/10 bg-white/5 px-3 py-2 text-sm text-white placeholder:text-slate-500 focus:outline-none"
               />
@@ -172,7 +171,7 @@ export default function AdvisorPage() {
               disabled={loading}
               className="border-accent-purple bg-accent-purple/20 hover:bg-accent-purple/30 rounded-sm border px-6 py-2 text-sm font-semibold text-white transition disabled:opacity-50"
             >
-              {loading ? 'Consulting advisor…' : 'Generate recommendation'}
+              {loading ? t('generating') : t('generate')}
             </button>
             {error && <p className="text-state-danger text-sm">{error}</p>}
           </div>

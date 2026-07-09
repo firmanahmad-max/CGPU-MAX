@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import { getTranslations } from 'next-intl/server';
 
 import { ProcessorCard } from '@/components/ProcessorCard';
 import { ProcessorFilters } from '@/components/ProcessorFilters';
@@ -38,6 +39,7 @@ function parseQuery(searchParams: PageProps['searchParams']): ListProcessorsQuer
 }
 
 export default async function ProcessorsPage({ searchParams }: PageProps) {
+  const t = await getTranslations('processors');
   const query = parseQuery(searchParams);
   let result;
   let error: string | null = null;
@@ -59,13 +61,13 @@ export default async function ProcessorsPage({ searchParams }: PageProps) {
     <main className="mx-auto max-w-7xl px-6 py-12">
       <div className="mb-10 flex items-end justify-between">
         <div>
-          <p className="label">Database</p>
+          <p className="label">{t('label')}</p>
           <h1 className="font-display mt-2 text-4xl font-semibold tracking-tight text-white">
-            Processors
+            {t('title')}
           </h1>
         </div>
         <Link href="/" className="text-sm text-slate-400 hover:text-white">
-          ← Back
+          ← {t('back')}
         </Link>
       </div>
 
@@ -73,21 +75,20 @@ export default async function ProcessorsPage({ searchParams }: PageProps) {
 
       {error && (
         <div className="card border-state-danger/40 bg-state-danger/10 text-state-danger">
-          <p className="label mb-1">API error</p>
+          <p className="label mb-1">{t('apiError')}</p>
           <p className="text-sm">{error}</p>
           <p className="mt-2 text-xs text-slate-400">
-            Make sure the API is running:{' '}
-            <code className="font-mono">pnpm --filter @cgpu-max/api dev</code>
+            {t('apiErrorHint')} <code className="font-mono">pnpm --filter @cgpu-max/api dev</code>
           </p>
         </div>
       )}
 
       {result && result.items.length === 0 && (
         <div className="card text-center">
-          <p className="label mb-2">No results</p>
+          <p className="label mb-2">{t('noResults')}</p>
           <p className="text-sm text-slate-400">
-            No processors match your filters. Try seeding data with{' '}
-            <code className="font-mono">pnpm db:seed</code> or running the scraper.
+            {t('noResultsHintPrefix')} <code className="font-mono">pnpm db:seed</code>{' '}
+            {t('noResultsHintSuffix')}
           </p>
         </div>
       )}
@@ -102,7 +103,11 @@ export default async function ProcessorsPage({ searchParams }: PageProps) {
 
           <div className="mt-8 flex items-center justify-between text-sm text-slate-400">
             <span>
-              {result.total.toLocaleString()} total · page {query.page} of {totalPages}
+              {t('pageInfo', {
+                total: result.total.toLocaleString(),
+                page: query.page,
+                totalPages,
+              })}
             </span>
           </div>
         </>

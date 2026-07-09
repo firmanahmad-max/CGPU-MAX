@@ -1,12 +1,14 @@
 'use client';
 
 import { useRouter, useSearchParams } from 'next/navigation';
+import { useTranslations } from 'next-intl';
 import { useTransition } from 'react';
 
 const TYPES = ['ALL', 'CPU', 'GPU'] as const;
 const MANUFACTURERS = ['ALL', 'INTEL', 'AMD', 'NVIDIA'] as const;
 
 export function ProcessorFilters() {
+  const t = useTranslations('processors');
   const router = useRouter();
   const params = useSearchParams();
   const [isPending, startTransition] = useTransition();
@@ -33,27 +35,27 @@ export function ProcessorFilters() {
     <div className="card mb-8 space-y-4">
       <div className="flex flex-wrap gap-6">
         <div>
-          <p className="label mb-2">Type</p>
+          <p className="label mb-2">{t('filterType')}</p>
           <div className="flex gap-2">
-            {TYPES.map((t) => (
+            {TYPES.map((ty) => (
               <button
-                key={t}
+                key={ty}
                 type="button"
-                onClick={() => push({ type: t })}
+                onClick={() => push({ type: ty })}
                 className={
                   'rounded-pill tracking-label border px-3 py-1 text-xs font-medium uppercase transition ' +
-                  (current.type === t
+                  (current.type === ty
                     ? 'border-white/40 bg-white/15 text-white'
                     : 'border-white/10 bg-white/5 text-slate-400 hover:text-slate-200')
                 }
               >
-                {t}
+                {ty}
               </button>
             ))}
           </div>
         </div>
         <div>
-          <p className="label mb-2">Manufacturer</p>
+          <p className="label mb-2">{t('filterManufacturer')}</p>
           <div className="flex gap-2">
             {MANUFACTURERS.map((m) => (
               <button
@@ -75,15 +77,15 @@ export function ProcessorFilters() {
       </div>
 
       <div>
-        <p className="label mb-2">Search</p>
+        <p className="label mb-2">{t('filterSearch')}</p>
         <input
           type="search"
           defaultValue={current.search}
-          placeholder="Model name…"
+          placeholder={t('searchPlaceholder')}
           onChange={(e) => push({ search: e.currentTarget.value })}
           className="focus:border-accent-blue w-full max-w-md rounded-sm border border-white/10 bg-white/5 px-3 py-2 text-sm text-white placeholder:text-slate-500 focus:outline-none"
         />
-        {isPending && <p className="mt-1 text-xs text-slate-500">Updating…</p>}
+        {isPending && <p className="mt-1 text-xs text-slate-500">{t('updating')}</p>}
       </div>
     </div>
   );

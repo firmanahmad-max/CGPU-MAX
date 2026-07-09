@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import { useTranslations } from 'next-intl';
 
 import { SignedIn, SignedOut } from '@/lib/auth';
 import { useState } from 'react';
@@ -23,6 +24,7 @@ interface StreamingResult {
 }
 
 export default function StreamingPage() {
+  const t = useTranslations('streaming');
   const authedFetch = useAuthedFetch();
   const [gpuManufacturer, setMfr] = useState<Mfr>('NVIDIA');
   const [platform, setPlatform] = useState<Platform>('twitch');
@@ -42,8 +44,7 @@ export default function StreamingPage() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ gpuManufacturer, platform, resolution, fps, uploadMbps }),
       });
-      if (res.status === 402)
-        throw new Error('Streaming suite is a Pro feature — upgrade on Pricing.');
+      if (res.status === 402) throw new Error(t('errProFeature'));
       if (!res.ok) throw new Error(await res.text());
       setResult((await res.json()) as StreamingResult);
     } catch (err) {
@@ -59,11 +60,11 @@ export default function StreamingPage() {
       <main className="mx-auto max-w-3xl px-6 py-12">
         <header className="mb-8">
           <div className="mb-3 flex items-center gap-3">
-            <p className="label">Pro</p>
-            <Pill variant="amd">Encoder + bandwidth</Pill>
+            <p className="label">{t('pro')}</p>
+            <Pill variant="amd">{t('pill')}</Pill>
           </div>
           <h1 className="font-display text-4xl font-semibold tracking-tight text-white">
-            Streaming Suite
+            {t('title')}
           </h1>
         </header>
 
@@ -73,36 +74,36 @@ export default function StreamingPage() {
               href="/sign-in?redirect_url=/streaming"
               className="text-accent-blue hover:underline"
             >
-              Sign in
+              {t('signIn')}
             </Link>{' '}
-            with a Pro plan to configure streaming.
+            {t('signInSuffix')}
           </div>
         </SignedOut>
 
         <SignedIn>
           <div className="card space-y-5">
-            <Row label="GPU brand">
+            <Row label={t('gpuBrand')}>
               {(['NVIDIA', 'AMD', 'INTEL'] as Mfr[]).map((m) => (
                 <Toggle key={m} active={gpuManufacturer === m} onClick={() => setMfr(m)}>
                   {m}
                 </Toggle>
               ))}
             </Row>
-            <Row label="Platform">
+            <Row label={t('platform')}>
               {(['twitch', 'youtube', 'kick'] as Platform[]).map((p) => (
                 <Toggle key={p} active={platform === p} onClick={() => setPlatform(p)}>
                   {p}
                 </Toggle>
               ))}
             </Row>
-            <Row label="Resolution">
+            <Row label={t('resolution')}>
               {(['720p', '1080p', '1440p', '4K'] as Res[]).map((r) => (
                 <Toggle key={r} active={resolution === r} onClick={() => setResolution(r)}>
                   {r}
                 </Toggle>
               ))}
             </Row>
-            <Row label="FPS">
+            <Row label={t('fps')}>
               {[30, 60, 120].map((f) => (
                 <Toggle key={f} active={fps === f} onClick={() => setFps(f)}>
                   {f}
@@ -111,7 +112,7 @@ export default function StreamingPage() {
             </Row>
             <div>
               <div className="mb-2 flex items-center justify-between">
-                <p className="label">Upload speed</p>
+                <p className="label">{t('uploadSpeed')}</p>
                 <span className="font-mono text-sm text-white">{uploadMbps} Mbps</span>
               </div>
               <input
@@ -131,7 +132,7 @@ export default function StreamingPage() {
               disabled={loading}
               className="border-accent-coral bg-accent-coral/20 hover:bg-accent-coral/30 rounded-sm border px-6 py-2 text-sm font-semibold text-white transition disabled:opacity-40"
             >
-              {loading ? 'Calculating…' : 'Build config'}
+              {loading ? t('calculating') : t('build')}
             </button>
             {error && <p className="text-state-danger text-sm">{error}</p>}
           </div>
@@ -139,21 +140,23 @@ export default function StreamingPage() {
           {result && (
             <section className="mt-8 space-y-4">
               <div className="grid gap-4 sm:grid-cols-3">
-                <Stat label="Encoder" value={result.encoder.encoder} small />
-                <Stat label="Bitrate" value={`${result.recommendedBitrateKbps} kbps`} />
-                <Stat label="Headroom" value={`${result.uploadHeadroomMbps} Mbps`} small />
+                <Stat label={t('encoder')} value={result.encoder.encoder} small />
+                <Stat label={t('bitrate')} value={`${result.recommendedBitrateKbps} kbps`} />
+                <Stat label={t('headroom')} value={`${result.uploadHeadroomMbps} Mbps`} small />
               </div>
               <div className="card">
-                <p className="label mb-1">Encoder rationale</p>
+                <p className="label mb-1">{t('rationale')}</p>
                 <p className="text-sm text-slate-300">{result.encoder.reason}</p>
                 <p className="mt-2 text-xs text-slate-500">
-                  Keyframe interval {result.keyframeIntervalSec}s · platform max{' '}
-                  {result.maxPlatformBitrateKbps} kbps
+                  {t('keyframe', {
+                    sec: result.keyframeIntervalSec,
+                    kbps: result.maxPlatformBitrateKbps,
+                  })}
                 </p>
               </div>
               {result.warnings.length > 0 && (
                 <div className="card border-state-warning/30 bg-state-warning/5">
-                  <p className="label mb-2 text-amber-300">Warnings</p>
+                  <p className="label mb-2 text-amber-300">{t('warnings')}</p>
                   <ul className="space-y-1 text-sm text-amber-200/90">
                     {result.warnings.map((w, i) => (
                       <li key={i}>• {w}</li>

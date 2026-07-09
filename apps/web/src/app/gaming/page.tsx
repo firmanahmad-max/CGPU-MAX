@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import { useTranslations } from 'next-intl';
 
 import { SignedIn, SignedOut } from '@/lib/auth';
 import { useState } from 'react';
@@ -25,14 +26,15 @@ interface GamingResult {
 }
 
 const RESOLUTIONS: Resolution[] = ['1080p', '1440p', '4K'];
-const PROFILES: { v: Profile; l: string }[] = [
-  { v: 'esports', l: 'Esports' },
-  { v: 'aaa', l: 'AAA' },
-  { v: 'vr', l: 'VR' },
-  { v: 'simulation', l: 'Simulation' },
+const PROFILES: { v: Profile; labelKey: string }[] = [
+  { v: 'esports', labelKey: 'profileEsports' },
+  { v: 'aaa', labelKey: 'profileAaa' },
+  { v: 'vr', labelKey: 'profileVr' },
+  { v: 'simulation', labelKey: 'profileSimulation' },
 ];
 
 export default function GamingPage() {
+  const t = useTranslations('gaming');
   const authedFetch = useAuthedFetch();
   const [gpuSlug, setGpuSlug] = useState<string | null>(null);
   const [cpuSlug, setCpuSlug] = useState<string | null>(null);
@@ -52,8 +54,7 @@ export default function GamingPage() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ gpuSlug, cpuSlug: cpuSlug ?? undefined, resolution, profile }),
       });
-      if (res.status === 402)
-        throw new Error('Gaming optimizer is a Pro feature — upgrade on Pricing.');
+      if (res.status === 402) throw new Error(t('errProFeature'));
       if (!res.ok) throw new Error(await res.text());
       setResult((await res.json()) as GamingResult);
     } catch (err) {
@@ -69,28 +70,28 @@ export default function GamingPage() {
       <main className="mx-auto max-w-5xl px-6 py-12">
         <header className="mb-8">
           <div className="mb-3 flex items-center gap-3">
-            <p className="label">Pro</p>
-            <Pill variant="nvidia">FPS predictor</Pill>
+            <p className="label">{t('pro')}</p>
+            <Pill variant="nvidia">{t('pill')}</Pill>
           </div>
           <h1 className="font-display text-4xl font-semibold tracking-tight text-white">
-            Gaming Optimizer
+            {t('title')}
           </h1>
         </header>
 
         <SignedOut>
           <div className="card text-center text-sm text-slate-400">
             <Link href="/sign-in?redirect_url=/gaming" className="text-accent-blue hover:underline">
-              Sign in
+              {t('signIn')}
             </Link>{' '}
-            with a Pro plan to use the optimizer.
+            {t('signInSuffix')}
           </div>
         </SignedOut>
 
         <SignedIn>
           <div className="grid gap-6 sm:grid-cols-2">
-            <ProcessorPicker label="GPU" type="GPU" value={gpuSlug} onChange={setGpuSlug} />
+            <ProcessorPicker label={t('gpu')} type="GPU" value={gpuSlug} onChange={setGpuSlug} />
             <ProcessorPicker
-              label="CPU (optional)"
+              label={t('cpuOptional')}
               type="CPU"
               value={cpuSlug}
               onChange={setCpuSlug}
@@ -99,7 +100,7 @@ export default function GamingPage() {
 
           <div className="mt-6 flex flex-wrap gap-6">
             <div>
-              <p className="label mb-2">Resolution</p>
+              <p className="label mb-2">{t('resolution')}</p>
               <div className="flex gap-2">
                 {RESOLUTIONS.map((r) => (
                   <Toggle key={r} active={resolution === r} onClick={() => setResolution(r)}>
@@ -109,11 +110,11 @@ export default function GamingPage() {
               </div>
             </div>
             <div>
-              <p className="label mb-2">Profile</p>
+              <p className="label mb-2">{t('profile')}</p>
               <div className="flex gap-2">
                 {PROFILES.map((p) => (
                   <Toggle key={p.v} active={profile === p.v} onClick={() => setProfile(p.v)}>
-                    {p.l}
+                    {t(p.labelKey)}
                   </Toggle>
                 ))}
               </div>
@@ -127,7 +128,7 @@ export default function GamingPage() {
               disabled={!gpuSlug || loading}
               className="border-accent-purple bg-accent-purple/20 hover:bg-accent-purple/30 rounded-sm border px-6 py-2 text-sm font-semibold text-white transition disabled:opacity-40"
             >
-              {loading ? 'Predicting…' : 'Predict FPS'}
+              {loading ? t('predicting') : t('predict')}
             </button>
             {error && <p className="text-state-danger text-sm">{error}</p>}
           </div>
@@ -146,21 +147,23 @@ export default function GamingPage() {
                   >
                     <p className="label capitalize">{p.preset}</p>
                     <p className="metric mt-2">{p.avgFps}</p>
-                    <p className="text-xs text-slate-500">{p.onePercentLowFps} fps 1% low</p>
+                    <p className="text-xs text-slate-500">
+                      {t('fpsLow', { fps: p.onePercentLowFps })}
+                    </p>
                   </div>
                 ))}
               </div>
 
               <div className="card">
-                <p className="label mb-1">Recommended</p>
+                <p className="label mb-1">{t('recommended')}</p>
                 <p className="text-sm text-slate-200">
                   <span className="font-semibold capitalize">{result.recommendedPreset}</span>{' '}
-                  preset. {result.upscaling.note}
+                  {t('presetSuffix')} {result.upscaling.note}
                 </p>
               </div>
 
               <div className="card">
-                <p className="label mb-3">Settings tips</p>
+                <p className="label mb-3">{t('settingsTips')}</p>
                 <ul className="space-y-2 text-sm text-slate-300">
                   {result.settingsTips.map((t, i) => (
                     <li key={i}>• {t}</li>
