@@ -1,5 +1,7 @@
 import Link from 'next/link';
-import { getTranslations } from 'next-intl/server';
+import { getLocale, getTranslations } from 'next-intl/server';
+
+import type { Processor } from '@cgpu-max/types';
 
 import { NavBar } from '@/components/NavBar';
 import { Pill } from '@/components/Pill';
@@ -20,12 +22,24 @@ async function countOf(type?: 'CPU' | 'GPU'): Promise<number | null> {
   }
 }
 
+// Newest releases (the API lists by releaseDate desc) — resilient like countOf.
+async function latest(limit: number): Promise<Processor[]> {
+  try {
+    const res = await listProcessors({ limit });
+    return res.items;
+  } catch {
+    return [];
+  }
+}
+
 export default async function HomePage() {
-  const [t, cpuCount, gpuCount, top] = await Promise.all([
+  const [t, locale, cpuCount, gpuCount, top, newest] = await Promise.all([
     getTranslations('home'),
+    getLocale(),
     countOf('CPU'),
     countOf('GPU'),
     getRankings({ sort: 'performance', limit: 6 }),
+    latest(6),
   ]);
   const total = cpuCount !== null && gpuCount !== null ? cpuCount + gpuCount : null;
 
@@ -88,7 +102,7 @@ export default async function HomePage() {
 
         {/* Top performers — real data from the rankings API */}
         {top && top.items.length > 0 && (
-          <section>
+          <section className="mb-14">
             <div className="mb-4 flex items-center justify-between">
               <h2 className="font-display text-2xl font-semibold text-white">
                 {t('topPerformers')}
@@ -104,8 +118,49 @@ export default async function HomePage() {
             </div>
           </section>
         )}
+
+        {/* Latest releases — API lists by releaseDate desc (prior version's "Terbaru") */}
+        {newest.length > 0 && (
+          <section>
+            <div className="mb-4 flex items-center justify-between">
+              <h2 className="font-display text-2xl font-semibold text-white">{t('latest')}</h2>
+              <Link href="/processors" className="text-accent-blue text-sm hover:underline">
+                {t('viewAll')} →
+              </Link>
+            </div>
+            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+              {newest.map((p) => (
+                <LatestCard key={p.slug} p={p} locale={locale} />
+              ))}
+            </div>
+          </section>
+        )}
       </main>
     </>
+  );
+}
+
+function LatestCard({ p, locale }: { p: Processor; locale: string }) {
+  const released = p.releaseDate
+    ? new Date(p.releaseDate).toLocaleDateString(locale, { year: 'numeric', month: 'short' })
+    : null;
+  return (
+    <Link
+      href={`/processors/${p.slug}`}
+      className="card flex flex-col transition hover:border-white/25 hover:bg-white/[0.04]"
+    >
+      <div className="mb-3 flex items-center gap-2">
+        <Pill variant={manufacturerVariant(p.manufacturer)}>{p.manufacturer}</Pill>
+        <Pill>{p.type}</Pill>
+      </div>
+      <p className="font-semibold text-white">{p.modelName}</p>
+      <p className="mt-1 text-xs text-slate-500">
+        {[p.architecture, released].filter(Boolean).join(' · ')}
+      </p>
+      <p className="mt-4 font-mono text-sm text-white">
+        {p.msrpUsd ? `$${p.msrpUsd.toLocaleString()}` : '—'}
+      </p>
+    </Link>
   );
 }
 
