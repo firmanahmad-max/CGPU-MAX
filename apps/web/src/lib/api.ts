@@ -100,6 +100,76 @@ export async function getRankings(
   }
 }
 
+// Catalog (Katalog table) — enriched rows + facets in one call.
+export type CatalogSort = 'index' | 'price' | 'perScore' | 'tdp' | 'vram';
+
+export interface CatalogRow {
+  slug: string;
+  modelName: string;
+  manufacturer: string;
+  type: string;
+  architecture: string | null;
+  tdpWatts: number | null;
+  msrpUsd: number | null;
+  performance: number;
+  vramGb: number | null;
+  vramType: string | null;
+  costPerScore: number | null;
+  priceSeries: number[];
+}
+
+export interface CatalogFacets {
+  architectures: { name: string; count: number }[];
+  vram: { gb: number; count: number }[];
+  priceMin: number | null;
+  priceMax: number | null;
+}
+
+export interface CatalogResponse {
+  items: CatalogRow[];
+  total: number;
+  facets: CatalogFacets;
+  sort: CatalogSort;
+  dir: 'asc' | 'desc';
+}
+
+export async function getCatalog(
+  params: {
+    type?: 'CPU' | 'GPU';
+    manufacturer?: 'INTEL' | 'AMD' | 'NVIDIA';
+    search?: string;
+    minPrice?: number;
+    maxPrice?: number;
+    vram?: number[];
+    architecture?: string;
+    sort?: CatalogSort;
+    dir?: 'asc' | 'desc';
+    limit?: number;
+  } = {},
+): Promise<CatalogResponse | null> {
+  const qs: Record<string, string | number | undefined> = {
+    type: params.type,
+    manufacturer: params.manufacturer,
+    search: params.search,
+    minPrice: params.minPrice,
+    maxPrice: params.maxPrice,
+    vram: params.vram && params.vram.length ? params.vram.join(',') : undefined,
+    architecture: params.architecture,
+    sort: params.sort,
+    dir: params.dir,
+    limit: params.limit,
+  };
+  try {
+    // Live, filterable table — always fetch fresh rather than serving the
+    // Next Data Cache.
+    const res = await fetch(buildUrl('/api/v1/catalog', qs), { cache: 'no-store' });
+    if (!res.ok) return null;
+    return (await res.json()) as CatalogResponse;
+  } catch {
+    return null;
+  }
+}
+
 export interface PriceHistory {
   slug: string;
   points: { retailer: string; priceUsd: number; inStock: boolean; recordedAt: string }[];

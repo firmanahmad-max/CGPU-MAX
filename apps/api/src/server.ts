@@ -12,6 +12,7 @@ import { analyticsRouter } from './modules/analytics/interface/routes.js';
 import { apiKeysRouter } from './modules/api-keys/interface/routes.js';
 import { billingRouter, billingWebhookRouter } from './modules/billing/interface/routes.js';
 import { bottleneckRouter } from './modules/bottleneck/interface/routes.js';
+import { catalogRouter } from './modules/catalog/interface/routes.js';
 import { comparisonsRouter } from './modules/comparisons/interface/routes.js';
 import { gamingRouter } from './modules/gaming-optimizer/interface/routes.js';
 import { brandingRouter, organizationsRouter } from './modules/organizations/interface/routes.js';
@@ -85,6 +86,7 @@ export function createServer(): Express {
   app.use('/health', healthRouter);
   app.use('/metrics', metricsRouter);
   app.use('/api/v1/processors', processorsRouter);
+  app.use('/api/v1/catalog', catalogRouter);
   app.use('/api/v1/comparisons', comparisonsRouter);
   app.use('/api/v1/bottleneck', bottleneckRouter);
   app.use('/api/v1/subscriptions', subscriptionsRouter);

@@ -1,7 +1,8 @@
 'use client';
 
+import { useSearchParams } from 'next/navigation';
 import { useTranslations } from 'next-intl';
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 import { CompareResult } from '@/components/CompareResult';
 import { ProcessorPicker } from '@/components/ProcessorPicker';
@@ -11,9 +12,10 @@ type Type = 'CPU' | 'GPU';
 
 export default function ComparePage() {
   const t = useTranslations('compare');
-  const [type, setType] = useState<Type>('CPU');
-  const [aSlug, setASlug] = useState<string | null>(null);
-  const [bSlug, setBSlug] = useState<string | null>(null);
+  const params = useSearchParams();
+  const [type, setType] = useState<Type>(params.get('type') === 'GPU' ? 'GPU' : 'CPU');
+  const [aSlug, setASlug] = useState<string | null>(params.get('a'));
+  const [bSlug, setBSlug] = useState<string | null>(params.get('b'));
   const [result, setResult] = useState<ComparisonPayload | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -33,6 +35,18 @@ export default function ComparePage() {
       setLoading(false);
     }
   };
+
+  // Auto-run once when arriving with ?a=&b= (the Katalog "Duel →" flow).
+  const autoRan = useRef(false);
+  useEffect(() => {
+    const a = params.get('a');
+    const b = params.get('b');
+    if (!autoRan.current && a && b && a !== b) {
+      autoRan.current = true;
+      void onCompare();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   return (
     <main className="mx-auto max-w-6xl px-6 py-10">
