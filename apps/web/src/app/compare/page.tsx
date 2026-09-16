@@ -1,6 +1,5 @@
 'use client';
 
-import Link from 'next/link';
 import { useTranslations } from 'next-intl';
 import { useState } from 'react';
 
@@ -36,43 +35,38 @@ export default function ComparePage() {
   };
 
   return (
-    <main className="mx-auto max-w-6xl px-6 py-12">
-      <div className="mb-10 flex items-end justify-between">
-        <div>
-          <p className="label">{t('label')}</p>
-          <h1 className="font-display mt-2 text-4xl font-semibold tracking-tight text-white">
-            {t('title')}
-          </h1>
-        </div>
-        <Link href="/" className="text-sm text-slate-400 hover:text-white">
-          ← {t('back')}
-        </Link>
-      </div>
+    <main className="mx-auto max-w-6xl px-6 py-10">
+      <header className="mb-6">
+        <p className="label">{t('label')}</p>
+        <h1 className="font-display text-ink-hi mt-2 text-[26px] font-bold tracking-tight">
+          {t('title')}
+        </h1>
+      </header>
 
       <div className="mb-6 flex gap-2">
-        {(['CPU', 'GPU'] as Type[]).map((t) => (
+        {(['CPU', 'GPU'] as Type[]).map((ty) => (
           <button
-            key={t}
+            key={ty}
             type="button"
             onClick={() => {
-              setType(t);
+              setType(ty);
               setASlug(null);
               setBSlug(null);
               setResult(null);
             }}
             className={
-              'rounded-pill tracking-label border px-4 py-1 text-xs font-medium uppercase transition ' +
-              (type === t
-                ? 'border-white/40 bg-white/15 text-white'
-                : 'border-white/10 bg-white/5 text-slate-400 hover:text-slate-200')
+              'rounded-control border px-4 py-1 text-[12px] font-semibold transition ' +
+              (type === ty
+                ? 'border-lime/45 bg-lime/[0.14] text-lime-bright'
+                : 'border-hairline bg-panel text-ink-faint hover:text-ink')
             }
           >
-            {t} vs {t}
+            {ty} vs {ty}
           </button>
         ))}
       </div>
 
-      <div className="grid gap-6 sm:grid-cols-2">
+      <div className="grid gap-4 sm:grid-cols-2">
         <ProcessorPicker
           label={t('sideA')}
           type={type}
@@ -94,11 +88,11 @@ export default function ComparePage() {
           type="button"
           onClick={onCompare}
           disabled={!canCompare || loading}
-          className="border-accent-blue bg-accent-blue/20 hover:bg-accent-blue/30 rounded-sm border px-6 py-2 text-sm font-semibold text-white transition disabled:cursor-not-allowed disabled:opacity-40"
+          className="rounded-control bg-lime text-lime-ink px-6 py-[10px] text-[13px] font-semibold transition hover:brightness-110 disabled:cursor-not-allowed disabled:opacity-40"
         >
           {loading ? t('buttonLoading') : t('button')}
         </button>
-        {error && <p className="text-state-danger text-sm">{error}</p>}
+        {error && <p className="text-cred text-[13px]">{error}</p>}
       </div>
 
       {result && <CompareResult result={result} />}

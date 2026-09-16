@@ -31,8 +31,14 @@ export function ProcessorFilters() {
     });
   };
 
+  const chip = (active: boolean) =>
+    'rounded-control border px-3 py-1 text-[12px] font-semibold transition ' +
+    (active
+      ? 'border-lime/45 bg-lime/[0.14] text-lime-bright'
+      : 'border-hairline bg-panel text-ink-faint hover:text-ink');
+
   return (
-    <div className="card mb-8 space-y-4">
+    <div className="panel mb-6 space-y-4">
       <div className="flex flex-wrap gap-6">
         <div>
           <p className="label mb-2">{t('filterType')}</p>
@@ -42,12 +48,7 @@ export function ProcessorFilters() {
                 key={ty}
                 type="button"
                 onClick={() => push({ type: ty })}
-                className={
-                  'rounded-pill tracking-label border px-3 py-1 text-xs font-medium uppercase transition ' +
-                  (current.type === ty
-                    ? 'border-white/40 bg-white/15 text-white'
-                    : 'border-white/10 bg-white/5 text-slate-400 hover:text-slate-200')
-                }
+                className={chip(current.type === ty)}
               >
                 {ty}
               </button>
@@ -62,12 +63,7 @@ export function ProcessorFilters() {
                 key={m}
                 type="button"
                 onClick={() => push({ manufacturer: m })}
-                className={
-                  'rounded-pill tracking-label border px-3 py-1 text-xs font-medium uppercase transition ' +
-                  (current.manufacturer === m
-                    ? 'border-white/40 bg-white/15 text-white'
-                    : 'border-white/10 bg-white/5 text-slate-400 hover:text-slate-200')
-                }
+                className={chip(current.manufacturer === m)}
               >
                 {m}
               </button>
@@ -83,9 +79,9 @@ export function ProcessorFilters() {
           defaultValue={current.search}
           placeholder={t('searchPlaceholder')}
           onChange={(e) => push({ search: e.currentTarget.value })}
-          className="focus:border-accent-blue w-full max-w-md rounded-sm border border-white/10 bg-white/5 px-3 py-2 text-sm text-white placeholder:text-slate-500 focus:outline-none"
+          className="rounded-control border-hairline bg-panel text-ink placeholder:text-ink-faint focus:border-lime/45 w-full max-w-md border px-3 py-2 text-[13px] focus:outline-none"
         />
-        {isPending && <p className="mt-1 text-xs text-slate-500">{t('updating')}</p>}
+        {isPending && <p className="text-ink-faint mt-1 text-[11px]">{t('updating')}</p>}
       </div>
     </div>
   );

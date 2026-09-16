@@ -1,4 +1,3 @@
-import Link from 'next/link';
 import { getTranslations } from 'next-intl/server';
 
 import { ProcessorCard } from '@/components/ProcessorCard';
@@ -58,35 +57,30 @@ export default async function ProcessorsPage({ searchParams }: PageProps) {
   const totalPages = result ? Math.max(1, Math.ceil(result.total / PAGE_SIZE)) : 1;
 
   return (
-    <main className="mx-auto max-w-7xl px-6 py-12">
-      <div className="mb-10 flex items-end justify-between">
-        <div>
-          <p className="label">{t('label')}</p>
-          <h1 className="font-display mt-2 text-4xl font-semibold tracking-tight text-white">
-            {t('title')}
-          </h1>
-        </div>
-        <Link href="/" className="text-sm text-slate-400 hover:text-white">
-          ← {t('back')}
-        </Link>
-      </div>
+    <main className="mx-auto max-w-7xl px-6 py-10">
+      <header className="mb-6">
+        <p className="label">{t('label')}</p>
+        <h1 className="font-display text-ink-hi mt-2 text-[26px] font-bold tracking-tight">
+          {t('title')}
+        </h1>
+      </header>
 
       <ProcessorFilters />
 
       {error && (
-        <div className="card border-state-danger/40 bg-state-danger/10 text-state-danger">
+        <div className="panel border-cred/40 bg-cred/10 text-cred">
           <p className="label mb-1">{t('apiError')}</p>
-          <p className="text-sm">{error}</p>
-          <p className="mt-2 text-xs text-slate-400">
+          <p className="text-[13px]">{error}</p>
+          <p className="text-ink-faint mt-2 text-[11px]">
             {t('apiErrorHint')} <code className="font-mono">pnpm --filter @cgpu-max/api dev</code>
           </p>
         </div>
       )}
 
       {result && result.items.length === 0 && (
-        <div className="card text-center">
+        <div className="panel text-center">
           <p className="label mb-2">{t('noResults')}</p>
-          <p className="text-sm text-slate-400">
+          <p className="text-ink-muted text-[13px]">
             {t('noResultsHintPrefix')} <code className="font-mono">pnpm db:seed</code>{' '}
             {t('noResultsHintSuffix')}
           </p>
@@ -101,7 +95,7 @@ export default async function ProcessorsPage({ searchParams }: PageProps) {
             ))}
           </div>
 
-          <div className="mt-8 flex items-center justify-between text-sm text-slate-400">
+          <div className="text-ink-faint mt-8 flex items-center justify-between text-[13px]">
             <span>
               {t('pageInfo', {
                 total: result.total.toLocaleString(),
