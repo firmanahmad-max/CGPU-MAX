@@ -56,3 +56,6 @@ apps/api/prisma/migrations/dev.db*
 
 # Sentry
 .sentryclirc
+
+# Claude Design reference artifacts (canvas .dc.html + vendored JS) — local only
+design/

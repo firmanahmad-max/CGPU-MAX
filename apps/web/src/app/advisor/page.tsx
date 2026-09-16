@@ -7,7 +7,6 @@ import { SignedIn, SignedOut } from '@/lib/auth';
 import { useState } from 'react';
 
 import { BuildAdviceResult } from '@/components/BuildAdviceResult';
-import { NavBar } from '@/components/NavBar';
 import type { BuildAdvice, BuildPurpose, Resolution } from '@/lib/advisorTypes';
 import { useAuthedFetch } from '@/lib/useAuthedFetch';
 
@@ -58,7 +57,6 @@ export default function AdvisorPage() {
 
   return (
     <>
-      <NavBar />
       <main className="mx-auto max-w-4xl px-6 py-12">
         <header className="mb-10">
           <div className="mb-3 flex items-center gap-3">

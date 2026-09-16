@@ -3,7 +3,6 @@ import { getLocale, getTranslations } from 'next-intl/server';
 
 import type { Processor } from '@cgpu-max/types';
 
-import { NavBar } from '@/components/NavBar';
 import { Pill } from '@/components/Pill';
 import { getRankings, listProcessors, type RankedProcessor } from '@/lib/api';
 
@@ -45,7 +44,6 @@ export default async function HomePage() {
 
   return (
     <>
-      <NavBar />
       <main className="mx-auto max-w-6xl px-6 py-16">
         {/* Hero */}
         <section className="mb-12">

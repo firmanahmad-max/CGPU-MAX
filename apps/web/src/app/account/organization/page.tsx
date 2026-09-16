@@ -4,7 +4,6 @@ import Link from 'next/link';
 import { useTranslations } from 'next-intl';
 import { useEffect, useState } from 'react';
 
-import { NavBar } from '@/components/NavBar';
 import { Pill } from '@/components/Pill';
 import { useAuthedFetch } from '@/lib/useAuthedFetch';
 
@@ -120,7 +119,6 @@ export default function OrganizationPage() {
 
   return (
     <>
-      <NavBar />
       <main className="mx-auto max-w-3xl px-6 py-12">
         <div className="mb-8 flex items-end justify-between">
           <div>

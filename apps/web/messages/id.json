@@ -1,4 +1,9 @@
 {
+  "console": {
+    "searchHint": "Cari 39 part, atau ketik pertanyaan…",
+    "dataFresh": "data 2 jam lalu",
+    "share": "Bagikan"
+  },
   "nav": {
     "processors": "Prosesor",
     "rankings": "Peringkat",

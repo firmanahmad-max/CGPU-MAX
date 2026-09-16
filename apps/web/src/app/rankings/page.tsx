@@ -2,7 +2,6 @@ import Link from 'next/link';
 import { useTranslations } from 'next-intl';
 import { getTranslations } from 'next-intl/server';
 
-import { NavBar } from '@/components/NavBar';
 import { Pill } from '@/components/Pill';
 import { RankingsFilters } from '@/components/RankingsFilters';
 import { getRankings, type RankedProcessor, type RankingCategory } from '@/lib/api';
@@ -53,7 +52,6 @@ export default async function RankingsPage({ searchParams }: PageProps) {
 
   return (
     <>
-      <NavBar />
       <main className="mx-auto max-w-4xl px-6 py-12">
         <header className="mb-8 flex items-center gap-3">
           <span className="text-3xl">🏆</span>

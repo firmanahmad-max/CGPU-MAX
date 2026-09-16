@@ -1,0 +1,17 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "web",
+      "runtimeExecutable": "corepack",
+      "runtimeArgs": ["pnpm@9.0.0", "--filter", "@cgpu-max/web", "run", "dev"],
+      "port": 3000
+    },
+    {
+      "name": "api",
+      "runtimeExecutable": "corepack",
+      "runtimeArgs": ["pnpm@9.0.0", "--filter", "@cgpu-max/api", "exec", "tsx", "src/index.ts"],
+      "port": 3001
+    }
+  ]
+}

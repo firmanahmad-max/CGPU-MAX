@@ -6,7 +6,6 @@ import { useTranslations } from 'next-intl';
 import { SignedIn, SignedOut } from '@/lib/auth';
 import { useState } from 'react';
 
-import { NavBar } from '@/components/NavBar';
 import { Pill } from '@/components/Pill';
 import { ProcessorPicker } from '@/components/ProcessorPicker';
 import { cn } from '@/lib/cn';
@@ -66,7 +65,6 @@ export default function GamingPage() {
 
   return (
     <>
-      <NavBar />
       <main className="mx-auto max-w-5xl px-6 py-12">
         <header className="mb-8">
           <div className="mb-3 flex items-center gap-3">

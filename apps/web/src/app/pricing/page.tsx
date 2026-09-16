@@ -6,7 +6,6 @@ import { useTranslations } from 'next-intl';
 import { SignedIn, SignedOut, useCurrentUser } from '@/lib/auth';
 import { useState } from 'react';
 
-import { NavBar } from '@/components/NavBar';
 import { Pill } from '@/components/Pill';
 import { useAuthedFetch } from '@/lib/useAuthedFetch';
 import { cn } from '@/lib/cn';
@@ -80,7 +79,6 @@ export default function PricingPage() {
 
   return (
     <>
-      <NavBar />
       <main className="mx-auto max-w-6xl px-6 py-16">
         <header className="mb-12 text-center">
           <p className="label">{t('label')}</p>

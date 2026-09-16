@@ -5,7 +5,6 @@ import { useEffect, useState } from 'react';
 
 import { useCurrentUser } from '@/lib/auth';
 
-import { NavBar } from '@/components/NavBar';
 import { Pill } from '@/components/Pill';
 import { useAuthedFetch } from '@/lib/useAuthedFetch';
 
@@ -68,7 +67,6 @@ export default function AccountPage() {
 
   return (
     <>
-      <NavBar />
       <main className="mx-auto max-w-4xl px-6 py-12">
         <header className="mb-10">
           <p className="label">{t('label')}</p>

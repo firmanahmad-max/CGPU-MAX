@@ -1,4 +1,9 @@
 {
+  "console": {
+    "searchHint": "Search 39 parts, or type a question…",
+    "dataFresh": "data 2h ago",
+    "share": "Share"
+  },
   "nav": {
     "processors": "Processors",
     "rankings": "Rankings",

@@ -13,19 +13,31 @@
 }
 
 @layer components {
+  /* Console primitives — see design/CGPU-MAX UI Reference.dc.html */
   .label {
-    @apply text-[10px] font-medium uppercase tracking-label text-slate-400;
+    @apply tracking-label text-ink-muted text-[10px] font-semibold uppercase;
   }
 
   .metric {
-    @apply font-display text-3xl font-semibold tracking-tight text-white;
+    @apply text-ink-hi font-mono text-3xl font-semibold tracking-tight;
   }
 
+  /* Panel: the 14px-radius instrument container on the panel surface. */
+  .panel {
+    @apply rounded-panel border-hairline bg-panel border p-[18px];
+  }
+
+  /* Card kept as an alias of panel so legacy markup still renders on-brand. */
   .card {
-    @apply rounded-card border border-white/10 bg-white/[0.02] p-6 transition;
+    @apply rounded-panel border-hairline bg-panel border p-[18px] transition;
   }
 
   .pill {
-    @apply inline-flex items-center rounded-pill border border-white/15 bg-white/5 px-3 py-1 text-xs font-medium uppercase tracking-label text-slate-200;
+    @apply rounded-pill border-hairline bg-panel tracking-label text-ink-muted inline-flex items-center border px-3 py-1 text-[11px] font-semibold uppercase;
+  }
+
+  /* Manufacturer wordmark chip (fixed 52px, colored per brand). */
+  .mark {
+    @apply w-[52px] flex-shrink-0 rounded-[5px] border py-[2px] text-center font-sans text-[9px] font-bold tracking-[0.09em];
   }
 }
