@@ -61,29 +61,29 @@ export default function AdvisorPage() {
         <header className="mb-10">
           <div className="mb-3 flex items-center gap-3">
             <p className="label">{t('pro')}</p>
-            <span className="pill border-accent-purple/40 bg-accent-purple/10 text-purple-300">
+            <span className="pill border-cblue/40 bg-cblue/10 text-cblue-bright">
               {t('aiPowered')}
             </span>
           </div>
-          <h1 className="font-display text-4xl font-semibold tracking-tight text-white">
+          <h1 className="font-display text-ink-hi text-4xl font-semibold tracking-tight">
             {t('title')}
           </h1>
-          <p className="mt-2 max-w-2xl text-sm text-slate-400">{t('subtitle')}</p>
+          <p className="text-ink-muted mt-2 max-w-2xl text-sm">{t('subtitle')}</p>
         </header>
 
         <SignedOut>
           <div className="card text-center">
             <p className="label mb-2">{t('signInRequired')}</p>
-            <p className="text-sm text-slate-400">
+            <p className="text-ink-muted text-sm">
               {t('proFeature')}{' '}
               <Link
                 href="/sign-in?redirect_url=/advisor"
-                className="text-accent-blue hover:underline"
+                className="text-lime-bright hover:underline"
               >
                 {t('signIn')}
               </Link>{' '}
               {t('or')}{' '}
-              <Link href="/pricing" className="text-accent-blue hover:underline">
+              <Link href="/pricing" className="text-lime-bright hover:underline">
                 {t('viewPricing')}
               </Link>
               .
@@ -96,7 +96,7 @@ export default function AdvisorPage() {
             <div>
               <div className="mb-2 flex items-center justify-between">
                 <p className="label">{t('budget')}</p>
-                <span className="font-mono text-lg text-white">${budget.toLocaleString()}</span>
+                <span className="text-ink-hi font-mono text-lg">${budget.toLocaleString()}</span>
               </div>
               <input
                 type="range"
@@ -105,7 +105,7 @@ export default function AdvisorPage() {
                 step={50}
                 value={budget}
                 onChange={(e) => setBudget(Number(e.currentTarget.value))}
-                className="accent-accent-blue w-full"
+                className="accent-lime w-full"
               />
             </div>
 
@@ -120,8 +120,8 @@ export default function AdvisorPage() {
                     className={
                       'rounded-pill tracking-label border px-3 py-1 text-xs font-medium uppercase transition ' +
                       (purpose === p.value
-                        ? 'border-white/40 bg-white/15 text-white'
-                        : 'border-white/10 bg-white/5 text-slate-400 hover:text-slate-200')
+                        ? 'text-ink-hi border-white/40 bg-white/15'
+                        : 'text-ink-muted hover:text-ink border-white/10 bg-white/5')
                     }
                   >
                     {t(p.labelKey)}
@@ -141,8 +141,8 @@ export default function AdvisorPage() {
                     className={
                       'rounded-pill tracking-label border px-4 py-1 text-xs font-medium uppercase transition ' +
                       (resolution === r
-                        ? 'border-white/40 bg-white/15 text-white'
-                        : 'border-white/10 bg-white/5 text-slate-400 hover:text-slate-200')
+                        ? 'text-ink-hi border-white/40 bg-white/15'
+                        : 'text-ink-muted hover:text-ink border-white/10 bg-white/5')
                     }
                   >
                     {r}
@@ -159,7 +159,7 @@ export default function AdvisorPage() {
                 maxLength={500}
                 placeholder={t('preferencesPlaceholder')}
                 onChange={(e) => setPreferences(e.currentTarget.value)}
-                className="focus:border-accent-blue w-full rounded-sm border border-white/10 bg-white/5 px-3 py-2 text-sm text-white placeholder:text-slate-500 focus:outline-none"
+                className="focus:border-lime/45 rounded-control border-hairline bg-panel text-ink-hi placeholder:text-ink-faint w-full border px-3 py-2 text-sm focus:outline-none"
               />
             </div>
 
@@ -167,11 +167,11 @@ export default function AdvisorPage() {
               type="button"
               onClick={onGenerate}
               disabled={loading}
-              className="border-accent-purple bg-accent-purple/20 hover:bg-accent-purple/30 rounded-sm border px-6 py-2 text-sm font-semibold text-white transition disabled:opacity-50"
+              className="rounded-control bg-lime text-lime-ink px-6 py-2 text-sm font-semibold transition hover:brightness-110 disabled:opacity-50"
             >
               {loading ? t('generating') : t('generate')}
             </button>
-            {error && <p className="text-state-danger text-sm">{error}</p>}
+            {error && <p className="text-cred text-sm">{error}</p>}
           </div>
 
           {advice && <BuildAdviceResult advice={advice} />}

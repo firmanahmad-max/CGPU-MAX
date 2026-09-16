@@ -70,19 +70,17 @@ export default function AccountPage() {
       <main className="mx-auto max-w-4xl px-6 py-12">
         <header className="mb-10">
           <p className="label">{t('label')}</p>
-          <h1 className="font-display mt-2 text-4xl font-semibold tracking-tight text-white">
+          <h1 className="font-display text-ink-hi mt-2 text-4xl font-semibold tracking-tight">
             {(() => {
               const name = user?.firstName ?? user?.username;
               return name ? t('dashboardTitle', { name }) : t('dashboardFallback');
             })()}
           </h1>
-          <p className="mt-2 text-sm text-slate-400">{user.email}</p>
+          <p className="text-ink-muted mt-2 text-sm">{user.email}</p>
         </header>
 
         {error && (
-          <div className="card border-state-danger/40 bg-state-danger/10 text-state-danger mb-6 text-sm">
-            {error}
-          </div>
+          <div className="card border-cred/40 bg-cred/10 text-cred mb-6 text-sm">{error}</div>
         )}
 
         {data && (
@@ -91,14 +89,16 @@ export default function AccountPage() {
               <div className="mb-4 flex items-center justify-between">
                 <div>
                   <p className="label">{t('currentPlan')}</p>
-                  <p className="font-display mt-2 text-3xl font-semibold text-white">{data.tier}</p>
+                  <p className="font-display text-ink-hi mt-2 text-3xl font-semibold">
+                    {data.tier}
+                  </p>
                 </div>
                 <Pill variant={data.tier === 'PRO' ? 'intel' : 'default'}>
                   {data.subscription?.status ?? t('noSubscription')}
                 </Pill>
               </div>
               {data.subscription && (
-                <p className="text-sm text-slate-400">
+                <p className="text-ink-muted text-sm">
                   {t('renews', {
                     date: new Date(data.subscription.currentPeriodEnd).toLocaleDateString(),
                     interval: data.subscription.interval.toLowerCase(),
@@ -112,14 +112,14 @@ export default function AccountPage() {
                     type="button"
                     onClick={onPortal}
                     disabled={portalLoading}
-                    className="rounded-sm border border-white/20 bg-white/10 px-4 py-2 text-sm font-semibold text-white transition hover:bg-white/20 disabled:opacity-50"
+                    className="rounded-control text-ink-hi border border-white/20 bg-white/10 px-4 py-2 text-sm font-semibold transition hover:bg-white/20 disabled:opacity-50"
                   >
                     {portalLoading ? t('opening') : t('manageBilling')}
                   </button>
                 ) : (
                   <a
                     href="/pricing"
-                    className="border-accent-blue bg-accent-blue/20 hover:bg-accent-blue/30 rounded-sm border px-4 py-2 text-sm font-semibold text-white transition"
+                    className="rounded-control bg-lime text-lime-ink px-4 py-2 text-sm font-semibold transition hover:brightness-110"
                   >
                     {t('upgrade')}
                   </a>
@@ -147,19 +147,19 @@ export default function AccountPage() {
               <section className="card flex items-center justify-between">
                 <div>
                   <p className="label">{t('developer')}</p>
-                  <p className="mt-1 text-sm text-slate-300">{t('developerDesc')}</p>
+                  <p className="text-ink-mid mt-1 text-sm">{t('developerDesc')}</p>
                 </div>
                 <div className="flex gap-2">
                   <a
                     href="/account/api-keys"
-                    className="rounded-sm border border-white/20 bg-white/10 px-4 py-2 text-sm font-semibold text-white transition hover:bg-white/20"
+                    className="rounded-control text-ink-hi border border-white/20 bg-white/10 px-4 py-2 text-sm font-semibold transition hover:bg-white/20"
                   >
                     {t('apiKeysLink')} →
                   </a>
                   {data.limits.features.whiteLabel && (
                     <a
                       href="/account/organization"
-                      className="rounded-sm border border-white/20 bg-white/10 px-4 py-2 text-sm font-semibold text-white transition hover:bg-white/20"
+                      className="rounded-control text-ink-hi border border-white/20 bg-white/10 px-4 py-2 text-sm font-semibold transition hover:bg-white/20"
                     >
                       {t('organizationLink')} →
                     </a>
@@ -181,15 +181,12 @@ function UsageRow({ label, used, limit }: { label: string; used: number; limit: 
     <div>
       <div className="mb-1 flex items-center justify-between">
         <p className="label">{label}</p>
-        <p className="font-mono text-xs text-slate-300">
+        <p className="text-ink-mid font-mono text-xs">
           {used} / {unlimited ? '∞' : limit}
         </p>
       </div>
       <div className="h-1.5 overflow-hidden rounded-full bg-white/5">
-        <div
-          className="bg-accent-blue h-full rounded-full transition-all"
-          style={{ width: `${pct}%` }}
-        />
+        <div className="bg-cblue h-full rounded-full transition-all" style={{ width: `${pct}%` }} />
       </div>
     </div>
   );

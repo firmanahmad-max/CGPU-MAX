@@ -123,19 +123,19 @@ export default function OrganizationPage() {
         <div className="mb-8 flex items-end justify-between">
           <div>
             <p className="label">{t('label')}</p>
-            <h1 className="font-display mt-2 text-4xl font-semibold tracking-tight text-white">
+            <h1 className="font-display text-ink-hi mt-2 text-4xl font-semibold tracking-tight">
               {t('title')}
             </h1>
           </div>
-          <Link href="/account" className="text-sm text-slate-400 hover:text-white">
+          <Link href="/account" className="text-ink-muted hover:text-ink-hi text-sm">
             ← {t('backAccount')}
           </Link>
         </div>
 
         {gated ? (
-          <div className="card text-center text-sm text-slate-400">
+          <div className="card text-ink-muted text-center text-sm">
             {t('gatedBody')}{' '}
-            <a href="mailto:sales@cgpu-max.app" className="text-accent-blue hover:underline">
+            <a href="mailto:sales@cgpu-max.app" className="text-lime-bright hover:underline">
               {t('contactSales')}
             </a>
             .
@@ -143,9 +143,7 @@ export default function OrganizationPage() {
         ) : (
           <>
             {error && (
-              <div className="card border-state-danger/40 bg-state-danger/10 text-state-danger mb-6 text-sm">
-                {error}
-              </div>
+              <div className="card border-cred/40 bg-cred/10 text-cred mb-6 text-sm">{error}</div>
             )}
 
             {!loading && orgs.length === 0 && (
@@ -156,12 +154,12 @@ export default function OrganizationPage() {
                     value={newName}
                     onChange={(e) => setNewName(e.currentTarget.value)}
                     placeholder={t('namePlaceholder')}
-                    className="focus:border-accent-blue flex-1 rounded-sm border border-white/10 bg-white/5 px-3 py-2 text-sm text-white placeholder:text-slate-500 focus:outline-none"
+                    className="focus:border-lime/45 rounded-control border-hairline bg-panel text-ink-hi placeholder:text-ink-faint flex-1 border px-3 py-2 text-sm focus:outline-none"
                   />
                   <button
                     type="button"
                     onClick={create}
-                    className="border-accent-blue bg-accent-blue/20 hover:bg-accent-blue/30 rounded-sm border px-5 py-2 text-sm font-semibold text-white"
+                    className="rounded-control bg-lime text-lime-ink px-5 py-2 text-sm font-semibold hover:brightness-110"
                   >
                     {t('create')}
                   </button>
@@ -212,24 +210,24 @@ export default function OrganizationPage() {
                   <button
                     type="button"
                     onClick={save}
-                    className="border-accent-blue bg-accent-blue/20 hover:bg-accent-blue/30 rounded-sm border px-5 py-2 text-sm font-semibold text-white"
+                    className="rounded-control bg-lime text-lime-ink px-5 py-2 text-sm font-semibold hover:brightness-110"
                   >
                     {t('save')}
                   </button>
-                  {saved && <span className="text-state-success text-sm">{t('savedMark')}</span>}
+                  {saved && <span className="text-lime-bright text-sm">{t('savedMark')}</span>}
                   <span className="ml-auto flex gap-2">
                     <span
-                      className="h-6 w-6 rounded-sm border border-white/20"
+                      className="rounded-control h-6 w-6 border border-white/20"
                       style={{ background: form.primaryColorHex || '#042C53' }}
                     />
                     <span
-                      className="h-6 w-6 rounded-sm border border-white/20"
+                      className="rounded-control h-6 w-6 border border-white/20"
                       style={{ background: form.secondaryColorHex || '#185FA5' }}
                     />
                   </span>
                 </div>
                 {active.customDomain && (
-                  <p className="text-xs text-slate-500">
+                  <p className="text-ink-faint text-xs">
                     {t('resolveTheme')}{' '}
                     <code className="font-mono">
                       GET /api/v1/branding/by-domain/{active.customDomain}
@@ -263,7 +261,7 @@ function Field({
         value={value}
         placeholder={placeholder}
         onChange={(e) => onChange(e.currentTarget.value)}
-        className="focus:border-accent-blue w-full rounded-sm border border-white/10 bg-white/5 px-3 py-2 text-sm text-white placeholder:text-slate-500 focus:outline-none"
+        className="focus:border-lime/45 rounded-control border-hairline bg-panel text-ink-hi placeholder:text-ink-faint w-full border px-3 py-2 text-sm focus:outline-none"
       />
     </div>
   );

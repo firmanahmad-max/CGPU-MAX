@@ -71,14 +71,14 @@ export default function GamingPage() {
             <p className="label">{t('pro')}</p>
             <Pill variant="nvidia">{t('pill')}</Pill>
           </div>
-          <h1 className="font-display text-4xl font-semibold tracking-tight text-white">
+          <h1 className="font-display text-ink-hi text-4xl font-semibold tracking-tight">
             {t('title')}
           </h1>
         </header>
 
         <SignedOut>
-          <div className="card text-center text-sm text-slate-400">
-            <Link href="/sign-in?redirect_url=/gaming" className="text-accent-blue hover:underline">
+          <div className="card text-ink-muted text-center text-sm">
+            <Link href="/sign-in?redirect_url=/gaming" className="text-lime-bright hover:underline">
               {t('signIn')}
             </Link>{' '}
             {t('signInSuffix')}
@@ -124,11 +124,11 @@ export default function GamingPage() {
               type="button"
               onClick={run}
               disabled={!gpuSlug || loading}
-              className="border-accent-purple bg-accent-purple/20 hover:bg-accent-purple/30 rounded-sm border px-6 py-2 text-sm font-semibold text-white transition disabled:opacity-40"
+              className="rounded-control bg-lime text-lime-ink px-6 py-2 text-sm font-semibold transition hover:brightness-110 disabled:opacity-40"
             >
               {loading ? t('predicting') : t('predict')}
             </button>
-            {error && <p className="text-state-danger text-sm">{error}</p>}
+            {error && <p className="text-cred text-sm">{error}</p>}
           </div>
 
           {result && (
@@ -139,13 +139,12 @@ export default function GamingPage() {
                     key={p.preset}
                     className={cn(
                       'card text-center',
-                      p.preset === result.recommendedPreset &&
-                        'border-state-success/40 bg-state-success/5',
+                      p.preset === result.recommendedPreset && 'border-lime/40 bg-lime/[0.05]',
                     )}
                   >
                     <p className="label capitalize">{p.preset}</p>
                     <p className="metric mt-2">{p.avgFps}</p>
-                    <p className="text-xs text-slate-500">
+                    <p className="text-ink-faint text-xs">
                       {t('fpsLow', { fps: p.onePercentLowFps })}
                     </p>
                   </div>
@@ -154,7 +153,7 @@ export default function GamingPage() {
 
               <div className="card">
                 <p className="label mb-1">{t('recommended')}</p>
-                <p className="text-sm text-slate-200">
+                <p className="text-ink text-sm">
                   <span className="font-semibold capitalize">{result.recommendedPreset}</span>{' '}
                   {t('presetSuffix')} {result.upscaling.note}
                 </p>
@@ -162,7 +161,7 @@ export default function GamingPage() {
 
               <div className="card">
                 <p className="label mb-3">{t('settingsTips')}</p>
-                <ul className="space-y-2 text-sm text-slate-300">
+                <ul className="text-ink-mid space-y-2 text-sm">
                   {result.settingsTips.map((t, i) => (
                     <li key={i}>• {t}</li>
                   ))}
@@ -192,8 +191,8 @@ function Toggle({
       className={
         'rounded-pill tracking-label border px-3 py-1 text-xs font-medium uppercase transition ' +
         (active
-          ? 'border-white/40 bg-white/15 text-white'
-          : 'border-white/10 bg-white/5 text-slate-400 hover:text-slate-200')
+          ? 'text-ink-hi border-white/40 bg-white/15'
+          : 'text-ink-muted hover:text-ink border-white/10 bg-white/5')
       }
     >
       {children}

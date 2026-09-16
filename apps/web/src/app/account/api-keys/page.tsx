@@ -95,11 +95,11 @@ export default function ApiKeysPage() {
         <div className="mb-8 flex items-end justify-between">
           <div>
             <p className="label">{t('label')}</p>
-            <h1 className="font-display mt-2 text-4xl font-semibold tracking-tight text-white">
+            <h1 className="font-display text-ink-hi mt-2 text-4xl font-semibold tracking-tight">
               {t('title')}
             </h1>
           </div>
-          <Link href="/account" className="text-sm text-slate-400 hover:text-white">
+          <Link href="/account" className="text-ink-muted hover:text-ink-hi text-sm">
             ← {t('backAccount')}
           </Link>
         </div>
@@ -107,9 +107,9 @@ export default function ApiKeysPage() {
         {gated ? (
           <div className="card text-center">
             <p className="label mb-2">{t('gatedTitle')}</p>
-            <p className="text-sm text-slate-400">
+            <p className="text-ink-muted text-sm">
               {t('gatedBody')}{' '}
-              <a href="mailto:sales@cgpu-max.app" className="text-accent-blue hover:underline">
+              <a href="mailto:sales@cgpu-max.app" className="text-lime-bright hover:underline">
                 {t('contactSales')}
               </a>
               .
@@ -118,22 +118,20 @@ export default function ApiKeysPage() {
         ) : (
           <>
             {error && (
-              <div className="card border-state-danger/40 bg-state-danger/10 text-state-danger mb-6 text-sm">
-                {error}
-              </div>
+              <div className="card border-cred/40 bg-cred/10 text-cred mb-6 text-sm">{error}</div>
             )}
 
             {revealed && (
-              <div className="card border-state-success/40 bg-state-success/5 mb-6">
-                <p className="label text-state-success mb-2">{t('newKeyTitle')}</p>
-                <p className="mb-3 text-xs text-slate-400">{t('newKeyBody')}</p>
-                <code className="block break-all rounded-sm bg-black/40 px-3 py-2 font-mono text-sm text-white">
+              <div className="card border-lime/40 bg-lime/[0.05] mb-6">
+                <p className="label text-lime-bright mb-2">{t('newKeyTitle')}</p>
+                <p className="text-ink-muted mb-3 text-xs">{t('newKeyBody')}</p>
+                <code className="rounded-control text-ink-hi block break-all bg-black/40 px-3 py-2 font-mono text-sm">
                   {revealed.key}
                 </code>
                 <button
                   type="button"
                   onClick={() => setRevealed(null)}
-                  className="mt-3 text-xs text-slate-400 hover:text-white"
+                  className="text-ink-muted hover:text-ink-hi mt-3 text-xs"
                 >
                   {t('dismiss')}
                 </button>
@@ -149,13 +147,13 @@ export default function ApiKeysPage() {
                   maxLength={80}
                   placeholder={t('namePlaceholder')}
                   onChange={(e) => setNewName(e.currentTarget.value)}
-                  className="focus:border-accent-blue flex-1 rounded-sm border border-white/10 bg-white/5 px-3 py-2 text-sm text-white placeholder:text-slate-500 focus:outline-none"
+                  className="focus:border-lime/45 rounded-control border-hairline bg-panel text-ink-hi placeholder:text-ink-faint flex-1 border px-3 py-2 text-sm focus:outline-none"
                 />
                 <button
                   type="button"
                   onClick={create}
                   disabled={creating || !newName.trim()}
-                  className="border-accent-blue bg-accent-blue/20 hover:bg-accent-blue/30 rounded-sm border px-5 py-2 text-sm font-semibold text-white transition disabled:opacity-40"
+                  className="rounded-control bg-lime text-lime-ink px-5 py-2 text-sm font-semibold transition hover:brightness-110 disabled:opacity-40"
                 >
                   {creating ? t('creating') : t('create')}
                 </button>
@@ -165,16 +163,16 @@ export default function ApiKeysPage() {
             <div className="card">
               <p className="label mb-4">{t('activeKeys')}</p>
               {loading ? (
-                <p className="text-sm text-slate-500">{t('loading')}</p>
+                <p className="text-ink-faint text-sm">{t('loading')}</p>
               ) : keys.length === 0 ? (
-                <p className="text-sm text-slate-500">{t('noKeys')}</p>
+                <p className="text-ink-faint text-sm">{t('noKeys')}</p>
               ) : (
                 <ul className="divide-y divide-white/5">
                   {keys.map((k) => (
                     <li key={k.id} className="flex items-center justify-between py-3">
                       <div>
-                        <p className="font-medium text-white">{k.name}</p>
-                        <p className="font-mono text-xs text-slate-500">
+                        <p className="text-ink-hi font-medium">{k.name}</p>
+                        <p className="text-ink-faint font-mono text-xs">
                           {k.keyPrefix}…
                           <span className="ml-2">
                             {k.lastUsedAt
@@ -190,7 +188,7 @@ export default function ApiKeysPage() {
                         <button
                           type="button"
                           onClick={() => revoke(k.id)}
-                          className="text-state-danger text-xs hover:underline"
+                          className="text-cred text-xs hover:underline"
                         >
                           {t('revoke')}
                         </button>
@@ -201,7 +199,7 @@ export default function ApiKeysPage() {
               )}
             </div>
 
-            <p className="mt-6 text-xs text-slate-500">
+            <p className="text-ink-faint mt-6 text-xs">
               {t('docsPrefix')} <code className="font-mono">GET /api/public/v1/openapi.json</code>.{' '}
               {t('authWith')} <code className="font-mono">Authorization: Bearer &lt;key&gt;</code>.
             </p>
