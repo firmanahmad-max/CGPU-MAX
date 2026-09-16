@@ -1,6 +1,8 @@
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 
+import { PriceSparkline } from '@/components/console/PriceSparkline';
+import { Price } from '@/components/console/Price';
 import { CreateAlertButton } from '@/components/CreateAlertButton';
 import { Pill } from '@/components/Pill';
 import { getPriceHistory, getProcessor } from '@/lib/api';
@@ -20,7 +22,10 @@ export default async function ProcessorDetailPage({ params }: PageProps) {
 
   const prices = history?.points.map((p) => p.priceUsd) ?? [];
   const lowest = prices.length ? Math.min(...prices) : null;
-  const latest = prices.length ? prices[prices.length - 1] : null;
+  const first = prices[0] ?? null;
+  const latest = prices[prices.length - 1] ?? null;
+  const deltaPct =
+    first !== null && latest !== null && first > 0 ? ((latest - first) / first) * 100 : null;
 
   return (
     <main className="mx-auto max-w-4xl px-6 py-12">
@@ -53,12 +58,39 @@ export default async function ProcessorDetailPage({ params }: PageProps) {
         <Metric label="TDP" value={processor.tdpWatts ? `${processor.tdpWatts} W` : '—'} />
         <Metric label="Architecture" value={processor.architecture ?? '—'} />
         <Metric label="Process" value={processor.processNm ? `${processor.processNm} nm` : '—'} />
-        <Metric label="MSRP" value={processor.msrpUsd ? `$${processor.msrpUsd}` : '—'} />
+        <Metric label="MSRP" value={<Price usd={processor.msrpUsd} />} />
       </section>
 
-      <section className="mt-8 grid gap-4 sm:grid-cols-3">
-        <Metric label="Latest price" value={latest !== null ? `$${latest}` : '—'} />
-        <Metric label="Lowest tracked" value={lowest !== null ? `$${lowest}` : '—'} />
+      {/* 90-day price trend — Console reference build-bay sparkline. */}
+      {prices.length >= 2 && (
+        <section className="panel mt-8">
+          <div className="mb-2 flex items-baseline justify-between">
+            <p className="label">Price · history</p>
+            {deltaPct !== null && (
+              <span
+                className={
+                  'font-mono text-[12px] font-semibold ' +
+                  (deltaPct <= 0 ? 'text-lime-bright' : 'text-camber-bright')
+                }
+              >
+                {deltaPct > 0 ? '+' : ''}
+                {deltaPct.toFixed(1)}%
+              </span>
+            )}
+          </div>
+          <PriceSparkline points={prices} />
+          <div className="mt-3 flex items-baseline justify-between">
+            <Price usd={latest} className="text-ink-hi font-mono text-[16px] font-bold" />
+            <span className="text-ink-faint font-mono text-[11px]">
+              lowest <Price usd={lowest} className="text-ink-mid" />
+            </span>
+          </div>
+        </section>
+      )}
+
+      <section className="mt-4 grid gap-4 sm:grid-cols-3">
+        <Metric label="Latest price" value={<Price usd={latest} />} />
+        <Metric label="Lowest tracked" value={<Price usd={lowest} />} />
         <CreateAlertButton slug={processor.slug} suggested={lowest} />
       </section>
       {history && history.points.length > 0 && (
@@ -70,7 +102,7 @@ export default async function ProcessorDetailPage({ params }: PageProps) {
   );
 }
 
-function Metric({ label, value }: { label: string; value: string }) {
+function Metric({ label, value }: { label: string; value: React.ReactNode }) {
   return (
     <div className="card">
       <p className="label">{label}</p>
