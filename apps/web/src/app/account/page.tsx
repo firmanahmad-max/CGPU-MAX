@@ -112,7 +112,7 @@ export default function AccountPage() {
                     type="button"
                     onClick={onPortal}
                     disabled={portalLoading}
-                    className="rounded-control text-ink-hi border border-white/20 bg-white/10 px-4 py-2 text-sm font-semibold transition hover:bg-white/20 disabled:opacity-50"
+                    className="rounded-control text-ink-hi border-hairline bg-panel-3 border px-4 py-2 text-sm font-semibold transition hover:bg-white/20 disabled:opacity-50"
                   >
                     {portalLoading ? t('opening') : t('manageBilling')}
                   </button>
@@ -152,14 +152,14 @@ export default function AccountPage() {
                 <div className="flex gap-2">
                   <a
                     href="/account/api-keys"
-                    className="rounded-control text-ink-hi border border-white/20 bg-white/10 px-4 py-2 text-sm font-semibold transition hover:bg-white/20"
+                    className="rounded-control text-ink-hi border-hairline bg-panel-3 border px-4 py-2 text-sm font-semibold transition hover:bg-white/20"
                   >
                     {t('apiKeysLink')} →
                   </a>
                   {data.limits.features.whiteLabel && (
                     <a
                       href="/account/organization"
-                      className="rounded-control text-ink-hi border border-white/20 bg-white/10 px-4 py-2 text-sm font-semibold transition hover:bg-white/20"
+                      className="rounded-control text-ink-hi border-hairline bg-panel-3 border px-4 py-2 text-sm font-semibold transition hover:bg-white/20"
                     >
                       {t('organizationLink')} →
                     </a>

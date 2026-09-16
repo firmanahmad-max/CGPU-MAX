@@ -11,10 +11,10 @@ export default function SignInPage() {
       ) : (
         <div className="card max-w-md text-center">
           <p className="label mb-2">Auth not configured</p>
-          <p className="text-sm text-slate-400">
+          <p className="text-ink-muted text-sm">
             Sign-in is disabled in this environment. Set a Clerk publishable key to enable accounts,
             or{' '}
-            <Link href="/processors" className="text-accent-blue hover:underline">
+            <Link href="/processors" className="text-lime-bright hover:underline">
               keep browsing
             </Link>
             .

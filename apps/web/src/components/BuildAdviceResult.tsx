@@ -11,17 +11,13 @@ export function BuildAdviceResult({ advice }: { advice: BuildAdvice }) {
         <div className="mb-3 flex items-center gap-3">
           <Pill variant="intel">AI Build</Pill>
           {advice.withinBudget ? (
-            <Pill className="border-state-success/50 bg-state-success/15 text-state-success">
-              Within budget
-            </Pill>
+            <Pill className="border-lime/50 bg-lime/15 text-lime-bright">Within budget</Pill>
           ) : (
-            <Pill className="border-state-warning/50 bg-state-warning/15 text-amber-300">
-              Over budget
-            </Pill>
+            <Pill className="border-camber/50 bg-camber/15 text-camber-bright">Over budget</Pill>
           )}
-          <span className="text-xs text-slate-500">{advice.modelUsed}</span>
+          <span className="text-ink-faint text-xs">{advice.modelUsed}</span>
         </div>
-        <p className="text-sm leading-relaxed text-slate-200">{advice.summary}</p>
+        <p className="text-ink text-sm leading-relaxed">{advice.summary}</p>
       </div>
 
       <div className="grid gap-4 sm:grid-cols-2">
@@ -37,13 +33,13 @@ export function BuildAdviceResult({ advice }: { advice: BuildAdvice }) {
 
       <div className="card">
         <p className="label mb-2">Upgrade path</p>
-        <p className="text-sm text-slate-300">{advice.upgradePathNote}</p>
+        <p className="text-ink-mid text-sm">{advice.upgradePathNote}</p>
       </div>
 
       {advice.warnings.length > 0 && (
-        <div className="card border-state-warning/30 bg-state-warning/5">
-          <p className="label mb-2 text-amber-300">Warnings</p>
-          <ul className="space-y-1 text-sm text-amber-200/90">
+        <div className="card border-camber/30 bg-camber/5">
+          <p className="label text-camber-bright mb-2">Warnings</p>
+          <ul className="text-camber-bright/90 space-y-1 text-sm">
             {advice.warnings.map((w, i) => (
               <li key={i}>• {w}</li>
             ))}
@@ -59,21 +55,21 @@ function PickCard({ pick }: { pick: ComponentPick }) {
     <div className="card">
       <div className="mb-2 flex items-center justify-between">
         <p className="label">{pick.category.toUpperCase()}</p>
-        <span className="font-mono text-sm text-slate-300">
+        <span className="text-ink-mid font-mono text-sm">
           ~${pick.approxPriceUsd.toLocaleString()}
         </span>
       </div>
       {pick.slug ? (
         <Link
           href={`/processors/${pick.slug}`}
-          className="font-display hover:text-accent-blue text-lg font-semibold text-white"
+          className="font-display hover:text-lime-bright text-ink-hi text-lg font-semibold"
         >
           {pick.modelName}
         </Link>
       ) : (
-        <p className="font-display text-lg font-semibold text-white">{pick.modelName}</p>
+        <p className="font-display text-ink-hi text-lg font-semibold">{pick.modelName}</p>
       )}
-      <p className="mt-2 text-sm text-slate-400">{pick.rationale}</p>
+      <p className="text-ink-muted mt-2 text-sm">{pick.rationale}</p>
     </div>
   );
 }
@@ -82,7 +78,7 @@ function Stat({ label, value, small }: { label: string; value: string; small?: b
   return (
     <div className="card">
       <p className="label">{label}</p>
-      <p className={small ? 'mt-2 text-sm text-slate-200' : 'metric mt-2'}>{value}</p>
+      <p className={small ? 'text-ink mt-2 text-sm' : 'metric mt-2'}>{value}</p>
     </div>
   );
 }

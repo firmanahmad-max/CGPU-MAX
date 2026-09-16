@@ -195,8 +195,8 @@ function Toggle({
       className={
         'rounded-pill tracking-label border px-3 py-1 text-xs font-medium uppercase transition ' +
         (active
-          ? 'text-ink-hi border-white/40 bg-white/15'
-          : 'text-ink-muted hover:text-ink border-white/10 bg-white/5')
+          ? 'border-lime/45 bg-lime/[0.14] text-lime-bright'
+          : 'border-hairline bg-panel text-ink-faint hover:text-ink')
       }
     >
       {children}

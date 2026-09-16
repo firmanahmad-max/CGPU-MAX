@@ -20,11 +20,11 @@ export default async function SharedBottleneckPage({ params }: PageProps) {
       <div className="mb-6 flex items-end justify-between">
         <div>
           <p className="label">Shared bottleneck</p>
-          <h1 className="font-display mt-2 text-3xl font-semibold tracking-tight text-white">
-            {result.cpu.modelName} <span className="text-slate-500">+</span> {result.gpu.modelName}
+          <h1 className="font-display text-ink-hi mt-2 text-3xl font-semibold tracking-tight">
+            {result.cpu.modelName} <span className="text-ink-faint">+</span> {result.gpu.modelName}
           </h1>
         </div>
-        <Link href="/bottleneck" className="text-sm text-slate-400 hover:text-white">
+        <Link href="/bottleneck" className="text-ink-muted hover:text-ink-hi text-sm">
           New analysis →
         </Link>
       </div>

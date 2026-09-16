@@ -39,21 +39,21 @@ export function CreateAlertButton({ slug, suggested }: { slug: string; suggested
       <div className="card">
         <p className="label mb-2">Price alert</p>
         {status === 'done' ? (
-          <p className="text-state-success text-sm">{message}</p>
+          <p className="text-lime-bright text-sm">{message}</p>
         ) : open ? (
           <div className="flex items-center gap-2">
-            <span className="text-sm text-slate-400">Notify me when ≤ $</span>
+            <span className="text-ink-muted text-sm">Notify me when ≤ $</span>
             <input
               type="number"
               value={target}
               onChange={(e) => setTarget(e.currentTarget.value)}
-              className="focus:border-accent-blue w-28 rounded-sm border border-white/10 bg-white/5 px-2 py-1 text-sm text-white focus:outline-none"
+              className="focus:border-lime/45 rounded-control border-hairline bg-panel text-ink-hi w-28 border px-2 py-1 text-sm focus:outline-none"
             />
             <button
               type="button"
               onClick={submit}
               disabled={status === 'saving'}
-              className="border-accent-blue bg-accent-blue/20 hover:bg-accent-blue/30 rounded-sm border px-3 py-1 text-xs font-semibold text-white disabled:opacity-40"
+              className="rounded-control bg-lime text-lime-ink px-3 py-1 text-xs font-semibold hover:brightness-110 disabled:opacity-40"
             >
               {status === 'saving' ? 'Saving…' : 'Set alert'}
             </button>
@@ -62,14 +62,12 @@ export function CreateAlertButton({ slug, suggested }: { slug: string; suggested
           <button
             type="button"
             onClick={() => setOpen(true)}
-            className="rounded-sm border border-white/20 bg-white/10 px-3 py-1 text-sm font-semibold text-white hover:bg-white/20"
+            className="rounded-control border-hairline bg-panel-3 text-ink-hi border px-3 py-1 text-sm font-semibold hover:bg-white/20"
           >
             Track price
           </button>
         )}
-        {status === 'error' && message && (
-          <p className="text-state-danger mt-2 text-xs">{message}</p>
-        )}
+        {status === 'error' && message && <p className="text-cred mt-2 text-xs">{message}</p>}
       </div>
     </SignedIn>
   );

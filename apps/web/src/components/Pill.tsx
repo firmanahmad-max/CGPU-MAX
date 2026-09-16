@@ -7,17 +7,17 @@ interface PillProps {
 }
 
 const VARIANT_CLASSES: Record<NonNullable<PillProps['variant']>, string> = {
-  default: 'border-white/15 bg-white/5 text-slate-200',
-  intel: 'border-accent-blue/40 bg-accent-blue/10 text-blue-300',
-  amd: 'border-accent-coral/40 bg-accent-coral/10 text-orange-300',
-  nvidia: 'border-accent-purple/40 bg-accent-purple/10 text-purple-300',
+  default: 'border-hairline bg-panel text-ink-muted',
+  intel: 'border-cblue/40 bg-cblue/10 text-cblue-bright',
+  amd: 'border-cred/40 bg-cred/10 text-cred',
+  nvidia: 'border-lime/40 bg-lime/10 text-lime-bright',
 };
 
 export function Pill({ children, variant = 'default', className }: PillProps) {
   return (
     <span
       className={cn(
-        'rounded-pill tracking-label inline-flex items-center border px-3 py-1 text-xs font-medium uppercase',
+        'rounded-pill tracking-label inline-flex items-center border px-3 py-1 text-[11px] font-semibold uppercase',
         VARIANT_CLASSES[variant],
         className,
       )}

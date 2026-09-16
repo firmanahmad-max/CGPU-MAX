@@ -49,7 +49,7 @@ export function ReportExportButtons({ kind, shareSlug }: ReportExportButtonsProp
           type="button"
           onClick={() => download('pdf')}
           disabled={busy !== null}
-          className="rounded-sm border border-white/20 bg-white/10 px-4 py-1.5 text-sm font-semibold text-white transition hover:bg-white/20 disabled:opacity-40"
+          className="rounded-control border-hairline bg-panel-3 text-ink-hi border px-4 py-1.5 text-sm font-semibold transition hover:bg-white/20 disabled:opacity-40"
         >
           {busy === 'pdf' ? 'Generating…' : 'PDF'}
         </button>
@@ -57,11 +57,11 @@ export function ReportExportButtons({ kind, shareSlug }: ReportExportButtonsProp
           type="button"
           onClick={() => download('xlsx')}
           disabled={busy !== null}
-          className="rounded-sm border border-white/20 bg-white/10 px-4 py-1.5 text-sm font-semibold text-white transition hover:bg-white/20 disabled:opacity-40"
+          className="rounded-control border-hairline bg-panel-3 text-ink-hi border px-4 py-1.5 text-sm font-semibold transition hover:bg-white/20 disabled:opacity-40"
         >
           {busy === 'xlsx' ? 'Generating…' : 'Excel'}
         </button>
-        {error && <span className="text-state-danger text-xs">{error}</span>}
+        {error && <span className="text-cred text-xs">{error}</span>}
       </div>
     </SignedIn>
   );

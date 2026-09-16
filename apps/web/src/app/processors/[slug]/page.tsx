@@ -24,7 +24,7 @@ export default async function ProcessorDetailPage({ params }: PageProps) {
 
   return (
     <main className="mx-auto max-w-4xl px-6 py-12">
-      <Link href="/processors" className="text-sm text-slate-400 hover:text-white">
+      <Link href="/processors" className="text-ink-muted hover:text-ink-hi text-sm">
         ← All processors
       </Link>
 
@@ -44,7 +44,7 @@ export default async function ProcessorDetailPage({ params }: PageProps) {
           <Pill>{processor.type}</Pill>
           {processor.generation && <Pill>Gen {processor.generation}</Pill>}
         </div>
-        <h1 className="font-display text-5xl font-semibold tracking-tight text-white">
+        <h1 className="font-display text-ink-hi text-5xl font-semibold tracking-tight">
           {processor.modelName}
         </h1>
       </header>
@@ -62,7 +62,7 @@ export default async function ProcessorDetailPage({ params }: PageProps) {
         <CreateAlertButton slug={processor.slug} suggested={lowest} />
       </section>
       {history && history.points.length > 0 && (
-        <p className="mt-3 text-xs text-slate-500">
+        <p className="text-ink-faint mt-3 text-xs">
           {history.points.length} price points tracked over the last year.
         </p>
       )}

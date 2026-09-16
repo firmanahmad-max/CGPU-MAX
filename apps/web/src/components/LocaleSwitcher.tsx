@@ -36,7 +36,9 @@ export function LocaleSwitcher() {
           onClick={() => setLocale(l)}
           className={
             'px-2.5 py-1 font-medium transition ' +
-            (locale === l ? 'bg-white/15 text-white' : 'bg-white/5 text-slate-400 hover:text-white')
+            (locale === l
+              ? 'text-ink-hi bg-white/15'
+              : 'text-ink-muted hover:text-ink-hi bg-white/5')
           }
         >
           {LABELS[l]}

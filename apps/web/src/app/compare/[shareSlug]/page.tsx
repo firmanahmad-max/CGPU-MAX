@@ -20,11 +20,11 @@ export default async function SharedComparisonPage({ params }: PageProps) {
       <div className="mb-6 flex items-end justify-between">
         <div>
           <p className="label">Shared comparison</p>
-          <h1 className="font-display mt-2 text-3xl font-semibold tracking-tight text-white">
-            {result.a.modelName} <span className="text-slate-500">vs</span> {result.b.modelName}
+          <h1 className="font-display text-ink-hi mt-2 text-3xl font-semibold tracking-tight">
+            {result.a.modelName} <span className="text-ink-faint">vs</span> {result.b.modelName}
           </h1>
         </div>
-        <Link href="/compare" className="text-sm text-slate-400 hover:text-white">
+        <Link href="/compare" className="text-ink-muted hover:text-ink-hi text-sm">
           New comparison →
         </Link>
       </div>
