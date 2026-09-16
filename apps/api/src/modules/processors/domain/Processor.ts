@@ -8,7 +8,11 @@ export interface ProcessorProps {
   manufacturer: Manufacturer;
   modelName: string;
   slug: string;
+  codeName: string | null;
   generation: number | null;
+  releaseDate: string | null;
+  architecture: string | null;
+  processNm: number | null;
   tdpWatts: number | null;
   msrpUsd: number | null;
 }
