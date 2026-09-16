@@ -51,7 +51,7 @@ export function RankingsFilters() {
   };
 
   return (
-    <div className="card mb-8 flex flex-wrap gap-6">
+    <div className="panel mb-6 flex flex-wrap gap-x-6 gap-y-5">
       <Group label={t('filterType')}>
         {TYPES.map((ty) => (
           <Toggle key={ty} active={current.type === ty} onClick={() => push({ type: ty })}>
@@ -103,7 +103,7 @@ export function RankingsFilters() {
           </Toggle>
         ))}
       </Group>
-      {isPending && <span className="self-end text-xs text-slate-500">{t('updating')}</span>}
+      {isPending && <span className="text-ink-faint self-end text-xs">{t('updating')}</span>}
     </div>
   );
 }
@@ -131,10 +131,10 @@ function Toggle({
       type="button"
       onClick={onClick}
       className={
-        'tracking-label rounded-pill border px-3 py-1 text-xs font-medium uppercase transition ' +
+        'rounded-control border px-3 py-1 text-[12px] font-semibold transition ' +
         (active
-          ? 'border-white/40 bg-white/15 text-white'
-          : 'border-white/10 bg-white/5 text-slate-400 hover:text-slate-200')
+          ? 'border-lime/45 bg-lime/[0.14] text-lime-bright'
+          : 'border-hairline bg-panel text-ink-faint hover:text-ink')
       }
     >
       {children}

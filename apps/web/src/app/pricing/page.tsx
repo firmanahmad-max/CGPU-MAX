@@ -6,7 +6,6 @@ import { useTranslations } from 'next-intl';
 import { SignedIn, SignedOut, useCurrentUser } from '@/lib/auth';
 import { useState } from 'react';
 
-import { Pill } from '@/components/Pill';
 import { useAuthedFetch } from '@/lib/useAuthedFetch';
 import { cn } from '@/lib/cn';
 
@@ -19,7 +18,7 @@ const TIERS = [
     price: '$0',
     cadenceKey: 'freeCadence',
     ctaKey: 'freeCta',
-    accent: 'border-white/10',
+    accent: 'border-hairline',
     featureKeys: ['free1', 'free2', 'free3', 'free4'],
     plan: null as Plan | null,
   },
@@ -28,7 +27,7 @@ const TIERS = [
     price: '$9.99',
     cadenceKey: 'proCadence',
     ctaKey: 'proCta',
-    accent: 'border-accent-blue/60 bg-accent-blue/5',
+    accent: 'border-lime/45 bg-gradient-to-b from-lime/[0.09] to-panel',
     highlight: true,
     featureKeys: ['pro1', 'pro2', 'pro3', 'pro4', 'pro5', 'pro6'],
     plan: 'pro_monthly' as Plan,
@@ -38,7 +37,7 @@ const TIERS = [
     price: '$99',
     cadenceKey: 'annualCadence',
     ctaKey: 'annualCta',
-    accent: 'border-accent-purple/60 bg-accent-purple/5',
+    accent: 'border-hairline',
     featureKeys: ['annual1', 'annual2', 'annual3'],
     plan: 'pro_yearly' as Plan,
   },
@@ -78,92 +77,95 @@ export default function PricingPage() {
   };
 
   return (
-    <>
-      <main className="mx-auto max-w-6xl px-6 py-16">
-        <header className="mb-12 text-center">
-          <p className="label">{t('label')}</p>
-          <h1 className="font-display mt-3 text-5xl font-semibold tracking-tight text-white">
-            {t('title')}
-          </h1>
-          <p className="mx-auto mt-4 max-w-2xl text-slate-400">{t('subtitle')}</p>
-        </header>
+    <main className="mx-auto max-w-5xl px-6 py-14">
+      <header className="mb-8 max-w-2xl">
+        <p className="label">{t('label')}</p>
+        <h1 className="font-display text-ink-hi mt-3 text-[32px] font-bold leading-[1.15] tracking-tight">
+          {t('title')}
+        </h1>
+        <p className="text-ink-faint mt-3 text-[13px] leading-relaxed">{t('subtitle')}</p>
+      </header>
 
-        {error && (
-          <div className="card border-state-danger/40 bg-state-danger/10 text-state-danger mb-6 text-sm">
-            {error}
-          </div>
-        )}
+      {error && (
+        <div className="panel border-cred/40 bg-cred/10 text-cred mb-6 text-sm">{error}</div>
+      )}
 
-        <div className="grid gap-6 sm:grid-cols-3">
-          {TIERS.map((tier) => (
-            <div
-              key={tier.nameKey}
-              className={cn(
-                'card flex flex-col',
-                tier.accent,
-                tier.highlight && 'ring-accent-blue/30 ring-1',
-              )}
-            >
-              <div className="mb-4 flex items-center justify-between">
-                <p className="label">{t(tier.nameKey)}</p>
-                {tier.highlight && <Pill variant="intel">{t('mostPopular')}</Pill>}
-              </div>
-              <p className="font-display text-4xl font-semibold tracking-tight text-white">
-                {tier.price}
-              </p>
-              <p className="tracking-label mt-1 text-xs uppercase text-slate-500">
-                {t(tier.cadenceKey)}
-              </p>
-              <ul className="my-6 space-y-2 text-sm text-slate-300">
-                {tier.featureKeys.map((f) => (
-                  <li key={f} className="flex gap-2">
-                    <span className="bg-accent-blue mt-1.5 inline-block h-1.5 w-1.5 flex-shrink-0 rounded-full" />
-                    <span>{t(f)}</span>
-                  </li>
-                ))}
-              </ul>
-              {tier.plan ? (
-                <button
-                  type="button"
-                  onClick={() => onCheckout(tier.plan!)}
-                  disabled={loading !== null}
-                  className="mt-auto rounded-sm border border-white/20 bg-white/10 px-4 py-2 text-sm font-semibold text-white transition hover:bg-white/20 disabled:opacity-50"
-                >
-                  {loading === tier.plan ? t('redirecting') : t(tier.ctaKey)}
-                </button>
-              ) : (
-                <Link
-                  href="/processors"
-                  className="mt-auto rounded-sm border border-white/15 bg-white/5 px-4 py-2 text-center text-sm font-semibold text-white transition hover:bg-white/10"
-                >
-                  {t(tier.ctaKey)}
-                </Link>
+      <div className="grid gap-4 sm:grid-cols-3">
+        {TIERS.map((tier) => (
+          <div key={tier.nameKey} className={cn('panel flex flex-col', tier.accent)}>
+            <div className="flex items-center justify-between">
+              <p className={cn('label', tier.highlight && 'text-lime-bright')}>{t(tier.nameKey)}</p>
+              {tier.highlight && (
+                <span className="rounded-pill bg-lime tracking-label text-lime-ink px-[9px] py-[3px] text-[9.5px] font-semibold uppercase">
+                  {t('mostPopular')}
+                </span>
               )}
             </div>
-          ))}
-        </div>
+            <p className="text-ink-hi mt-[10px] font-mono text-[30px] font-bold tracking-tight">
+              {tier.price}
+            </p>
+            <p className="tracking-label text-ink-faint mt-1 text-[11px] uppercase">
+              {t(tier.cadenceKey)}
+            </p>
+            <ul className="text-ink-mid my-[18px] flex flex-col gap-2 text-[12.5px]">
+              {tier.featureKeys.map((f) => (
+                <li key={f} className="flex gap-2">
+                  <span
+                    className={cn(
+                      'rounded-pill mt-[6px] inline-block h-[5px] w-[5px] flex-shrink-0',
+                      tier.highlight ? 'bg-lime' : 'bg-ink-faint',
+                    )}
+                  />
+                  <span>{t(f)}</span>
+                </li>
+              ))}
+            </ul>
+            {tier.plan ? (
+              <button
+                type="button"
+                onClick={() => onCheckout(tier.plan!)}
+                disabled={loading !== null}
+                className={cn(
+                  'rounded-control mt-auto px-4 py-[9px] text-center text-[12.5px] font-semibold transition disabled:opacity-50',
+                  tier.highlight
+                    ? 'bg-lime text-lime-ink hover:brightness-110'
+                    : 'border-hairline text-ink-mid border hover:bg-white/5',
+                )}
+              >
+                {loading === tier.plan ? t('redirecting') : t(tier.ctaKey)}
+              </button>
+            ) : (
+              <Link
+                href="/processors"
+                className="rounded-control border-hairline text-ink-mid mt-auto border px-4 py-[9px] text-center text-[12.5px] font-semibold transition hover:bg-white/5"
+              >
+                {t(tier.ctaKey)}
+              </Link>
+            )}
+          </div>
+        ))}
+      </div>
 
-        <p className="mt-10 text-center text-xs text-slate-500">
-          {t('enterpriseQuestion')}{' '}
-          <a href="mailto:sales@cgpu-max.app" className="text-accent-blue hover:underline">
-            {t('contactUs')}
-          </a>
+      <p className="text-ink-faint mt-8 text-center text-[11px]">
+        {t('enterpriseQuestion')}{' '}
+        <a href="mailto:sales@cgpu-max.app" className="text-lime-bright hover:underline">
+          {t('contactUs')}
+        </a>
+        .
+      </p>
+
+      <SignedOut>
+        <p className="text-ink-faint mt-3 text-center text-[11px]">{t('signInNote')}</p>
+      </SignedOut>
+      <SignedIn>
+        <p className="text-ink-faint mt-3 text-center text-[11px]">
+          {t('managePrefix')}{' '}
+          <Link href="/account" className="text-lime-bright hover:underline">
+            {t('manageLink')}
+          </Link>
           .
         </p>
-
-        <SignedOut>
-          <p className="mt-4 text-center text-xs text-slate-500">{t('signInNote')}</p>
-        </SignedOut>
-        <SignedIn>
-          <p className="mt-4 text-center text-xs text-slate-500">
-            {t('managePrefix')}{' '}
-            <Link href="/account" className="text-accent-blue hover:underline">
-              {t('manageLink')}
-            </Link>
-            .
-          </p>
-        </SignedIn>
-      </main>
-    </>
+      </SignedIn>
+    </main>
   );
 }
