@@ -191,9 +191,10 @@ async function refreshSignals(
     })),
   });
 
-  // A ~90-day weekly price series so the detail-page sparkline shows a real
-  // trend. Deterministic from processorId: a gentle downward drift off MSRP
-  // with small week-to-week noise.
+  // A dense 90-day daily price series so the sparkline reads as a smooth
+  // curve. Deterministic from processorId: a gentle downward drift off MSRP,
+  // followed by a mean-reverting random walk so consecutive days stay close
+  // (dense but not jagged).
   let seed = 0;
   for (let i = 0; i < processorId.length; i++)
     seed = (seed * 31 + processorId.charCodeAt(i)) % 9973;
@@ -201,16 +202,18 @@ async function refreshSignals(
     seed = (seed * 1103515245 + 12345) % 2147483648;
     return seed / 2147483648;
   };
-  const WEEKS = 13;
+  const DAYS = 90;
   const drift = 0.06 + rand() * 0.06; // total decline 6–12% over the window
-  const priceHistory = Array.from({ length: WEEKS }, (_, i) => {
-    const t = i / (WEEKS - 1);
-    const factor = 1 - drift * t + (rand() - 0.5) * 0.03; // trend + ±1.5% noise
+  let factor = 1;
+  const priceHistory = Array.from({ length: DAYS }, (_, i) => {
+    const t = i / (DAYS - 1);
+    const target = 1 - drift * t; // smooth downward trend line
+    factor += (target - factor) * 0.25 + (rand() - 0.5) * 0.006; // ease toward it + gentle texture
     return {
       processorId,
       retailer: 'seed-retailer',
       priceUsd: Math.max(1, Math.round(msrpUsd * factor)),
-      recordedAt: new Date(now.getTime() - (WEEKS - 1 - i) * 7 * 86_400_000),
+      recordedAt: new Date(now.getTime() - (DAYS - 1 - i) * 86_400_000),
     };
   });
   await prisma.priceHistory.createMany({ data: priceHistory });
