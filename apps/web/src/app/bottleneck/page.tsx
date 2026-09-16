@@ -1,6 +1,5 @@
 'use client';
 
-import Link from 'next/link';
 import { useTranslations } from 'next-intl';
 import { useState } from 'react';
 
@@ -33,27 +32,22 @@ export default function BottleneckPage() {
   };
 
   return (
-    <main className="mx-auto max-w-6xl px-6 py-12">
-      <div className="mb-10 flex items-end justify-between">
-        <div>
-          <p className="label">{t('label')}</p>
-          <h1 className="font-display mt-2 text-4xl font-semibold tracking-tight text-white">
-            {t('title')}
-          </h1>
-          <p className="mt-2 max-w-2xl text-sm text-slate-400">
-            {t('subtitle')}
-            <code className="ml-1 font-mono text-xs text-slate-300">
-              apps/api/src/modules/bottleneck/domain/BottleneckAlgorithm.ts
-            </code>
-            .
-          </p>
-        </div>
-        <Link href="/" className="text-sm text-slate-400 hover:text-white">
-          ← {t('back')}
-        </Link>
-      </div>
+    <main className="mx-auto max-w-6xl px-6 py-10">
+      <header className="mb-8">
+        <p className="label">{t('label')}</p>
+        <h1 className="font-display text-ink-hi mt-2 text-[26px] font-bold tracking-tight">
+          {t('title')}
+        </h1>
+        <p className="text-ink-faint mt-2 max-w-2xl text-[13px] leading-relaxed">
+          {t('subtitle')}
+          <code className="text-ink-mid ml-1 font-mono text-[11px]">
+            apps/api/src/modules/bottleneck/domain/BottleneckAlgorithm.ts
+          </code>
+          .
+        </p>
+      </header>
 
-      <div className="grid gap-6 sm:grid-cols-2">
+      <div className="grid gap-4 sm:grid-cols-2">
         <ProcessorPicker label="CPU" type="CPU" value={cpuSlug} onChange={setCpuSlug} />
         <ProcessorPicker label="GPU" type="GPU" value={gpuSlug} onChange={setGpuSlug} />
       </div>
@@ -63,11 +57,11 @@ export default function BottleneckPage() {
           type="button"
           onClick={onCalculate}
           disabled={!canCalculate || loading}
-          className="border-accent-purple bg-accent-purple/20 hover:bg-accent-purple/30 rounded-sm border px-6 py-2 text-sm font-semibold text-white transition disabled:cursor-not-allowed disabled:opacity-40"
+          className="rounded-control bg-lime text-lime-ink px-6 py-[10px] text-[13px] font-semibold transition hover:brightness-110 disabled:cursor-not-allowed disabled:opacity-40"
         >
           {loading ? t('buttonLoading') : t('button')}
         </button>
-        {error && <p className="text-state-danger text-sm">{error}</p>}
+        {error && <p className="text-cred text-[13px]">{error}</p>}
       </div>
 
       {result && <BottleneckResult result={result} />}

@@ -66,6 +66,7 @@
     "button": "Hitung Bottleneck",
     "buttonLoading": "Menganalisis…",
     "powerIndex": "Indeks daya (0–100)",
+    "matrix": "Matriks 12 skenario",
     "limiting": "Pembatas",
     "thermalEstimate": "Estimasi termal",
     "powerDraw": "Konsumsi daya",

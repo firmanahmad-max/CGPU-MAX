@@ -1,10 +1,8 @@
 import { useTranslations } from 'next-intl';
 
 import type { BottleneckPayload } from '@/lib/api';
-import { cn } from '@/lib/cn';
 
-import { BottleneckGauge } from './BottleneckGauge';
-import { Pill } from './Pill';
+import { BottleneckGauge, severityColor, type Severity } from './BottleneckGauge';
 
 interface BottleneckResultProps {
   result: BottleneckPayload;
@@ -13,17 +11,8 @@ interface BottleneckResultProps {
 const PROFILES = ['esports', 'aaa', 'vr', 'creative'] as const;
 const RESOLUTIONS = ['1080p', '1440p', '4K'] as const;
 
-const SEVERITY_BG: Record<BottleneckPayload['scenarios'][number]['severity'], string> = {
-  optimal: 'bg-state-success/15 text-state-success border-state-success/30',
-  minor: 'bg-state-success/10 text-emerald-300 border-emerald-300/30',
-  moderate: 'bg-state-warning/15 text-amber-300 border-state-warning/30',
-  significant: 'bg-state-warning/20 text-orange-300 border-orange-300/40',
-  severe: 'bg-state-danger/15 text-red-300 border-state-danger/40',
-};
-
 export function BottleneckResult({ result }: BottleneckResultProps) {
   const t = useTranslations('bottleneck');
-  // Use 1440p AAA as headline scenario.
   const headline =
     result.scenarios.find((s) => s.resolution === '1440p' && s.profile === 'aaa') ??
     result.scenarios[0];
@@ -31,117 +20,73 @@ export function BottleneckResult({ result }: BottleneckResultProps) {
   if (!headline) return null;
 
   return (
-    <section className="mt-10 space-y-8">
-      <div className="grid gap-6 sm:grid-cols-[1fr_2fr]">
-        <div className="card flex flex-col items-center justify-center">
+    <section className="mt-8 space-y-4">
+      <div className="grid gap-4 lg:grid-cols-[360px_1fr]">
+        {/* Gauge + metric grid */}
+        <div className="panel flex flex-col items-center bg-gradient-to-b from-[#15181C] to-[#101216]">
           <BottleneckGauge
             percentage={headline.bottleneckPercentage}
             severity={headline.severity}
             label={`${headline.resolution} · ${headline.profile}`}
           />
-          <p className="mt-2 text-sm text-slate-400">
-            {t('limiting')}:{' '}
-            <span className="font-mono uppercase">{headline.limitingComponent}</span>
-          </p>
+          <div className="mt-4 grid w-full grid-cols-2 gap-[10px]">
+            <MetricCell label={t('limiting')} value={headline.limitingComponent.toUpperCase()} />
+            <MetricCell
+              label={t('thermalEstimate')}
+              value={result.thermalEstimateC ? `${result.thermalEstimateC} °C` : '—'}
+            />
+            <MetricCell
+              label={t('powerDraw')}
+              value={result.totalPowerDrawW ? `${result.totalPowerDrawW} W` : '—'}
+            />
+            <MetricCell
+              label={t('recommendedPsu')}
+              value={result.recommendedPsuW ? `${result.recommendedPsuW} W` : '—'}
+            />
+          </div>
         </div>
 
-        <div className="card flex flex-col justify-center">
+        {/* Power index bars */}
+        <div className="panel flex flex-col justify-center">
           <p className="label mb-4">{t('powerIndex')}</p>
-          <PowerBar
-            label={`CPU: ${result.cpu.modelName}`}
-            value={result.cpuPower}
-            colorClass="bg-accent-purple"
-          />
+          <PowerBar label={`CPU · ${result.cpu.modelName}`} value={result.cpuPower} color="cblue" />
           <div className="mt-4">
             <PowerBar
-              label={`GPU: ${result.gpu.modelName}`}
+              label={`GPU · ${result.gpu.modelName}`}
               value={result.gpuPower}
-              colorClass="bg-cyan-400"
+              color="lime"
             />
           </div>
         </div>
       </div>
 
-      <div className="card">
-        <p className="label mb-4">Scenario matrix</p>
-        <div className="overflow-x-auto">
-          <table className="w-full text-sm">
-            <thead>
-              <tr className="tracking-label text-left text-xs uppercase text-slate-400">
-                <th className="px-3 py-2">Resolution</th>
-                {PROFILES.map((p) => (
-                  <th key={p} className="px-3 py-2 text-center">
-                    {p}
-                  </th>
-                ))}
-              </tr>
-            </thead>
-            <tbody>
-              {RESOLUTIONS.map((res) => (
-                <tr key={res} className="border-t border-white/5">
-                  <td className="px-3 py-3 font-mono text-slate-300">{res}</td>
-                  {PROFILES.map((profile) => {
-                    const s = result.scenarios.find(
-                      (x) => x.resolution === res && x.profile === profile,
-                    );
-                    if (!s)
-                      return (
-                        <td key={profile} className="px-3 py-3 text-slate-600">
-                          —
-                        </td>
-                      );
-                    return (
-                      <td key={profile} className="px-3 py-3 text-center">
-                        <div
-                          className={cn(
-                            'inline-flex flex-col items-center rounded-sm border px-3 py-1 text-xs',
-                            SEVERITY_BG[s.severity],
-                          )}
-                        >
-                          <span className="font-mono font-semibold">
-                            {s.bottleneckPercentage.toFixed(1)}%
-                          </span>
-                          <span className="tracking-label mt-0.5 text-[10px] uppercase opacity-80">
-                            {s.limitingComponent}
-                          </span>
-                          {s.expectedFpsRange && (
-                            <span className="mt-1 text-[10px] text-slate-400">
-                              {s.expectedFpsRange.min}–{s.expectedFpsRange.max} fps
-                            </span>
-                          )}
-                        </div>
-                      </td>
-                    );
-                  })}
-                </tr>
-              ))}
-            </tbody>
-          </table>
+      {/* 12-scenario matrix */}
+      <div className="panel">
+        <p className="label mb-3">{t('matrix')}</p>
+        <div className="grid grid-cols-[70px_repeat(4,1fr)] gap-[6px]">
+          <span />
+          {PROFILES.map((p) => (
+            <span
+              key={p}
+              className="text-ink-muted text-center text-[10px] font-semibold uppercase tracking-[0.1em]"
+            >
+              {p}
+            </span>
+          ))}
+          {RESOLUTIONS.map((res) => (
+            <MatrixRow key={res} res={res} scenarios={result.scenarios} headline={headline} />
+          ))}
         </div>
       </div>
 
-      <div className="grid gap-4 sm:grid-cols-3">
-        <Stat
-          label={t('thermalEstimate')}
-          value={result.thermalEstimateC ? `${result.thermalEstimateC} °C` : '—'}
-        />
-        <Stat
-          label={t('powerDraw')}
-          value={result.totalPowerDrawW ? `${result.totalPowerDrawW} W` : '—'}
-        />
-        <Stat
-          label={t('recommendedPsu')}
-          value={result.recommendedPsuW ? `${result.recommendedPsuW} W` : '—'}
-        />
-      </div>
-
+      {/* Recommendations */}
       {result.recommendations.length > 0 && (
-        <div className="card">
+        <div className="panel">
           <p className="label mb-3">{t('recommendations')}</p>
-          <ul className="space-y-2 text-sm text-slate-300">
+          <ul className="text-ink-mid flex flex-col gap-2 text-[13px]">
             {result.recommendations.map((r, i) => (
               <li key={i} className="flex gap-2">
-                <span className="text-state-success mt-0.5 flex-shrink-0">✓</span>
+                <span className="text-lime-bright mt-[1px] flex-shrink-0">✓</span>
                 <span>{r}</span>
               </li>
             ))}
@@ -149,11 +94,11 @@ export function BottleneckResult({ result }: BottleneckResultProps) {
         </div>
       )}
 
-      <div className="flex flex-wrap items-center gap-3 text-xs text-slate-500">
-        <Pill>{t('algorithm', { version: result.algorithmVersion })}</Pill>
+      <div className="text-ink-faint flex flex-wrap items-center gap-3 text-[11px]">
+        <span className="pill">{t('algorithm', { version: result.algorithmVersion })}</span>
         {result.shareSlug && (
           <span className="font-mono">
-            {t('share')}: <span className="text-slate-300">{result.shareSlug}</span>
+            {t('share')}: <span className="text-ink-mid">{result.shareSlug}</span>
           </span>
         )}
       </div>
@@ -161,11 +106,60 @@ export function BottleneckResult({ result }: BottleneckResultProps) {
   );
 }
 
-function Stat({ label, value }: { label: string; value: string }) {
+function MatrixRow({
+  res,
+  scenarios,
+  headline,
+}: {
+  res: string;
+  scenarios: BottleneckPayload['scenarios'];
+  headline: BottleneckPayload['scenarios'][number];
+}) {
   return (
-    <div className="card">
+    <>
+      <span className="text-ink-faint flex items-center font-mono text-[12px] font-semibold">
+        {res}
+      </span>
+      {PROFILES.map((profile) => {
+        const s = scenarios.find((x) => x.resolution === res && x.profile === profile);
+        if (!s)
+          return (
+            <span
+              key={profile}
+              className="border-hairline bg-panel-2 text-ink-faint rounded-[9px] border px-[6px] py-[10px] text-center"
+            >
+              —
+            </span>
+          );
+        const color = severityColor(s.severity as Severity);
+        const on = s.resolution === headline.resolution && s.profile === headline.profile;
+        return (
+          <span
+            key={profile}
+            className="rounded-[9px] border px-[6px] py-[10px] text-center"
+            style={{
+              borderColor: on ? color : 'rgba(255,255,255,.07)',
+              background: on ? 'rgba(255,255,255,.06)' : '#0E1013',
+            }}
+          >
+            <span className="block font-mono text-[15px] font-bold" style={{ color }}>
+              {s.bottleneckPercentage.toFixed(1)}
+            </span>
+            <span className="text-ink-muted mt-[2px] block text-[9.5px] font-semibold uppercase tracking-[0.1em]">
+              {s.limitingComponent}
+            </span>
+          </span>
+        );
+      })}
+    </>
+  );
+}
+
+function MetricCell({ label, value }: { label: string; value: string }) {
+  return (
+    <div className="border-hairline bg-panel-2 rounded-[10px] border p-[11px]">
       <p className="label">{label}</p>
-      <p className="metric mt-2">{value}</p>
+      <p className="text-ink-hi mt-[5px] font-mono text-[14px] font-semibold">{value}</p>
     </div>
   );
 }
@@ -173,21 +167,24 @@ function Stat({ label, value }: { label: string; value: string }) {
 function PowerBar({
   label,
   value,
-  colorClass,
+  color,
 }: {
   label: string;
   value: number;
-  colorClass: string;
+  color: 'cblue' | 'lime';
 }) {
   const pct = Math.max(3, Math.min(100, value));
   return (
     <div>
-      <div className="mb-1 flex items-center justify-between text-sm">
-        <span className="truncate text-slate-300">{label}</span>
-        <span className="ml-2 font-mono font-semibold text-white">{Math.round(value)}/100</span>
+      <div className="mb-1 flex items-center justify-between text-[13px]">
+        <span className="text-ink-mid truncate">{label}</span>
+        <span className="text-ink-hi ml-2 font-mono font-semibold">{Math.round(value)}/100</span>
       </div>
-      <div className="h-2 overflow-hidden rounded-full bg-white/5">
-        <div className={`h-full rounded-full ${colorClass}`} style={{ width: `${pct}%` }} />
+      <div className="rounded-pill h-2 overflow-hidden bg-white/5">
+        <div
+          className={'rounded-pill h-full ' + (color === 'lime' ? 'bg-lime' : 'bg-cblue')}
+          style={{ width: `${pct}%` }}
+        />
       </div>
     </div>
   );

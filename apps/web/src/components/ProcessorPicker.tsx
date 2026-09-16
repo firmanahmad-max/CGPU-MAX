@@ -7,7 +7,7 @@ import type { Processor } from '@cgpu-max/types';
 
 import { API_BASE_URL } from '@/lib/env';
 
-import { Pill } from './Pill';
+import { Mark } from './console/Mark';
 
 interface ProcessorPickerProps {
   label: string;
@@ -16,9 +16,6 @@ interface ProcessorPickerProps {
   onChange: (slug: string | null, processor: Processor | null) => void;
   excludeSlug?: string | null;
 }
-
-const manufacturerVariant = (m: string) =>
-  m === 'INTEL' ? 'intel' : m === 'AMD' ? 'amd' : 'nvidia';
 
 export function ProcessorPicker({
   label,
@@ -59,22 +56,24 @@ export function ProcessorPicker({
   // version's "Ganti" pattern) — declutters the picker after choosing.
   if (value && selected && selected.slug === value && !editing) {
     return (
-      <div className="card">
-        <div className="mb-2 flex items-center justify-between">
-          <p className="label">{label}</p>
+      <div className="rounded-card border-hairline bg-panel-2 border p-[15px]">
+        <div className="mb-[9px] flex items-center justify-between">
+          <span className="label">{label}</span>
           <button
             type="button"
             onClick={() => setEditing(true)}
-            className="text-accent-blue text-xs font-medium hover:underline"
+            className="text-lime-bright text-[11px] font-semibold hover:underline"
           >
             {t('change')}
           </button>
         </div>
         <div className="flex items-center gap-2">
-          <Pill variant={manufacturerVariant(selected.manufacturer)}>{selected.manufacturer}</Pill>
-          <span className="font-semibold text-white">{selected.modelName}</span>
+          <Mark mfr={selected.manufacturer} />
+          <span className="font-display text-ink-hi text-[17px] font-bold tracking-tight">
+            {selected.modelName}
+          </span>
         </div>
-        <p className="mt-2 text-xs text-slate-500">
+        <p className="text-ink-faint mt-[5px] font-mono text-[11.5px]">
           {[
             selected.generation ? `Gen ${selected.generation}` : null,
             selected.tdpWatts ? `${selected.tdpWatts} W` : null,
@@ -88,20 +87,20 @@ export function ProcessorPicker({
   }
 
   return (
-    <div className="card">
+    <div className="rounded-card border-hairline bg-panel-2 border p-[15px]">
       <p className="label mb-3">{label}</p>
       <input
         type="search"
         placeholder={t('searchPlaceholder', { type })}
         value={search}
         onChange={(e) => setSearch(e.currentTarget.value)}
-        className="focus:border-accent-blue w-full rounded-sm border border-white/10 bg-white/5 px-3 py-2 text-sm text-white placeholder:text-slate-500 focus:outline-none"
+        className="rounded-control border-hairline bg-panel text-ink placeholder:text-ink-faint focus:border-lime/45 w-full border px-3 py-2 text-[13px] focus:outline-none"
       />
 
       <div className="mt-3 max-h-64 space-y-1 overflow-y-auto">
-        {loading && <p className="text-xs text-slate-500">{t('loading')}</p>}
+        {loading && <p className="text-ink-faint text-[11px]">{t('loading')}</p>}
         {!loading && results.length === 0 && (
-          <p className="text-xs text-slate-500">{t('noMatches')}</p>
+          <p className="text-ink-faint text-[11px]">{t('noMatches')}</p>
         )}
         {results.map((p) => (
           <button
@@ -114,14 +113,16 @@ export function ProcessorPicker({
               onChange(p.slug, p);
             }}
             className={
-              'block w-full rounded-sm border px-3 py-2 text-left text-sm transition ' +
+              'flex w-full items-center gap-[9px] rounded-[9px] border px-[10px] py-2 text-left transition ' +
               (value === p.slug
-                ? 'border-accent-blue/60 bg-accent-blue/10 text-white'
-                : 'border-white/5 bg-transparent text-slate-300 hover:border-white/15 hover:bg-white/5')
+                ? 'border-lime/40 bg-lime/[0.1]'
+                : 'border-hairline bg-transparent hover:border-white/[0.22]')
             }
           >
-            <span className="font-medium">{p.modelName}</span>
-            <span className="ml-2 text-xs text-slate-500">{p.manufacturer}</span>
+            <Mark mfr={p.manufacturer} />
+            <span className="text-ink flex-1 truncate text-[12.5px] font-medium">
+              {p.modelName}
+            </span>
           </button>
         ))}
       </div>

@@ -1,64 +1,68 @@
-import { cn } from '@/lib/cn';
+export type Severity = 'optimal' | 'minor' | 'moderate' | 'significant' | 'severe';
 
 interface BottleneckGaugeProps {
   percentage: number;
-  severity: 'optimal' | 'minor' | 'moderate' | 'significant' | 'severe';
+  severity: Severity;
   label?: string;
 }
 
-const SEVERITY_COLOR: Record<BottleneckGaugeProps['severity'], string> = {
-  optimal: 'stroke-state-success',
-  minor: 'stroke-state-success',
-  moderate: 'stroke-state-warning',
-  significant: 'stroke-state-warning',
-  severe: 'stroke-state-danger',
-};
+// Console severity → arc color (oklch, used directly as an SVG stroke).
+export const severityColor = (s: Severity): string =>
+  s === 'optimal' || s === 'minor'
+    ? 'oklch(0.78 0.17 152)'
+    : s === 'moderate'
+      ? 'oklch(0.80 0.15 75)'
+      : s === 'significant'
+        ? 'oklch(0.72 0.17 55)'
+        : 'oklch(0.65 0.19 25)';
 
-const SEVERITY_TEXT: Record<BottleneckGaugeProps['severity'], string> = {
-  optimal: 'text-state-success',
-  minor: 'text-state-success',
-  moderate: 'text-state-warning',
-  significant: 'text-state-warning',
-  severe: 'text-state-danger',
-};
-
+// Semicircle gauge with a needle, matching the Console reference (1a).
 export function BottleneckGauge({ percentage, severity, label }: BottleneckGaugeProps) {
   const clamped = Math.max(0, Math.min(100, percentage));
-  const radius = 70;
-  const stroke = 10;
-  const circumference = 2 * Math.PI * radius;
-  const dashOffset = circumference * (1 - clamped / 100);
+  const color = severityColor(severity);
+  // Arc spans 180°; the reference uses a ~52% ceiling for a full sweep so
+  // real-world bottlenecks read boldly. dash length ≈ π·100.
+  const frac = clamped / 52;
+  const dash = 314.16;
+  const offset = (dash * (1 - Math.min(1, frac))).toFixed(1);
+  const angle = Math.PI - Math.min(1, frac) * Math.PI;
+  const needleX = (125 + 100 * Math.cos(angle)).toFixed(1);
+  const needleY = (138 - 100 * Math.sin(angle)).toFixed(1);
 
   return (
-    <div className="flex flex-col items-center">
-      <svg width="180" height="180" viewBox="0 0 180 180" className="-rotate-90">
-        <circle
-          cx="90"
-          cy="90"
-          r={radius}
+    <div className="relative h-[170px] w-[250px]">
+      <svg viewBox="0 0 250 150" className="block h-[150px] w-[250px]">
+        <path
+          d="M25 138 A100 100 0 0 1 225 138"
           fill="none"
-          stroke="rgba(255,255,255,0.08)"
-          strokeWidth={stroke}
-        />
-        <circle
-          cx="90"
-          cy="90"
-          r={radius}
-          fill="none"
-          strokeWidth={stroke}
+          stroke="rgba(255,255,255,.08)"
+          strokeWidth="14"
           strokeLinecap="round"
-          strokeDasharray={circumference}
-          strokeDashoffset={dashOffset}
-          className={cn('transition-all duration-500', SEVERITY_COLOR[severity])}
         />
+        <path
+          d="M25 138 A100 100 0 0 1 225 138"
+          fill="none"
+          stroke={color}
+          strokeWidth="14"
+          strokeLinecap="round"
+          strokeDasharray={dash}
+          strokeDashoffset={offset}
+          style={{ transition: 'stroke-dashoffset .55s cubic-bezier(.2,.7,.2,1), stroke .3s' }}
+        />
+        <circle cx={needleX} cy={needleY} r="7" fill="#fff" />
+        <circle cx={needleX} cy={needleY} r="3" fill={color} />
       </svg>
-      <div className="-mt-[120px] mb-[40px] text-center">
-        <p className={cn('font-display text-4xl font-semibold', SEVERITY_TEXT[severity])}>
-          {clamped.toFixed(1)}%
+      <div className="absolute left-0 right-0 top-[56px] text-center">
+        <p
+          className="m-0 font-mono text-[44px] font-bold leading-none tracking-tight"
+          style={{ color }}
+        >
+          {clamped.toFixed(1)}
         </p>
-        <p className="label mt-1">{severity}</p>
+        <p className="text-ink-faint mt-[6px] text-[10px] font-semibold uppercase tracking-[0.16em]">
+          {label ?? severity}
+        </p>
       </div>
-      {label && <p className="tracking-label mt-2 text-xs uppercase text-slate-400">{label}</p>}
     </div>
   );
 }

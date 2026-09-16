@@ -66,6 +66,7 @@
     "button": "Analyze bottleneck",
     "buttonLoading": "Analyzing…",
     "powerIndex": "Power index (0–100)",
+    "matrix": "12-scenario matrix",
     "limiting": "Limiting",
     "thermalEstimate": "Thermal estimate",
     "powerDraw": "Power draw",
