@@ -1,6 +1,6 @@
 import type { Processor } from '@cgpu-max/types';
 
-import { API_BASE_URL } from './env';
+import { API_BASE_URL, INTERNAL_API_BASE_URL } from './env';
 
 export interface ListResponse<T> {
   items: T[];
@@ -18,7 +18,10 @@ export interface ListProcessorsQuery {
 }
 
 function buildUrl(path: string, params?: Record<string, string | number | undefined>): string {
-  const url = new URL(`${API_BASE_URL}${path}`);
+  // Server-rendered fetches use the internal base (container→container);
+  // browser fetches use the public base.
+  const base = typeof window === 'undefined' ? INTERNAL_API_BASE_URL : API_BASE_URL;
+  const url = new URL(`${base}${path}`);
   for (const [k, v] of Object.entries(params ?? {})) {
     if (v !== undefined && v !== '') url.searchParams.set(k, String(v));
   }

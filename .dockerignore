@@ -1,0 +1,24 @@
+# Keep host build artifacts and platform-specific deps out of the image build
+# context. Dependencies are installed fresh inside each Dockerfile's deps stage;
+# copying the host node_modules (Windows) over the container's (Alpine/Linux)
+# breaks native binaries and pnpm's symlink layout.
+**/node_modules
+**/.next
+**/dist
+**/.turbo
+**/coverage
+**/*.log
+
+.git
+.github
+.vscode
+.idea
+
+**/.env
+**/.env.*
+!**/.env.example
+
+# Local-only / non-build assets
+design
+docker-compose*.yml
+**/*.md
