@@ -1,10 +1,11 @@
-import type { Metadata } from 'next';
+import type { Metadata, Viewport } from 'next';
 import { cookies } from 'next/headers';
 import { Instrument_Sans, JetBrains_Mono, Syne } from 'next/font/google';
 import { NextIntlClientProvider } from 'next-intl';
 import { getLocale, getMessages } from 'next-intl/server';
 
 import { ConsoleShell } from '@/components/console/ConsoleShell';
+import { ServiceWorkerRegister } from '@/components/ServiceWorkerRegister';
 import { AppAuthProvider } from '@/lib/auth';
 import { CURRENCY_COOKIE, DEFAULT_CURRENCY, isCurrency } from '@/lib/currency';
 import { CurrencyProvider } from '@/lib/currency-context';
@@ -32,12 +33,26 @@ const jetbrainsMono = JetBrains_Mono({
 });
 
 export const metadata: Metadata = {
+  applicationName: 'CGPU-MAX',
   title: {
     default: 'CGPU-MAX — Hardware Intelligence Platform',
     template: '%s · CGPU-MAX',
   },
   description:
     'Professional CPU & GPU comparison, bottleneck analysis, and AI-driven build recommendations.',
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: 'black-translucent',
+    title: 'CGPU-MAX',
+  },
+  icons: {
+    apple: '/pwa-icon.svg',
+  },
+};
+
+export const viewport: Viewport = {
+  themeColor: '#0B0C0F',
+  colorScheme: 'dark',
 };
 
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
@@ -58,6 +73,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
             </AppAuthProvider>
           </CurrencyProvider>
         </NextIntlClientProvider>
+        <ServiceWorkerRegister />
       </body>
     </html>
   );

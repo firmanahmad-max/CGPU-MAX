@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="CGPU-MAX">
+  <!-- Maskable: background fills to the edges; the mark stays inside the ~80% safe zone. -->
+  <rect width="512" height="512" fill="#0B0C0F"/>
+  <rect x="168" y="168" width="176" height="176" rx="48" fill="#57d98d"/>
+  <path d="M311 214 A66 66 0 1 0 311 298" fill="none" stroke="#07130d" stroke-width="34" stroke-linecap="round"/>
+</svg>
