@@ -6,8 +6,11 @@ import { logger } from './shared/logging/logger.js';
 
 async function bootstrap() {
   const app = createServer();
-  const server = app.listen(env.API_PORT, () => {
-    logger.info({ port: env.API_PORT, env: env.NODE_ENV }, 'CGPU-MAX API listening');
+  // Honor the PaaS-injected PORT (Render/Railway/Fly/Heroku…) when present;
+  // fall back to API_PORT for local/dev.
+  const port = Number(process.env.PORT) || env.API_PORT;
+  const server = app.listen(port, () => {
+    logger.info({ port, env: env.NODE_ENV }, 'CGPU-MAX API listening');
   });
 
   const shutdown = (signal: string) => {

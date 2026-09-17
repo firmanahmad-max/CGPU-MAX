@@ -12,6 +12,11 @@ COPY packages/types/package.json packages/types/
 COPY packages/config/package.json packages/config/
 RUN pnpm install --frozen-lockfile=false
 COPY . .
+# NEXT_PUBLIC_* is inlined at build time, so the browser-facing API URL must be
+# baked here. Defaults to localhost for local runs; pass --build-arg (or the
+# platform's docker build args) with the deployed API URL in the cloud.
+ARG NEXT_PUBLIC_API_URL=http://localhost:3001
+ENV NEXT_PUBLIC_API_URL=$NEXT_PUBLIC_API_URL
 RUN pnpm --filter @cgpu-max/web build
 
 WORKDIR /repo/apps/web
