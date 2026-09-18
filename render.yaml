@@ -1,59 +1,25 @@
-# Render Blueprint — deploys the whole stack (Postgres + Redis + API + web) from
-# the fixed Dockerfiles. Review before use; you provide the Render account.
-# In the dashboard, create a Blueprint from this repo, then fill the two
-# `sync: false` values once the service URLs exist (see docs/DEPLOY.md).
-databases:
-  - name: cgpu-max-db
-    databaseName: cgpu_max
-    user: cgpu_user
-    plan: free # upgrade for anything real; free instances sleep/expire
-
+# Render Blueprint — API only.
+# Stack split: web → Vercel, Postgres → Neon, Redis → off. This deploys just the
+# Express API as a Docker web service. Fill the two `sync: false` values in the
+# Render dashboard (see docs/DEPLOY.md). You provide the Render account.
 services:
-  - type: keyvalue
-    name: cgpu-max-redis
-    plan: free
-    ipAllowList: [] # reachable only from your Render services
-    maxmemoryPolicy: allkeys-lru
-
   - type: web
     name: cgpu-max-api
     runtime: docker
     dockerfilePath: ./apps/api/Dockerfile
     dockerContext: .
-    plan: free
+    plan: free # free web services cold-start after ~15 min idle
     region: singapore # nearest to Indonesia; change if you like
     healthCheckPath: /health
     # Sync schema + seed once per deploy (idempotent). Drop the seed for a real
-    # dataset. Render injects PORT, which the API now honors.
+    # dataset. Needs a DIRECT (non-pooled) Neon URL so migrations work.
     preDeployCommand: 'pnpm exec prisma db push --skip-generate && pnpm exec tsx prisma/seed.ts'
     envVars:
       - key: NODE_ENV
         value: production
+      - key: REDIS_ENABLED
+        value: 'false' # no Redis in this setup; caching/rate-limit become no-ops
       - key: DATABASE_URL
-        fromDatabase:
-          name: cgpu-max-db
-          property: connectionString
-      - key: REDIS_URL
-        fromService:
-          type: keyvalue
-          name: cgpu-max-redis
-          property: connectionString
+        sync: false # Neon connection string (use the DIRECT one — see DEPLOY.md)
       - key: CORS_ALLOWED_ORIGINS
-        sync: false # set to the web URL, e.g. https://cgpu-max-web.onrender.com
-
-  - type: web
-    name: cgpu-max-web
-    runtime: docker
-    dockerfilePath: ./apps/web/Dockerfile
-    dockerContext: .
-    plan: free
-    region: singapore
-    envVars:
-      # NEXT_PUBLIC_API_URL is consumed at BUILD (baked into the browser bundle).
-      # Set it to the API's public URL, e.g. https://cgpu-max-api.onrender.com
-      - key: NEXT_PUBLIC_API_URL
-        sync: false
-      # API_INTERNAL_URL is used at runtime for server-rendered fetches; the
-      # public API URL works fine here too.
-      - key: API_INTERNAL_URL
-        sync: false
+        sync: false # your Vercel URL, e.g. https://cgpu-max.vercel.app
