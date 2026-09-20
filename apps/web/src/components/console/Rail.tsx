@@ -59,7 +59,19 @@ export function Rail() {
         })}
       </nav>
 
-      <div className="mt-auto">
+      <div className="mt-auto flex flex-col items-center gap-2">
+        <Link
+          href="/tentang"
+          title={t('about')}
+          className={
+            'flex h-[30px] w-[30px] items-center justify-center rounded-[9px] border font-mono text-[12px] font-semibold transition ' +
+            (pathname.startsWith('/tentang')
+              ? 'border-lime/40 bg-lime/[0.16] text-lime-bright'
+              : 'text-ink-faint hover:text-ink border-white/10 hover:bg-white/5')
+          }
+        >
+          i
+        </Link>
         <SignedIn>
           <Link
             href="/account"

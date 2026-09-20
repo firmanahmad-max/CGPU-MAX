@@ -14,7 +14,8 @@
     "streaming": "Streaming",
     "pricing": "Pricing",
     "account": "Account",
-    "signIn": "Sign in"
+    "signIn": "Sign in",
+    "about": "About"
   },
   "home": {
     "tagline": "Hardware Intelligence Platform",
@@ -299,5 +300,63 @@
     "save": "Save branding",
     "savedMark": "Saved ✓",
     "resolveTheme": "Resolve theme:"
+  },
+  "about": {
+    "eyebrow": "Arta Ecosystem",
+    "tagline": "Hardware Intelligence Platform",
+    "intro": "CGPU-MAX is a full-stack platform for comparing CPUs and GPUs — specs, real performance, bottlenecks, and value — so you can build with data instead of guesswork. It is part of the Arta Ecosystem.",
+    "versionLabel": "Version",
+    "featuresTitle": "Key Features",
+    "feat": {
+      "processors": {
+        "title": "Catalog",
+        "desc": "A complete CPU & GPU spec database with faceted filters and 90-day price sparklines."
+      },
+      "rankings": {
+        "title": "Rankings",
+        "desc": "Parts ranked by performance index or price-performance value, across categories and price brackets."
+      },
+      "compare": {
+        "title": "Compare",
+        "desc": "Two parts side by side — metric-by-metric winners, deltas, and price-to-performance."
+      },
+      "bottleneck": {
+        "title": "Bottleneck",
+        "desc": "Pair a CPU with a GPU to see balance across resolutions and game profiles."
+      },
+      "advisor": {
+        "title": "Build Advisor",
+        "desc": "An AI advisor recommends a balanced CPU + GPU build for your budget and goals."
+      },
+      "gaming": {
+        "title": "Gaming Optimizer",
+        "desc": "An FPS predictor with tuning suggestions to get the most from your setup."
+      },
+      "streaming": {
+        "title": "Streaming Suite",
+        "desc": "Encoder and bandwidth guidance for a smooth streaming build."
+      },
+      "pricing": {
+        "title": "Pricing & Plans",
+        "desc": "Live price history plus Free, Pro, and Enterprise tiers."
+      },
+      "platform": {
+        "title": "Built for everywhere",
+        "desc": "Bilingual EN/ID, a USD/Rp currency toggle, and installable as a PWA."
+      }
+    },
+    "developerTitle": "Developer",
+    "developerRole": "Developer & designer of the Arta Ecosystem",
+    "poweredBy": "Powered by",
+    "otherAppsTitle": "Other Apps — Arta Ecosystem",
+    "otherAppsNote": "More projects from the same maker.",
+    "disclaimerTitle": "Disclaimer",
+    "disclaimer": [
+      "A personal project, provided “as is” without warranty — keep backups of anything important.",
+      "AI features are assistive, not absolute; results can be wrong, so verify anything that matters.",
+      "Specs, prices, and benchmarks are approximate and may be incomplete or out of date; not affiliated with any manufacturer.",
+      "All trademarks, names, and logos belong to their respective owners."
+    ],
+    "footer": "CGPU-MAX · Arta Ecosystem — built by Firman Ahmad"
   }
 }

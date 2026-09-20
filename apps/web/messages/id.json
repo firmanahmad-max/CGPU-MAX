@@ -14,7 +14,8 @@
     "streaming": "Streaming",
     "pricing": "Harga",
     "account": "Akun",
-    "signIn": "Masuk"
+    "signIn": "Masuk",
+    "about": "Tentang"
   },
   "home": {
     "tagline": "Platform Intelijen Hardware",
@@ -299,5 +300,63 @@
     "save": "Simpan branding",
     "savedMark": "Tersimpan ✓",
     "resolveTheme": "Ambil tema:"
+  },
+  "about": {
+    "eyebrow": "Arta Ecosystem",
+    "tagline": "Platform Intelijen Hardware",
+    "intro": "CGPU-MAX adalah platform lengkap untuk membandingkan CPU dan GPU — spesifikasi, performa nyata, bottleneck, dan nilai — agar kamu merakit dengan data, bukan tebakan. Bagian dari Arta Ecosystem.",
+    "versionLabel": "Versi",
+    "featuresTitle": "Fitur Utama",
+    "feat": {
+      "processors": {
+        "title": "Katalog",
+        "desc": "Basis data spesifikasi CPU & GPU lengkap dengan filter faset dan sparkline harga 90 hari."
+      },
+      "rankings": {
+        "title": "Peringkat",
+        "desc": "Komponen diperingkat berdasarkan indeks performa atau nilai harga-performa, lintas kategori dan rentang harga."
+      },
+      "compare": {
+        "title": "Bandingkan",
+        "desc": "Dua komponen berdampingan — pemenang per metrik, selisih, dan harga-ke-performa."
+      },
+      "bottleneck": {
+        "title": "Bottleneck",
+        "desc": "Pasangkan CPU dengan GPU untuk melihat keseimbangan di berbagai resolusi dan profil game."
+      },
+      "advisor": {
+        "title": "Penasihat Rakitan",
+        "desc": "Penasihat AI merekomendasikan rakitan CPU + GPU seimbang sesuai anggaran dan tujuanmu."
+      },
+      "gaming": {
+        "title": "Gaming Optimizer",
+        "desc": "Prediktor FPS dengan saran penyetelan agar performa rakitan maksimal."
+      },
+      "streaming": {
+        "title": "Streaming Suite",
+        "desc": "Panduan encoder dan bandwidth untuk rakitan streaming yang mulus."
+      },
+      "pricing": {
+        "title": "Harga & Paket",
+        "desc": "Riwayat harga langsung plus paket Free, Pro, dan Enterprise."
+      },
+      "platform": {
+        "title": "Siap di mana saja",
+        "desc": "Dwibahasa EN/ID, pengalih mata uang USD/Rp, dan bisa dipasang sebagai PWA."
+      }
+    },
+    "developerTitle": "Pengembang",
+    "developerRole": "Pengembang & desainer Arta Ecosystem",
+    "poweredBy": "Didukung oleh",
+    "otherAppsTitle": "Aplikasi Lain — Arta Ecosystem",
+    "otherAppsNote": "Proyek lain dari pengembang yang sama.",
+    "disclaimerTitle": "Disclaimer",
+    "disclaimer": [
+      "Proyek pribadi, disediakan “apa adanya” tanpa jaminan — cadangkan data penting.",
+      "Fitur AI bersifat membantu, bukan mutlak; hasil bisa keliru, jadi verifikasi hal penting.",
+      "Spesifikasi, harga, dan benchmark bersifat perkiraan dan bisa tidak lengkap atau usang; tidak berafiliasi dengan produsen mana pun.",
+      "Semua merek, nama, dan logo milik pemegang haknya masing-masing."
+    ],
+    "footer": "CGPU-MAX · Arta Ecosystem — dibuat oleh Firman Ahmad"
   }
 }

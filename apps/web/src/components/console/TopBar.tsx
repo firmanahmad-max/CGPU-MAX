@@ -18,6 +18,7 @@ const SECTION: Record<string, string> = {
   '/streaming': 'streaming',
   '/pricing': 'pricing',
   '/account': 'account',
+  '/tentang': 'about',
 };
 
 function sectionKey(pathname: string): string | null {
