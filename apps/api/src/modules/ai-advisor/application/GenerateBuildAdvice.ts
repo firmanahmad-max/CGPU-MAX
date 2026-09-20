@@ -13,8 +13,21 @@ import {
   type AdvisorRequest,
   type CatalogPart,
 } from '../domain/promptBuilder.js';
-import { buildAdviceJsonSchema } from '../domain/schema.js';
+import { buildAdviceJsonSchema, buildAdviceZod } from '../domain/schema.js';
 import { anthropic } from '../infrastructure/AnthropicClient.js';
+import { openAICompatible } from '../infrastructure/OpenAICompatibleClient.js';
+
+// Prefer an OpenAI-compatible gateway (e.g. Sumopod) when configured; otherwise
+// fall back to Anthropic. The advisor is disabled unless one is set.
+function useOpenAI(): boolean {
+  return Boolean(env.AI_BASE_URL && env.AI_API_KEY);
+}
+function aiConfigured(): boolean {
+  return useOpenAI() || Boolean(env.ANTHROPIC_API_KEY);
+}
+function activeModel(): string {
+  return useOpenAI() ? env.AI_MODEL : env.ANTHROPIC_MODEL;
+}
 
 // How many catalog parts to feed the model. Keep bounded so the prompt stays
 // cache-friendly and within a sensible token budget.
@@ -28,7 +41,7 @@ export class GenerateBuildAdvice {
   }
 
   async execute(auth: AuthContext, req: AdvisorRequest) {
-    if (!env.ANTHROPIC_API_KEY) {
+    if (!aiConfigured()) {
       throw new AppError('AI_NOT_CONFIGURED', 'AI advisor is not configured on this server', 503);
     }
 
@@ -43,9 +56,12 @@ export class GenerateBuildAdvice {
     const catalogContext = buildCatalogContext(catalog);
     const userMessage = buildUserMessage(req, catalogContext);
 
-    const advice = await this.callClaude(userMessage);
+    const advice = useOpenAI()
+      ? await this.callOpenAI(userMessage)
+      : await this.callClaude(userMessage);
     const validated = this.validateAndGround(advice, catalog);
 
+    const modelUsed = activeModel();
     const shareSlug = `build-${auth.userId.slice(0, 8)}-${Date.now().toString(36)}`;
     await this.prisma.savedBuild.create({
       data: {
@@ -55,11 +71,11 @@ export class GenerateBuildAdvice {
         purpose: req.purpose,
         resolution: req.resolution,
         payload: validated as object,
-        modelUsed: env.ANTHROPIC_MODEL,
+        modelUsed,
       },
     });
 
-    return { ...validated, shareSlug, modelUsed: env.ANTHROPIC_MODEL };
+    return { ...validated, shareSlug, modelUsed };
   }
 
   private async loadCatalog(budgetUsd: number): Promise<CatalogPart[]> {
@@ -120,6 +136,39 @@ export class GenerateBuildAdvice {
     } catch (err) {
       if (err instanceof AppError) throw err;
       logger.error({ err }, 'Anthropic call failed');
+      throw new AppError('AI_UPSTREAM_ERROR', 'AI provider request failed', 502);
+    }
+  }
+
+  private async callOpenAI(userMessage: string): Promise<BuildAdvice> {
+    try {
+      // OpenAI-compatible structured outputs: constrain the reply to our schema.
+      const response = await openAICompatible().chat.completions.create({
+        model: env.AI_MODEL,
+        max_tokens: 4000,
+        messages: [
+          { role: 'system', content: SYSTEM_PROMPT },
+          { role: 'user', content: userMessage },
+        ],
+        response_format: {
+          type: 'json_schema',
+          json_schema: { name: 'build_advice', schema: buildAdviceJsonSchema, strict: true },
+        },
+      });
+
+      const choice = response.choices[0];
+      if (choice?.message.refusal) {
+        throw new AppError('AI_REFUSED', 'The advisor declined to answer this request', 422);
+      }
+      const content = choice?.message.content;
+      if (!content) {
+        throw new AppError('AI_BAD_OUTPUT', 'The advisor returned an empty response', 502);
+      }
+      // The gateway may or may not enforce the schema, so validate the JSON.
+      return buildAdviceZod.parse(JSON.parse(content));
+    } catch (err) {
+      if (err instanceof AppError) throw err;
+      logger.error({ err }, 'OpenAI-compatible call failed');
       throw new AppError('AI_UPSTREAM_ERROR', 'AI provider request failed', 502);
     }
   }

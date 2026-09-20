@@ -2,6 +2,30 @@
 // Keep in sync with BuildAdvice.ts. Structured outputs do not support
 // min/max/length constraints, so we omit them and validate ranges downstream.
 
+import { z } from 'zod';
+
+const componentPickZod = z.object({
+  category: z.enum(['cpu', 'gpu']),
+  modelName: z.string(),
+  slug: z.string().nullable(),
+  approxPriceUsd: z.number(),
+  rationale: z.string(),
+});
+
+// Runtime validation for provider responses that arrive as raw JSON (the
+// OpenAI-compatible path), since those aren't parsed against the schema for us.
+export const buildAdviceZod = z.object({
+  summary: z.string(),
+  cpu: componentPickZod,
+  gpu: componentPickZod,
+  estimatedTotalUsd: z.number(),
+  withinBudget: z.boolean(),
+  expectedPerformance: z.string(),
+  recommendedPsuWatts: z.number(),
+  upgradePathNote: z.string(),
+  warnings: z.array(z.string()),
+});
+
 export const buildAdviceJsonSchema = {
   type: 'object',
   additionalProperties: false,

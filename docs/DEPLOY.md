@@ -124,8 +124,9 @@ Render's free Postgres is deleted after 30 days — point `DATABASE_URL` at Neon
 
 Optional integrations (unset ⇒ that feature is disabled, app still runs):
 
-| Var                                                     | Unlocks                                                                        |
-| ------------------------------------------------------- | ------------------------------------------------------------------------------ |
-| `NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY`, `CLERK_SECRET_KEY` | real auth (Account/Pro gating); otherwise an auth shim treats you as signed-in |
-| `STRIPE_SECRET_KEY`, `STRIPE_WEBHOOK_SECRET`            | billing/checkout                                                               |
-| `ANTHROPIC_API_KEY`                                     | the AI Build Advisor                                                           |
+| Var                                                     | Unlocks                                                                                                                                       |
+| ------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------- |
+| `NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY`, `CLERK_SECRET_KEY` | real auth (Account/Pro gating); otherwise an auth shim treats you as signed-in                                                                |
+| `STRIPE_SECRET_KEY`, `STRIPE_WEBHOOK_SECRET`            | billing/checkout                                                                                                                              |
+| `AI_BASE_URL`, `AI_API_KEY`, `AI_MODEL`                 | the AI Build Advisor via an OpenAI-compatible gateway (e.g. Sumopod; `AI_MODEL` defaults to `gpt-5.6-luna`). Takes precedence over Anthropic. |
+| `ANTHROPIC_API_KEY`, `ANTHROPIC_MODEL`                  | the AI Build Advisor via Anthropic (used when no `AI_BASE_URL` is set)                                                                        |

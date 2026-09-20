@@ -26,9 +26,16 @@ const schema = z.object({
   STRIPE_PRICE_PRO_MONTHLY: z.string().optional(),
   STRIPE_PRICE_PRO_YEARLY: z.string().optional(),
 
-  // AI (Anthropic Claude) — required when the advisor route is hit.
+  // AI (Anthropic Claude) — used when no OpenAI-compatible provider is set.
   ANTHROPIC_API_KEY: z.string().optional(),
   ANTHROPIC_MODEL: z.string().default('claude-opus-4-8'),
+
+  // AI (OpenAI-compatible gateway, e.g. Sumopod) — takes precedence over
+  // Anthropic when AI_BASE_URL + AI_API_KEY are both set. AI_MODEL defaults to
+  // the Sumopod model. The advisor is disabled unless one provider is configured.
+  AI_BASE_URL: z.string().url().optional(),
+  AI_API_KEY: z.string().optional(),
+  AI_MODEL: z.string().default('gpt-5.6-luna'),
 });
 
 const parsed = schema.safeParse(process.env);

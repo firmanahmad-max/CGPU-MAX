@@ -33,6 +33,7 @@
     "express-slow-down": "^2.0.1",
     "helmet": "^7.1.0",
     "ioredis": "^5.4.1",
+    "openai": "^4.104.0",
     "pdfkit": "^0.15.0",
     "prom-client": "^15.1.0",
     "pino": "^9.0.0",
