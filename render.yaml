@@ -11,9 +11,11 @@ services:
     plan: free # free web services cold-start after ~15 min idle
     region: singapore # nearest to Indonesia; change if you like
     healthCheckPath: /health
-    # Sync schema + seed once per deploy (idempotent). Drop the seed for a real
-    # dataset. Needs a DIRECT (non-pooled) Neon URL so migrations work.
-    preDeployCommand: 'pnpm exec prisma db push --skip-generate && pnpm exec tsx prisma/seed.ts'
+    # Free tier doesn't allow preDeployCommand, so sync schema + seed at startup
+    # instead (both idempotent), then start the server. Needs a DIRECT
+    # (non-pooled) Neon URL so `prisma db push` works. Drop the seed for a real
+    # dataset.
+    dockerCommand: 'sh -c "pnpm exec prisma db push --skip-generate && pnpm exec tsx prisma/seed.ts && node dist/index.js"'
     envVars:
       - key: NODE_ENV
         value: production
