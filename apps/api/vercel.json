@@ -1,6 +1,7 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "buildCommand": "pnpm run db:generate && pnpm run build && pnpm exec prisma db push --skip-generate && pnpm exec tsx prisma/seed.ts",
+  "outputDirectory": "public",
   "functions": {
     "api/index.ts": {
       "maxDuration": 30,

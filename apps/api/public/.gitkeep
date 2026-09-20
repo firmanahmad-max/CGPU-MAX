@@ -1,0 +1,6 @@
+# Intentionally empty.
+#
+# This API project has no static output — every request is rewritten to the
+# serverless function in `api/` (see ../vercel.json). But Vercel, given a
+# buildCommand and no static framework, still insists on an output directory
+# named "public" after the build. This empty directory satisfies that check.
