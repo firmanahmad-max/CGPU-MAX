@@ -36,6 +36,11 @@ const schema = z.object({
   AI_BASE_URL: z.string().url().optional(),
   AI_API_KEY: z.string().optional(),
   AI_MODEL: z.string().default('gpt-5.6-luna'),
+
+  // Optional secret-guarded demo access to the AI advisor without Clerk. When
+  // set, a request whose `X-Advisor-Secret` header matches is treated as a fixed
+  // PRO demo user. A shared secret — not a substitute for real auth in the open.
+  ADVISOR_DEMO_SECRET: z.string().optional(),
 });
 
 const parsed = schema.safeParse(process.env);
