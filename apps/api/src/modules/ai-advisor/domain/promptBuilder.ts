@@ -18,6 +18,7 @@ export interface AdvisorRequest {
   purpose: BuildPurpose;
   resolution: Resolution;
   preferences?: string;
+  language?: 'en' | 'id';
 }
 
 export const SYSTEM_PROMPT = `You are CGPU-MAX's build advisor — an expert PC hardware consultant.
@@ -43,6 +44,11 @@ export function buildCatalogContext(parts: CatalogPart[]): string {
 }
 
 export function buildUserMessage(req: AdvisorRequest, catalog: string): string {
+  // Localize the human-readable prose. Part model names/slugs stay as-is.
+  const languageLine =
+    req.language === 'id'
+      ? 'IMPORTANT: Write every human-readable text field (summary, each rationale, expectedPerformance, upgradePathNote, and every warning) in Indonesian (Bahasa Indonesia). Keep part model names and slugs unchanged.'
+      : 'Write all text fields in English.';
   return [
     `Budget: $${req.budgetUsd} (CPU + GPU combined)`,
     `Purpose: ${req.purpose}`,
@@ -51,6 +57,7 @@ export function buildUserMessage(req: AdvisorRequest, catalog: string): string {
     '',
     catalog,
     '',
+    languageLine,
     'Recommend the best CPU + GPU pairing. Return the structured build advice.',
   ]
     .filter(Boolean)

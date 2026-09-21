@@ -17,8 +17,8 @@ type Profile = 'esports' | 'aaa' | 'vr' | 'simulation';
 interface GamingResult {
   presets: { preset: string; avgFps: number; onePercentLowFps: number }[];
   recommendedPreset: string;
-  upscaling: { recommended: boolean; tech: string; note: string };
-  settingsTips: string[];
+  upscaling: { recommended: boolean; tech: string; noteKey: string };
+  tipKeys: string[];
   cpuLimited: boolean;
   gpuPower: number;
   cpuPower: number | null;
@@ -155,15 +155,19 @@ export default function GamingPage() {
                 <p className="label mb-1">{t('recommended')}</p>
                 <p className="text-ink text-sm">
                   <span className="font-semibold capitalize">{result.recommendedPreset}</span>{' '}
-                  {t('presetSuffix')} {result.upscaling.note}
+                  {t('presetSuffix')}{' '}
+                  {t(`upscalingNote.${result.upscaling.noteKey}`, {
+                    tech: result.upscaling.tech,
+                    resolution,
+                  })}
                 </p>
               </div>
 
               <div className="card">
                 <p className="label mb-3">{t('settingsTips')}</p>
                 <ul className="text-ink-mid space-y-2 text-sm">
-                  {result.settingsTips.map((t, i) => (
-                    <li key={i}>• {t}</li>
+                  {result.tipKeys.map((k, i) => (
+                    <li key={i}>• {t(`tip.${k}`)}</li>
                   ))}
                 </ul>
               </div>

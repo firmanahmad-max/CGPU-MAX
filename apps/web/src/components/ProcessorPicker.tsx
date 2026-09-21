@@ -5,6 +5,7 @@ import { useEffect, useState } from 'react';
 
 import type { Processor } from '@cgpu-max/types';
 
+import { useCurrency } from '@/lib/currency-context';
 import { API_BASE_URL } from '@/lib/env';
 
 import { Mark } from './console/Mark';
@@ -25,6 +26,7 @@ export function ProcessorPicker({
   excludeSlug,
 }: ProcessorPickerProps) {
   const t = useTranslations('picker');
+  const { format } = useCurrency();
   const [search, setSearch] = useState('');
   const [results, setResults] = useState<Processor[]>([]);
   const [loading, setLoading] = useState(false);
@@ -77,7 +79,7 @@ export function ProcessorPicker({
           {[
             selected.generation ? `Gen ${selected.generation}` : null,
             selected.tdpWatts ? `${selected.tdpWatts} W` : null,
-            selected.msrpUsd ? `$${selected.msrpUsd}` : null,
+            selected.msrpUsd ? format(selected.msrpUsd) : null,
           ]
             .filter(Boolean)
             .join(' · ') || selected.slug}

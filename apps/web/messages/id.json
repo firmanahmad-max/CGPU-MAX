@@ -161,7 +161,16 @@
     "generate": "Buat rekomendasi",
     "generating": "Berkonsultasi…",
     "errProFeature": "Penasihat Rakitan AI adalah fitur Pro. Upgrade di halaman Harga.",
-    "errLimit": "Batas rekomendasi AI bulanan untuk paket Anda sudah tercapai."
+    "errLimit": "Batas rekomendasi AI bulanan untuk paket Anda sudah tercapai.",
+    "aiBuild": "Rakitan AI",
+    "withinBudget": "Sesuai anggaran",
+    "overBudget": "Melebihi anggaran",
+    "estimatedTotal": "Perkiraan total",
+    "recommendedPsu": "PSU disarankan",
+    "performance": "Performa",
+    "upgradePath": "Jalur upgrade",
+    "warnings": "Peringatan",
+    "poweredBy": "Powered by Arta"
   },
   "gaming": {
     "pro": "Pro",
@@ -183,7 +192,17 @@
     "presetSuffix": "adalah preset yang disarankan.",
     "settingsTips": "Tips pengaturan",
     "fpsLow": "{fps} fps 1% low",
-    "errProFeature": "Pengoptimal gaming adalah fitur Pro — upgrade di halaman Harga."
+    "errProFeature": "Pengoptimal gaming adalah fitur Pro — upgrade di halaman Harga.",
+    "upscalingNote": {
+      "enableUpscaling": "Aktifkan {tech} (mode Quality) untuk menaikkan frame rate di {resolution} dengan penurunan visual minimal.",
+      "nativeComfortable": "Resolusi native sudah nyaman di sini."
+    },
+    "tip": {
+      "esportsShadows": "Turunkan shadow dan refleksi untuk memaksimalkan frame rate dan menekan input latency.",
+      "fourKTextures": "Kualitas tekstur hampir gratis di 4K bila VRAM cukup — biarkan tinggi.",
+      "cpuLimited": "Kamu CPU-limited: menaikkan resolusi atau setting tidak banyak menurunkan FPS.",
+      "capFps": "Batasi FPS sedikit di bawah refresh rate monitor untuk frametime lebih halus."
+    }
   },
   "streaming": {
     "pro": "Pro",

@@ -161,7 +161,16 @@
     "generate": "Generate recommendation",
     "generating": "Consulting advisor…",
     "errProFeature": "The AI Build Advisor is a Pro feature. Upgrade on the Pricing page.",
-    "errLimit": "Monthly AI recommendation limit reached for your plan."
+    "errLimit": "Monthly AI recommendation limit reached for your plan.",
+    "aiBuild": "AI Build",
+    "withinBudget": "Within budget",
+    "overBudget": "Over budget",
+    "estimatedTotal": "Estimated total",
+    "recommendedPsu": "Recommended PSU",
+    "performance": "Performance",
+    "upgradePath": "Upgrade path",
+    "warnings": "Warnings",
+    "poweredBy": "Powered by Arta"
   },
   "gaming": {
     "pro": "Pro",
@@ -183,7 +192,17 @@
     "presetSuffix": "preset.",
     "settingsTips": "Settings tips",
     "fpsLow": "{fps} fps 1% low",
-    "errProFeature": "Gaming optimizer is a Pro feature — upgrade on Pricing."
+    "errProFeature": "Gaming optimizer is a Pro feature — upgrade on Pricing.",
+    "upscalingNote": {
+      "enableUpscaling": "Enable {tech} (Quality mode) to lift frame rates at {resolution} with minimal visual loss.",
+      "nativeComfortable": "Native resolution is comfortable here."
+    },
+    "tip": {
+      "esportsShadows": "Lower shadows and reflections to maximise frame rate and reduce input latency.",
+      "fourKTextures": "Texture quality is nearly free at 4K with enough VRAM — keep it high.",
+      "cpuLimited": "You are CPU-limited: raising resolution or settings will not lower FPS much.",
+      "capFps": "Cap FPS slightly below your monitor refresh rate for smoother frametimes."
+    }
   },
   "streaming": {
     "pro": "Pro",

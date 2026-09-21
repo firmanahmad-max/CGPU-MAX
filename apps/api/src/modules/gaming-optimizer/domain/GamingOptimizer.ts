@@ -10,6 +10,8 @@ export const GAMING_ALGORITHM_VERSION = '2026.06.0';
 export type Resolution = '1080p' | '1440p' | '4K';
 export type GameProfile = 'esports' | 'aaa' | 'vr' | 'simulation';
 export type Preset = 'low' | 'medium' | 'high' | 'ultra';
+export type UpscalingNote = 'enableUpscaling' | 'nativeComfortable';
+export type TipKey = 'esportsShadows' | 'fourKTextures' | 'cpuLimited' | 'capFps';
 
 export interface PresetFps {
   preset: Preset;
@@ -24,8 +26,12 @@ export interface GamingResult {
   profile: GameProfile;
   presets: PresetFps[];
   recommendedPreset: Preset;
-  upscaling: { recommended: boolean; tech: 'DLSS' | 'FSR' | 'XeSS' | 'none'; note: string };
-  settingsTips: string[];
+  upscaling: {
+    recommended: boolean;
+    tech: 'DLSS' | 'FSR' | 'XeSS' | 'none';
+    noteKey: UpscalingNote;
+  };
+  tipKeys: TipKey[];
   cpuLimited: boolean;
   algorithmVersion: string;
 }
@@ -89,7 +95,7 @@ export class GamingOptimizer {
       presets,
       recommendedPreset: this.pickPreset(presets, profile),
       upscaling: this.upscaling(gpu, resolution, presets),
-      settingsTips: this.tips(resolution, profile, cpuLimited),
+      tipKeys: this.tips(resolution, profile, cpuLimited),
       cpuLimited,
       algorithmVersion: GAMING_ALGORITHM_VERSION,
     };
@@ -116,27 +122,18 @@ export class GamingOptimizer {
     const tech: 'DLSS' | 'FSR' | 'XeSS' =
       gpu.manufacturer === 'NVIDIA' ? 'DLSS' : gpu.manufacturer === 'INTEL' ? 'XeSS' : 'FSR';
     if (resolution === '4K' || struggling) {
-      return {
-        recommended: true,
-        tech,
-        note: `Enable ${tech} (Quality mode) to lift frame rates at ${resolution} with minimal visual loss.`,
-      };
+      return { recommended: true, tech, noteKey: 'enableUpscaling' };
     }
-    return { recommended: false, tech: 'none', note: 'Native resolution is comfortable here.' };
+    return { recommended: false, tech: 'none', noteKey: 'nativeComfortable' };
   }
 
-  private tips(resolution: Resolution, profile: GameProfile, cpuLimited: boolean): string[] {
-    const tips: string[] = [];
-    if (profile === 'esports') {
-      tips.push('Lower shadows and reflections to maximise frame rate and reduce input latency.');
-    }
-    if (resolution === '4K') {
-      tips.push('Texture quality is nearly free at 4K with enough VRAM — keep it high.');
-    }
-    if (cpuLimited) {
-      tips.push('You are CPU-limited: raising resolution or settings will not lower FPS much.');
-    }
-    tips.push('Cap FPS slightly below your monitor refresh rate for smoother frametimes.');
+  // Returns i18n keys; the web layer localizes them (see gaming.tip.* messages).
+  private tips(resolution: Resolution, profile: GameProfile, cpuLimited: boolean): TipKey[] {
+    const tips: TipKey[] = [];
+    if (profile === 'esports') tips.push('esportsShadows');
+    if (resolution === '4K') tips.push('fourKTextures');
+    if (cpuLimited) tips.push('cpuLimited');
+    tips.push('capFps');
     return tips;
   }
 

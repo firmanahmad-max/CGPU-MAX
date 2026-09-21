@@ -5,6 +5,7 @@ export const adviceBody = z.object({
   purpose: z.enum(['gaming', 'streaming', 'workstation', 'budget', 'content_creation']),
   resolution: z.enum(['1080p', '1440p', '4K']),
   preferences: z.string().max(500).optional(),
+  language: z.enum(['en', 'id']).optional(),
 });
 
 export const shareSlugParam = z.object({

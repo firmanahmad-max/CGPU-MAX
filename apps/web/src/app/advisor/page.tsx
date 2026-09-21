@@ -1,13 +1,14 @@
 'use client';
 
 import Link from 'next/link';
-import { useTranslations } from 'next-intl';
+import { useLocale, useTranslations } from 'next-intl';
 
 import { SignedIn, SignedOut } from '@/lib/auth';
 import { useState } from 'react';
 
 import { BuildAdviceResult } from '@/components/BuildAdviceResult';
 import type { BuildAdvice, BuildPurpose, Resolution } from '@/lib/advisorTypes';
+import { useCurrency } from '@/lib/currency-context';
 import { useAuthedFetch } from '@/lib/useAuthedFetch';
 
 const PURPOSES: { value: BuildPurpose; labelKey: string }[] = [
@@ -21,6 +22,8 @@ const RESOLUTIONS: Resolution[] = ['1080p', '1440p', '4K'];
 
 export default function AdvisorPage() {
   const t = useTranslations('advisor');
+  const locale = useLocale();
+  const { format } = useCurrency();
   const authedFetch = useAuthedFetch();
   const [budget, setBudget] = useState(1500);
   const [purpose, setPurpose] = useState<BuildPurpose>('gaming');
@@ -38,7 +41,13 @@ export default function AdvisorPage() {
       const res = await authedFetch('/api/v1/advisor/build', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ budgetUsd: budget, purpose, resolution, preferences }),
+        body: JSON.stringify({
+          budgetUsd: budget,
+          purpose,
+          resolution,
+          preferences,
+          language: locale,
+        }),
       });
       if (res.status === 402) {
         throw new Error(t('errProFeature'));
@@ -96,7 +105,7 @@ export default function AdvisorPage() {
             <div>
               <div className="mb-2 flex items-center justify-between">
                 <p className="label">{t('budget')}</p>
-                <span className="text-ink-hi font-mono text-lg">${budget.toLocaleString()}</span>
+                <span className="text-ink-hi font-mono text-lg">{format(budget)}</span>
               </div>
               <input
                 type="range"
