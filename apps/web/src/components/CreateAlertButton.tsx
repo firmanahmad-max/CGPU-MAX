@@ -1,11 +1,15 @@
 'use client';
 
+import { useTranslations } from 'next-intl';
 import { useState } from 'react';
 
 import { SignedIn } from '@/lib/auth';
+import { useCurrency } from '@/lib/currency-context';
 import { useAuthedFetch } from '@/lib/useAuthedFetch';
 
 export function CreateAlertButton({ slug, suggested }: { slug: string; suggested: number | null }) {
+  const t = useTranslations('alerts');
+  const { format } = useCurrency();
   const authedFetch = useAuthedFetch();
   const [open, setOpen] = useState(false);
   const [target, setTarget] = useState(suggested ? String(suggested) : '');
@@ -23,11 +27,11 @@ export function CreateAlertButton({ slug, suggested }: { slug: string; suggested
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ slug, targetPriceUsd: value, direction: 'BELOW' }),
       });
-      if (res.status === 402) throw new Error('Price alerts are a Pro feature.');
-      if (res.status === 429) throw new Error('Alert limit reached for your plan.');
+      if (res.status === 402) throw new Error(t('errPro'));
+      if (res.status === 429) throw new Error(t('errLimit'));
       if (!res.ok) throw new Error(await res.text());
       setStatus('done');
-      setMessage(`Alert set: notify when ≤ $${value}`);
+      setMessage(t('done', { price: format(value) }));
     } catch (err) {
       setStatus('error');
       setMessage((err as Error).message);
@@ -37,12 +41,12 @@ export function CreateAlertButton({ slug, suggested }: { slug: string; suggested
   return (
     <SignedIn>
       <div className="card">
-        <p className="label mb-2">Price alert</p>
+        <p className="label mb-2">{t('title')}</p>
         {status === 'done' ? (
           <p className="text-lime-bright text-sm">{message}</p>
         ) : open ? (
           <div className="flex items-center gap-2">
-            <span className="text-ink-muted text-sm">Notify me when ≤ $</span>
+            <span className="text-ink-muted text-sm">{t('notifyWhen')} $</span>
             <input
               type="number"
               value={target}
@@ -55,7 +59,7 @@ export function CreateAlertButton({ slug, suggested }: { slug: string; suggested
               disabled={status === 'saving'}
               className="rounded-control bg-lime text-lime-ink px-3 py-1 text-xs font-semibold hover:brightness-110 disabled:opacity-40"
             >
-              {status === 'saving' ? 'Saving…' : 'Set alert'}
+              {status === 'saving' ? t('saving') : t('set')}
             </button>
           </div>
         ) : (
@@ -64,7 +68,7 @@ export function CreateAlertButton({ slug, suggested }: { slug: string; suggested
             onClick={() => setOpen(true)}
             className="rounded-control border-hairline bg-panel-3 text-ink-hi border px-3 py-1 text-sm font-semibold hover:bg-white/20"
           >
-            Track price
+            {t('track')}
           </button>
         )}
         {status === 'error' && message && <p className="text-cred mt-2 text-xs">{message}</p>}

@@ -223,7 +223,18 @@
     "rationale": "Encoder rationale",
     "keyframe": "Keyframe interval {sec}s · platform max {kbps} kbps",
     "warnings": "Warnings",
-    "errProFeature": "Streaming suite is a Pro feature — upgrade on Pricing."
+    "errProFeature": "Streaming suite is a Pro feature — upgrade on Pricing.",
+    "encoderReason": {
+      "nvenc": "NVENC (Turing+) offloads encoding from the CPU with near-x264-medium quality.",
+      "amf": "AMD AMF/VCE hardware encoding frees the CPU; use the latest drivers for best quality.",
+      "quicksync": "Intel Quick Sync provides efficient hardware encoding, ideal for single-PC setups.",
+      "x264": "No hardware encoder detected — x264 (CPU) encoding. Needs spare CPU headroom."
+    },
+    "warning": {
+      "uploadLimit": "Your upload ({upload} Mbps) limits quality — recommended bitrate capped at {recommended} kbps.",
+      "platformCap": "{platform} caps ingest at {platformMax} kbps; {resolution}@{fps} would ideally use {ideal} kbps.",
+      "twitch4k": "Twitch does not officially support 4K ingest — consider 1080p/1440p."
+    }
   },
   "pricing": {
     "label": "Pricing",
@@ -377,5 +388,15 @@
       "All trademarks, names, and logos belong to their respective owners."
     ],
     "footer": "CGPU-MAX · Arta Ecosystem — built by Firman Ahmad"
+  },
+  "alerts": {
+    "title": "Price alert",
+    "track": "Track price",
+    "notifyWhen": "Notify me when ≤",
+    "set": "Set alert",
+    "saving": "Saving…",
+    "done": "Alert set: notify at ≤ {price}",
+    "errPro": "Price alerts are a Pro feature.",
+    "errLimit": "Alert limit reached for your plan."
   }
 }

@@ -223,7 +223,18 @@
     "rationale": "Alasan encoder",
     "keyframe": "Interval keyframe {sec}s · maks platform {kbps} kbps",
     "warnings": "Peringatan",
-    "errProFeature": "Paket streaming adalah fitur Pro — upgrade di halaman Harga."
+    "errProFeature": "Paket streaming adalah fitur Pro — upgrade di halaman Harga.",
+    "encoderReason": {
+      "nvenc": "NVENC (Turing+) memindahkan encoding dari CPU dengan kualitas mendekati x264-medium.",
+      "amf": "Hardware encoding AMD AMF/VCE meringankan CPU; pakai driver terbaru untuk kualitas terbaik.",
+      "quicksync": "Intel Quick Sync memberi hardware encoding efisien, ideal untuk setup satu PC.",
+      "x264": "Tidak ada hardware encoder — encoding x264 (CPU). Butuh headroom CPU yang cukup."
+    },
+    "warning": {
+      "uploadLimit": "Upload-mu ({upload} Mbps) membatasi kualitas — bitrate disarankan dibatasi {recommended} kbps.",
+      "platformCap": "{platform} membatasi ingest di {platformMax} kbps; {resolution}@{fps} idealnya {ideal} kbps.",
+      "twitch4k": "Twitch tidak resmi mendukung ingest 4K — pertimbangkan 1080p/1440p."
+    }
   },
   "pricing": {
     "label": "Harga",
@@ -377,5 +388,15 @@
       "Semua merek, nama, dan logo milik pemegang haknya masing-masing."
     ],
     "footer": "CGPU-MAX · Arta Ecosystem — dibuat oleh Firman Ahmad"
+  },
+  "alerts": {
+    "title": "Peringatan harga",
+    "track": "Lacak harga",
+    "notifyWhen": "Beri tahu saat ≤",
+    "set": "Pasang",
+    "saving": "Menyimpan…",
+    "done": "Peringatan dipasang: beri tahu saat ≤ {price}",
+    "errPro": "Peringatan harga adalah fitur Pro.",
+    "errLimit": "Batas peringatan untuk paketmu tercapai."
   }
 }

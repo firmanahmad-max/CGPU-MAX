@@ -39,6 +39,6 @@ describe('StreamingAdvisor', () => {
       fps: 60,
       uploadMbps: 1000,
     });
-    expect(r.warnings.some((w) => w.includes('4K'))).toBe(true);
+    expect(r.warnings.some((w) => w.key === 'twitch4k')).toBe(true);
   });
 });

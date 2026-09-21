@@ -6,10 +6,25 @@ import type { Manufacturer } from '@cgpu-max/types';
 export type Platform = 'twitch' | 'youtube' | 'kick';
 export type StreamResolution = '720p' | '1080p' | '1440p' | '4K';
 
+export type EncoderReason = 'nvenc' | 'amf' | 'quicksync' | 'x264';
+
+// i18n descriptors — the web layer localizes them (see streaming.warning.*).
+export type StreamWarning =
+  | { key: 'uploadLimit'; upload: number; recommended: number }
+  | {
+      key: 'platformCap';
+      platform: string;
+      platformMax: number;
+      resolution: string;
+      fps: number;
+      ideal: number;
+    }
+  | { key: 'twitch4k' };
+
 export interface EncoderChoice {
   encoder: 'NVENC' | 'QuickSync' | 'AMF' | 'x264';
   hardware: boolean;
-  reason: string;
+  reasonKey: EncoderReason;
   x264Preset?: string;
 }
 
@@ -19,7 +34,7 @@ export interface StreamingResult {
   maxPlatformBitrateKbps: number;
   uploadHeadroomMbps: number;
   keyframeIntervalSec: number;
-  warnings: string[];
+  warnings: StreamWarning[];
 }
 
 // Platform max ingest bitrate (kbps). Twitch's higher tier is non-partner-soft.
@@ -40,32 +55,13 @@ const BASE_BITRATE_60: Record<StreamResolution, number> = {
 export function recommendEncoder(gpuManufacturer: Manufacturer | null): EncoderChoice {
   switch (gpuManufacturer) {
     case 'NVIDIA':
-      return {
-        encoder: 'NVENC',
-        hardware: true,
-        reason: 'NVENC (Turing+) offloads encoding from the CPU with near-x264-medium quality.',
-      };
+      return { encoder: 'NVENC', hardware: true, reasonKey: 'nvenc' };
     case 'AMD':
-      return {
-        encoder: 'AMF',
-        hardware: true,
-        reason:
-          'AMD AMF/VCE hardware encoding frees the CPU; use the latest drivers for best quality.',
-      };
+      return { encoder: 'AMF', hardware: true, reasonKey: 'amf' };
     case 'INTEL':
-      return {
-        encoder: 'QuickSync',
-        hardware: true,
-        reason:
-          'Intel Quick Sync provides efficient hardware encoding, ideal for single-PC setups.',
-      };
+      return { encoder: 'QuickSync', hardware: true, reasonKey: 'quicksync' };
     default:
-      return {
-        encoder: 'x264',
-        hardware: false,
-        reason: 'No hardware encoder detected — x264 (CPU) encoding. Needs spare CPU headroom.',
-        x264Preset: 'veryfast',
-      };
+      return { encoder: 'x264', hardware: false, reasonKey: 'x264', x264Preset: 'veryfast' };
   }
 }
 
@@ -86,21 +82,24 @@ export function planStream(params: {
   const uploadCapKbps = Math.round(params.uploadMbps * 1000 * 0.8);
   const recommended = Math.min(ideal, platformMax, uploadCapKbps);
 
-  const warnings: string[] = [];
+  const warnings: StreamWarning[] = [];
   if (recommended < ideal) {
     if (uploadCapKbps < ideal && uploadCapKbps <= platformMax) {
-      warnings.push(
-        `Your upload (${params.uploadMbps} Mbps) limits quality — recommended bitrate capped at ${recommended} kbps.`,
-      );
+      warnings.push({ key: 'uploadLimit', upload: params.uploadMbps, recommended });
     }
     if (platformMax < ideal) {
-      warnings.push(
-        `${params.platform} caps ingest at ${platformMax} kbps; ${params.resolution}@${params.fps} would ideally use ${ideal} kbps.`,
-      );
+      warnings.push({
+        key: 'platformCap',
+        platform: params.platform,
+        platformMax,
+        resolution: params.resolution,
+        fps: params.fps,
+        ideal,
+      });
     }
   }
   if (params.resolution === '4K' && params.platform === 'twitch') {
-    warnings.push('Twitch does not officially support 4K ingest — consider 1080p/1440p.');
+    warnings.push({ key: 'twitch4k' });
   }
 
   return {

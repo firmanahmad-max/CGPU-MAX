@@ -13,13 +13,17 @@ type Platform = 'twitch' | 'youtube' | 'kick';
 type Res = '720p' | '1080p' | '1440p' | '4K';
 type Mfr = 'NVIDIA' | 'AMD' | 'INTEL';
 
+interface StreamWarning {
+  key: string;
+  [param: string]: string | number;
+}
 interface StreamingResult {
-  encoder: { encoder: string; hardware: boolean; reason: string };
+  encoder: { encoder: string; hardware: boolean; reasonKey: string };
   recommendedBitrateKbps: number;
   maxPlatformBitrateKbps: number;
   uploadHeadroomMbps: number;
   keyframeIntervalSec: number;
-  warnings: string[];
+  warnings: StreamWarning[];
 }
 
 export default function StreamingPage() {
@@ -144,7 +148,9 @@ export default function StreamingPage() {
               </div>
               <div className="card">
                 <p className="label mb-1">{t('rationale')}</p>
-                <p className="text-ink-mid text-sm">{result.encoder.reason}</p>
+                <p className="text-ink-mid text-sm">
+                  {t(`encoderReason.${result.encoder.reasonKey}`)}
+                </p>
                 <p className="text-ink-faint mt-2 text-xs">
                   {t('keyframe', {
                     sec: result.keyframeIntervalSec,
@@ -157,7 +163,7 @@ export default function StreamingPage() {
                   <p className="label mb-2 text-amber-300">{t('warnings')}</p>
                   <ul className="space-y-1 text-sm text-amber-200/90">
                     {result.warnings.map((w, i) => (
-                      <li key={i}>• {w}</li>
+                      <li key={i}>• {t(`warning.${w.key}`, w)}</li>
                     ))}
                   </ul>
                 </div>
