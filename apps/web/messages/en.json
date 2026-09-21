@@ -398,5 +398,11 @@
     "done": "Alert set: notify at ≤ {price}",
     "errPro": "Price alerts are a Pro feature.",
     "errLimit": "Alert limit reached for your plan."
+  },
+  "reports": {
+    "export": "Export",
+    "generating": "Generating…",
+    "errPro": "Reports are a Pro feature — upgrade on Pricing.",
+    "errFailed": "Export failed ({status})"
   }
 }

@@ -1,5 +1,6 @@
 'use client';
 
+import { useTranslations } from 'next-intl';
 import { useState } from 'react';
 
 import { SignedIn } from '@/lib/auth';
@@ -14,6 +15,7 @@ interface ReportExportButtonsProps {
 // carry auth. We fetch the file as a blob with the token attached, then trigger
 // a client-side download.
 export function ReportExportButtons({ kind, shareSlug }: ReportExportButtonsProps) {
+  const t = useTranslations('reports');
   const authedFetch = useAuthedFetch();
   const [busy, setBusy] = useState<'pdf' | 'xlsx' | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -23,8 +25,8 @@ export function ReportExportButtons({ kind, shareSlug }: ReportExportButtonsProp
     setError(null);
     try {
       const res = await authedFetch(`/api/v1/reports/${kind}/${shareSlug}?format=${format}`);
-      if (res.status === 402) throw new Error('Reports are a Pro feature — upgrade on Pricing.');
-      if (!res.ok) throw new Error(`Export failed (${res.status})`);
+      if (res.status === 402) throw new Error(t('errPro'));
+      if (!res.ok) throw new Error(t('errFailed', { status: res.status }));
       const blob = await res.blob();
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
@@ -44,14 +46,14 @@ export function ReportExportButtons({ kind, shareSlug }: ReportExportButtonsProp
   return (
     <SignedIn>
       <div className="card flex flex-wrap items-center gap-3">
-        <span className="label">Export</span>
+        <span className="label">{t('export')}</span>
         <button
           type="button"
           onClick={() => download('pdf')}
           disabled={busy !== null}
           className="rounded-control border-hairline bg-panel-3 text-ink-hi border px-4 py-1.5 text-sm font-semibold transition hover:bg-white/20 disabled:opacity-40"
         >
-          {busy === 'pdf' ? 'Generating…' : 'PDF'}
+          {busy === 'pdf' ? t('generating') : 'PDF'}
         </button>
         <button
           type="button"
@@ -59,7 +61,7 @@ export function ReportExportButtons({ kind, shareSlug }: ReportExportButtonsProp
           disabled={busy !== null}
           className="rounded-control border-hairline bg-panel-3 text-ink-hi border px-4 py-1.5 text-sm font-semibold transition hover:bg-white/20 disabled:opacity-40"
         >
-          {busy === 'xlsx' ? 'Generating…' : 'Excel'}
+          {busy === 'xlsx' ? t('generating') : 'Excel'}
         </button>
         {error && <span className="text-cred text-xs">{error}</span>}
       </div>

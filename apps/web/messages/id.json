@@ -398,5 +398,11 @@
     "done": "Peringatan dipasang: beri tahu saat ≤ {price}",
     "errPro": "Peringatan harga adalah fitur Pro.",
     "errLimit": "Batas peringatan untuk paketmu tercapai."
+  },
+  "reports": {
+    "export": "Ekspor",
+    "generating": "Membuat…",
+    "errPro": "Laporan adalah fitur Pro — tingkatkan di Harga.",
+    "errFailed": "Ekspor gagal ({status})"
   }
 }
