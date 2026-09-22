@@ -12,6 +12,7 @@ export interface ProcessorSnapshot {
   modelName: string;
   tdpWatts: number | null;
   msrpUsd: number | null;
+  priceIdr: number | null;
   generation: number | null;
 
   cpu?: {

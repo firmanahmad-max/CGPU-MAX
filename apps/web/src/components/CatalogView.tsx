@@ -236,7 +236,7 @@ export function CatalogView({ data }: { data: CatalogResponse | null }) {
                       {r.tdpWatts ? `${r.tdpWatts} W` : '—'}
                     </td>
                     <td className="text-ink-mid px-3 py-3 text-right font-mono">
-                      <Price usd={r.msrpUsd} />
+                      <Price usd={r.msrpUsd} idr={r.priceIdr} />
                     </td>
                     <td className="text-ink-mid px-3 py-3 text-right font-mono">
                       {r.costPerScore !== null ? <Price usd={r.costPerScore} small /> : '—'}

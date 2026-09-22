@@ -82,6 +82,9 @@ model Processor {
   processNm     Int?          @map("process_nm")
   tdpWatts      Int?          @map("tdp_watts")
   msrpUsd       Decimal?      @map("msrp_usd") @db.Decimal(10, 2)
+  // Real Indonesian street price (Rp), sourced from a local retailer. Shown in
+  // Rp mode when present; otherwise the UI falls back to USD × reference rate.
+  priceIdr      Int?          @map("price_idr")
 
   cpuSpecs    CpuSpecs?
   gpuSpecs    GpuSpecs?

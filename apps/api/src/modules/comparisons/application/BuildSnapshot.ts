@@ -33,6 +33,7 @@ export async function buildProcessorSnapshot(
     modelName: row.modelName,
     tdpWatts: row.tdpWatts,
     msrpUsd: row.msrpUsd ? Number(row.msrpUsd) : null,
+    priceIdr: row.priceIdr ?? null,
     generation: row.generation,
     cpu: row.cpuSpecs
       ? {

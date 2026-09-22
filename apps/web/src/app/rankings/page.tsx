@@ -110,7 +110,11 @@ function RankRow({
           <div className="mb-[6px] flex items-center gap-2">
             <Mark mfr={p.manufacturer} />
             <span className="text-ink-hi truncate text-[13px] font-semibold">{p.modelName}</span>
-            <Price usd={p.msrpUsd} className="text-ink-muted font-mono text-[10.5px] font-medium" />
+            <Price
+              usd={p.msrpUsd}
+              idr={p.priceIdr}
+              className="text-ink-muted font-mono text-[10.5px] font-medium"
+            />
           </div>
           <div className="rounded-pill h-[6px] overflow-hidden bg-white/[0.06]">
             <div

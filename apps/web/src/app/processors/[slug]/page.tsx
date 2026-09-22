@@ -58,7 +58,7 @@ export default async function ProcessorDetailPage({ params }: PageProps) {
         <Metric label="TDP" value={processor.tdpWatts ? `${processor.tdpWatts} W` : '—'} />
         <Metric label="Architecture" value={processor.architecture ?? '—'} />
         <Metric label="Process" value={processor.processNm ? `${processor.processNm} nm` : '—'} />
-        <Metric label="MSRP" value={<Price usd={processor.msrpUsd} />} />
+        <Metric label="MSRP" value={<Price usd={processor.msrpUsd} idr={processor.priceIdr} />} />
       </section>
 
       {/* 90-day price trend — Console reference build-bay sparkline. */}

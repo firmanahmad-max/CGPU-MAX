@@ -56,6 +56,7 @@ export interface RankedProcessor {
   manufacturer: string;
   type: string;
   msrpUsd: number | null;
+  priceIdr: number | null;
   performance: number;
   value: number | null;
 }
@@ -114,6 +115,7 @@ export interface CatalogRow {
   architecture: string | null;
   tdpWatts: number | null;
   msrpUsd: number | null;
+  priceIdr: number | null;
   performance: number;
   vramGb: number | null;
   vramType: string | null;

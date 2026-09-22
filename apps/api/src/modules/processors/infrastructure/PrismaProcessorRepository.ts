@@ -22,6 +22,7 @@ export class PrismaProcessorRepository implements ProcessorRepository {
       processNm: row.processNm,
       tdpWatts: row.tdpWatts,
       msrpUsd: row.msrpUsd ? Number(row.msrpUsd) : null,
+      priceIdr: row.priceIdr ?? null,
     });
   }
 
@@ -59,6 +60,7 @@ export class PrismaProcessorRepository implements ProcessorRepository {
         processNm: row.processNm,
         tdpWatts: row.tdpWatts,
         msrpUsd: row.msrpUsd ? Number(row.msrpUsd) : null,
+        priceIdr: row.priceIdr ?? null,
       }),
     );
     return { items, total };

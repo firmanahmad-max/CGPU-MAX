@@ -23,6 +23,7 @@ export interface RankedProcessor {
   manufacturer: string;
   type: string;
   msrpUsd: number | null;
+  priceIdr: number | null;
   performance: number;
   value: number | null;
 }
@@ -71,6 +72,7 @@ export class GetRankings {
               manufacturer: String(r.manufacturer),
               type: String(r.type),
               msrpUsd,
+              priceIdr: r.priceIdr ?? null,
               performance,
               value: valueScore(performance, msrpUsd),
             };

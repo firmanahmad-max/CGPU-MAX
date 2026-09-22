@@ -185,13 +185,41 @@ const GPUS: GpuSeed[] = [
 ];
 /* eslint-enable max-len */
 
+// Real Indonesian street prices (Rp), keyed by slug — snapshot from a local
+// retailer (enterkomputer). Shown directly in Rp mode; parts not listed here
+// fall back to USD × reference rate. Extend per category over time.
+const PRICE_IDR: Record<string, number> = {
+  // Intel CPUs
+  'intel-core-ultra-9-285k': 12040000,
+  'intel-core-ultra-7-265k': 5800000,
+  'intel-core-ultra-5-245k': 3899000,
+  'intel-core-i9-14900k': 8815000,
+  'intel-core-i7-14700k': 6770000,
+  'intel-core-i5-14600k': 4570000,
+  'intel-core-i5-14400f': 3150000,
+  'intel-core-i3-14100f': 1785000,
+  'intel-core-i9-12900k': 7445000,
+  'intel-core-i7-12700k': 5249000,
+  'intel-core-i5-12600k': 3995000,
+  'intel-core-i5-12400f': 2585000,
+  'intel-core-i3-12100f': 1569000,
+  'intel-core-i5-13400f': 3150000,
+  'intel-core-i5-11400f': 1795000,
+  'intel-core-i5-10400f': 2229000,
+};
+
 const now = new Date();
 
 async function seedCpu(c: CpuSeed) {
   const releaseDate = new Date(c.releaseDate);
   const proc = await prisma.processor.upsert({
     where: { slug: c.slug },
-    update: { msrpUsd: c.msrpUsd, tdpWatts: c.tdpWatts, releaseDate },
+    update: {
+      msrpUsd: c.msrpUsd,
+      tdpWatts: c.tdpWatts,
+      releaseDate,
+      priceIdr: PRICE_IDR[c.slug] ?? null,
+    },
     create: {
       type: 'CPU',
       manufacturer: c.manufacturer,
@@ -202,6 +230,7 @@ async function seedCpu(c: CpuSeed) {
       processNm: c.processNm,
       tdpWatts: c.tdpWatts,
       msrpUsd: c.msrpUsd,
+      priceIdr: PRICE_IDR[c.slug] ?? null,
       releaseDate,
       cpuSpecs: {
         create: {
@@ -227,7 +256,12 @@ async function seedGpu(g: GpuSeed) {
   const releaseDate = new Date(g.releaseDate);
   const proc = await prisma.processor.upsert({
     where: { slug: g.slug },
-    update: { msrpUsd: g.msrpUsd, tdpWatts: g.tdpWatts, releaseDate },
+    update: {
+      msrpUsd: g.msrpUsd,
+      tdpWatts: g.tdpWatts,
+      releaseDate,
+      priceIdr: PRICE_IDR[g.slug] ?? null,
+    },
     create: {
       type: 'GPU',
       manufacturer: g.manufacturer,
@@ -238,6 +272,7 @@ async function seedGpu(g: GpuSeed) {
       processNm: g.processNm,
       tdpWatts: g.tdpWatts,
       msrpUsd: g.msrpUsd,
+      priceIdr: PRICE_IDR[g.slug] ?? null,
       releaseDate,
       gpuSpecs: {
         create: {

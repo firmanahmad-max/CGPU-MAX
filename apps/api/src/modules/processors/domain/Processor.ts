@@ -15,6 +15,7 @@ export interface ProcessorProps {
   processNm: number | null;
   tdpWatts: number | null;
   msrpUsd: number | null;
+  priceIdr: number | null;
 }
 
 export class Processor {

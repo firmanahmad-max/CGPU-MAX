@@ -197,7 +197,11 @@ function ProcessorCard({ p }: { p: RankedProcessor }) {
       <div className="mt-4 flex items-end justify-between">
         <div>
           <p className="label">MSRP</p>
-          <Price usd={p.msrpUsd} className="text-ink-hi mt-1 block font-mono text-[13px]" />
+          <Price
+            usd={p.msrpUsd}
+            idr={p.priceIdr}
+            className="text-ink-hi mt-1 block font-mono text-[13px]"
+          />
         </div>
         <div className="text-right">
           <p className="label">Score</p>
@@ -229,7 +233,11 @@ function LatestCard({ p, locale }: { p: Processor; locale: string }) {
       <p className="text-ink-faint mt-1 text-[11.5px]">
         {[p.architecture, released].filter(Boolean).join(' · ')}
       </p>
-      <Price usd={p.msrpUsd} className="text-ink-hi mt-4 block font-mono text-[13px]" />
+      <Price
+        usd={p.msrpUsd}
+        idr={p.priceIdr}
+        className="text-ink-hi mt-4 block font-mono text-[13px]"
+      />
     </Link>
   );
 }

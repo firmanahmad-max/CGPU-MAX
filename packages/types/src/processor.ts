@@ -14,6 +14,7 @@ export interface ProcessorBase {
   processNm: number | null;
   tdpWatts: number | null;
   msrpUsd: number | null;
+  priceIdr: number | null;
   createdAt: string;
   updatedAt: string;
 }

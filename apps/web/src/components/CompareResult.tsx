@@ -141,7 +141,7 @@ function ValueCard({
   return (
     <div className={cn('panel', bestValue && 'border-lime/40 bg-lime/[0.05]')}>
       <p className="text-ink-muted text-[13px]">{processor.modelName}</p>
-      <Price usd={processor.msrpUsd} className="metric mt-2 block" />
+      <Price usd={processor.msrpUsd} idr={processor.priceIdr} className="metric mt-2 block" />
       <p className="text-ink-faint mt-1 text-[11px]">
         {costPerScore !== null
           ? t('perScore', { value: costPerScore.toFixed(2) })

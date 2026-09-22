@@ -9,13 +9,17 @@ export function isCurrency(value: string | undefined): value is Currency {
   return value === 'USD' || value === 'IDR';
 }
 
-// Whole-price format ($999 / Rp16,3 jt).
-export function formatPrice(usd: number, currency: Currency): string {
-  if (currency === 'USD') return '$' + Math.round(usd).toLocaleString('en-US');
-  const rp = usd * IDR_RATE;
+// Format a raw Rupiah amount the same way as the converted view (Rp8,8 jt / Rp1,57 jt).
+export function formatIdrValue(rp: number): string {
   return rp >= 1e6
     ? 'Rp' + (rp / 1e6).toFixed(1).replace('.', ',') + ' jt'
     : 'Rp' + Math.round(rp / 1000) + ' rb';
+}
+
+// Whole-price format ($999 / Rp16,3 jt).
+export function formatPrice(usd: number, currency: Currency): string {
+  if (currency === 'USD') return '$' + Math.round(usd).toLocaleString('en-US');
+  return formatIdrValue(usd * IDR_RATE);
 }
 
 // Fine-grained format for $/point style figures ($11.22 / Rp183 rb).

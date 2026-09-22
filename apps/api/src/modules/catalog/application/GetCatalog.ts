@@ -26,6 +26,7 @@ export interface CatalogRow {
   architecture: string | null;
   tdpWatts: number | null;
   msrpUsd: number | null;
+  priceIdr: number | null;
   performance: number;
   vramGb: number | null;
   vramType: string | null;
@@ -110,6 +111,7 @@ export class GetCatalog {
               architecture: r.architecture,
               tdpWatts: r.tdpWatts,
               msrpUsd,
+              priceIdr: r.priceIdr ?? null,
               performance,
               vramGb: r.gpuSpecs?.vramGb ?? null,
               vramType: r.gpuSpecs?.vramType ?? null,
