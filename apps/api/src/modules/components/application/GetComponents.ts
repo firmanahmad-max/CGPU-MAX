@@ -10,6 +10,9 @@ export interface ComponentsInput {
   formFactor?: string;
   memoryType?: string;
   capacityGb?: number;
+  interface?: string;
+  wattage?: number;
+  efficiency?: string;
   sort: ComponentSort;
   dir: 'asc' | 'desc';
   limit: number;
@@ -30,6 +33,10 @@ export interface ComponentRow {
   moduleCount: number | null;
   speedMhz: number | null;
   casLatency: number | null;
+  interface: string | null;
+  wattage: number | null;
+  efficiency: string | null;
+  modular: string | null;
 }
 
 export interface ComponentFacets {
@@ -40,6 +47,9 @@ export interface ComponentFacets {
   memoryTypes: { name: string; count: number }[];
   capacities: { gb: number; count: number }[];
   speeds: { mhz: number; count: number }[];
+  interfaces: { name: string; count: number }[];
+  wattages: { w: number; count: number }[];
+  efficiencies: { name: string; count: number }[];
   priceMin: number | null;
   priceMax: number | null;
 }
@@ -75,6 +85,10 @@ export class GetComponents {
       moduleCount: r.moduleCount,
       speedMhz: r.speedMhz,
       casLatency: r.casLatency,
+      interface: r.interface,
+      wattage: r.wattage,
+      efficiency: r.efficiency,
+      modular: r.modular,
     }));
 
     const prices = base.map((r) => r.priceIdr).filter((p): p is number => p !== null);
@@ -100,6 +114,15 @@ export class GetComponents {
       speeds: tally(base.map((r) => r.speedMhz))
         .map((x) => ({ mhz: x.value, count: x.count }))
         .sort((a, b) => a.mhz - b.mhz),
+      interfaces: tally(base.map((r) => r.interface))
+        .map((x) => ({ name: x.value, count: x.count }))
+        .sort((a, b) => a.name.localeCompare(b.name)),
+      wattages: tally(base.map((r) => r.wattage))
+        .map((x) => ({ w: x.value, count: x.count }))
+        .sort((a, b) => a.w - b.w),
+      efficiencies: tally(base.map((r) => r.efficiency))
+        .map((x) => ({ name: x.value, count: x.count }))
+        .sort((a, b) => a.name.localeCompare(b.name)),
       priceMin: prices.length ? Math.min(...prices) : null,
       priceMax: prices.length ? Math.max(...prices) : null,
     };
@@ -111,6 +134,9 @@ export class GetComponents {
       if (input.formFactor && r.formFactor !== input.formFactor) return false;
       if (input.memoryType && r.memoryType !== input.memoryType) return false;
       if (input.capacityGb && r.capacityGb !== input.capacityGb) return false;
+      if (input.interface && r.interface !== input.interface) return false;
+      if (input.wattage && r.wattage !== input.wattage) return false;
+      if (input.efficiency && r.efficiency !== input.efficiency) return false;
       return true;
     });
 

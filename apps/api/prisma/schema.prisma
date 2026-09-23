@@ -22,6 +22,9 @@ enum ProcessorType {
 enum ComponentType {
   MOTHERBOARD
   RAM
+  SSD
+  PSU
+  CASING
 }
 
 enum Manufacturer {
@@ -129,10 +132,18 @@ model Component {
   memoryType String? @map("memory_type") // DDR4 / DDR5 (also used by RAM)
 
   // RAM-specific
-  capacityGb  Int? @map("capacity_gb")
+  capacityGb  Int? @map("capacity_gb") // also used by SSD (GB)
   moduleCount Int? @map("module_count")
   speedMhz    Int? @map("speed_mhz")
   casLatency  Int? @map("cas_latency")
+
+  // SSD-specific (formFactor + capacityGb reused)
+  interface String? // NVMe Gen4 / SATA
+
+  // PSU-specific
+  wattage    Int?
+  efficiency String? // 80+ Gold
+  modular    String? // Full / Semi / Non Modular
 
   createdAt DateTime  @default(now()) @map("created_at")
   updatedAt DateTime  @updatedAt @map("updated_at")

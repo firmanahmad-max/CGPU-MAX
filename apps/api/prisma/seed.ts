@@ -506,13 +506,140 @@ async function seedRam(r: RamSeed) {
   });
 }
 
+interface SsdSeed {
+  slug: string;
+  brand: string;
+  modelName: string;
+  capacityGb: number;
+  interface: string;
+  formFactor: string;
+  priceIdr: number;
+}
+interface PsuSeed {
+  slug: string;
+  brand: string;
+  modelName: string;
+  wattage: number;
+  efficiency: string;
+  modular: string;
+  priceIdr: number;
+}
+interface CaseSeed {
+  slug: string;
+  brand: string;
+  modelName: string;
+  formFactor: string;
+  priceIdr: number;
+}
+
+/* eslint-disable max-len */
+// prettier-ignore
+const SSDS: SsdSeed[] = [
+  { slug: 'adata-su650-256gb', brand: 'ADATA', modelName: 'SU650 256GB', capacityGb: 256, interface: 'SATA', formFactor: '2.5"', priceIdr: 700000 },
+  { slug: 'klevv-cras-c715-256gb', brand: 'KLEVV', modelName: 'CRAS C715 256GB', capacityGb: 256, interface: 'NVMe Gen3', formFactor: 'M.2 2280', priceIdr: 1100000 },
+  { slug: 'adata-su650-512gb', brand: 'ADATA', modelName: 'SU650 512GB', capacityGb: 512, interface: 'SATA', formFactor: '2.5"', priceIdr: 1150000 },
+  { slug: 'klevv-cras-c715-512gb', brand: 'KLEVV', modelName: 'CRAS C715 512GB', capacityGb: 512, interface: 'NVMe Gen3', formFactor: 'M.2 2280', priceIdr: 1630000 },
+  { slug: 'klevv-cras-c910g-500gb', brand: 'KLEVV', modelName: 'CRAS C910G 500GB', capacityGb: 500, interface: 'NVMe Gen4', formFactor: 'M.2 2280', priceIdr: 1700000 },
+  { slug: 'adata-legend-710-1tb', brand: 'ADATA', modelName: 'Legend 710 1TB', capacityGb: 1024, interface: 'NVMe Gen4', formFactor: 'M.2 2280', priceIdr: 2900000 },
+  { slug: 'klevv-cras-c715-1tb', brand: 'KLEVV', modelName: 'CRAS C715 1TB', capacityGb: 1024, interface: 'NVMe Gen3', formFactor: 'M.2 2280', priceIdr: 2900000 },
+  { slug: 'klevv-genuine-g560-1tb', brand: 'KLEVV', modelName: 'GENUINE G560 1TB', capacityGb: 1024, interface: 'NVMe Gen5', formFactor: 'M.2 2280', priceIdr: 3600000 },
+  { slug: 'klevv-cras-c910g-2tb', brand: 'KLEVV', modelName: 'CRAS C910G 2TB', capacityGb: 2048, interface: 'NVMe Gen4', formFactor: 'M.2 2280', priceIdr: 5410000 },
+  { slug: 'klevv-genuine-g560-2tb', brand: 'KLEVV', modelName: 'GENUINE G560 2TB', capacityGb: 2048, interface: 'NVMe Gen5', formFactor: 'M.2 2280', priceIdr: 6300000 },
+  { slug: 'klevv-cras-c910-4tb', brand: 'KLEVV', modelName: 'CRAS C910 4TB', capacityGb: 4096, interface: 'NVMe Gen4', formFactor: 'M.2 2280', priceIdr: 8970000 },
+  { slug: 'klevv-genuine-g560-4tb', brand: 'KLEVV', modelName: 'GENUINE G560 4TB', capacityGb: 4096, interface: 'NVMe Gen5', formFactor: 'M.2 2280', priceIdr: 11250000 },
+];
+
+// prettier-ignore
+const PSUS: PsuSeed[] = [
+  { slug: 'adata-xpg-pylon-550w', brand: 'ADATA', modelName: 'XPG Pylon 550W', wattage: 550, efficiency: '80+ Bronze', modular: 'Non-Modular', priceIdr: 696000 },
+  { slug: 'adata-xpg-pylon-650w', brand: 'ADATA', modelName: 'XPG Pylon 650W', wattage: 650, efficiency: '80+ Bronze', modular: 'Non-Modular', priceIdr: 770000 },
+  { slug: 'adata-xpg-pylon-750w', brand: 'ADATA', modelName: 'XPG Pylon 750W', wattage: 750, efficiency: '80+ Bronze', modular: 'Non-Modular', priceIdr: 944000 },
+  { slug: 'adata-xpg-kyber-ii-650w', brand: 'ADATA', modelName: 'XPG Kyber II 650W', wattage: 650, efficiency: '80+ Gold', modular: 'Non-Modular', priceIdr: 973000 },
+  { slug: 'antec-atom-g750', brand: 'Antec', modelName: 'ATOM G750', wattage: 750, efficiency: '80+ Gold', modular: 'Semi Modular', priceIdr: 1050000 },
+  { slug: 'antec-atom-g850', brand: 'Antec', modelName: 'ATOM G850', wattage: 850, efficiency: '80+ Gold', modular: 'Semi Modular', priceIdr: 1150000 },
+  { slug: 'adata-xpg-core-reactor-ii-1000w', brand: 'ADATA', modelName: 'XPG Core Reactor II 1000W', wattage: 1000, efficiency: '80+ Gold', modular: 'Full Modular', priceIdr: 1990000 },
+  { slug: 'lian-li-sp850p-850w', brand: 'Lian Li', modelName: 'SP850P 850W', wattage: 850, efficiency: '80+ Platinum', modular: 'Non-Modular', priceIdr: 2650000 },
+  { slug: 'adata-xpg-core-reactor-ii-1200w', brand: 'ADATA', modelName: 'XPG Core Reactor II 1200W', wattage: 1200, efficiency: '80+ Gold', modular: 'Full Modular', priceIdr: 2685000 },
+  { slug: 'lian-li-sp1000p-1000w', brand: 'Lian Li', modelName: 'SP1000P 1000W', wattage: 1000, efficiency: '80+ Platinum', modular: 'Non-Modular', priceIdr: 3020000 },
+  { slug: 'adata-xpg-cybercore-ii-1300w', brand: 'ADATA', modelName: 'XPG Cybercore II 1300W', wattage: 1300, efficiency: '80+ Platinum', modular: 'Full Modular', priceIdr: 3370000 },
+];
+
+// prettier-ignore
+const CASES: CaseSeed[] = [
+  { slug: 'cube-gaming-park', brand: 'Cube Gaming', modelName: 'Park (with PSU)', formFactor: 'ATX', priceIdr: 285000 },
+  { slug: 'cube-gaming-bluey-white', brand: 'Cube Gaming', modelName: 'Bluey White', formFactor: 'Micro-ATX', priceIdr: 310000 },
+  { slug: 'antec-vx100m-argb', brand: 'Antec', modelName: 'VX100M ARGB', formFactor: 'Mini Tower', priceIdr: 380000 },
+  { slug: 'cube-gaming-veeka-black', brand: 'Cube Gaming', modelName: 'Veeka Black', formFactor: 'Mini-ITX', priceIdr: 430000 },
+  { slug: 'antec-cx300m-rgb', brand: 'Antec', modelName: 'CX300M RGB', formFactor: 'Mini Tower', priceIdr: 565000 },
+  { slug: 'cube-gaming-yaltric-white', brand: 'Cube Gaming', modelName: 'Yaltric White', formFactor: 'Micro-ATX', priceIdr: 670000 },
+  { slug: 'cube-gaming-roccu-black', brand: 'Cube Gaming', modelName: 'Roccu Black', formFactor: 'ATX', priceIdr: 749000 },
+  { slug: 'antec-cx300-argb', brand: 'Antec', modelName: 'CX300 ARGB', formFactor: 'Mid Tower', priceIdr: 750000 },
+  { slug: 'cube-gaming-axel-v2-white', brand: 'Cube Gaming', modelName: 'Axel V2.0 White', formFactor: 'Mini-ITX', priceIdr: 790000 },
+  { slug: 'lian-li-vector-v100r', brand: 'Lian Li', modelName: 'Vector V100R', formFactor: 'Mid Tower', priceIdr: 1150000 },
+  { slug: 'antec-constellation-c8', brand: 'Antec', modelName: 'Constellation C8 Wood', formFactor: 'Full Tower', priceIdr: 1480000 },
+];
+/* eslint-enable max-len */
+
+async function seedSsd(s: SsdSeed) {
+  await prisma.component.upsert({
+    where: { slug: s.slug },
+    update: { priceIdr: s.priceIdr, msrpUsd: usdFromIdr(s.priceIdr) },
+    create: {
+      type: 'SSD',
+      brand: s.brand,
+      modelName: s.modelName,
+      slug: s.slug,
+      priceIdr: s.priceIdr,
+      msrpUsd: usdFromIdr(s.priceIdr),
+      capacityGb: s.capacityGb,
+      interface: s.interface,
+      formFactor: s.formFactor,
+    },
+  });
+}
+async function seedPsu(p: PsuSeed) {
+  await prisma.component.upsert({
+    where: { slug: p.slug },
+    update: { priceIdr: p.priceIdr, msrpUsd: usdFromIdr(p.priceIdr) },
+    create: {
+      type: 'PSU',
+      brand: p.brand,
+      modelName: p.modelName,
+      slug: p.slug,
+      priceIdr: p.priceIdr,
+      msrpUsd: usdFromIdr(p.priceIdr),
+      wattage: p.wattage,
+      efficiency: p.efficiency,
+      modular: p.modular,
+    },
+  });
+}
+async function seedCase(c: CaseSeed) {
+  await prisma.component.upsert({
+    where: { slug: c.slug },
+    update: { priceIdr: c.priceIdr, msrpUsd: usdFromIdr(c.priceIdr) },
+    create: {
+      type: 'CASING',
+      brand: c.brand,
+      modelName: c.modelName,
+      slug: c.slug,
+      priceIdr: c.priceIdr,
+      msrpUsd: usdFromIdr(c.priceIdr),
+      formFactor: c.formFactor,
+    },
+  });
+}
+
 async function main() {
   for (const c of CPUS) await seedCpu(c);
   for (const g of GPUS) await seedGpu(g);
   for (const m of MOBOS) await seedMobo(m);
   for (const r of RAMS) await seedRam(r);
+  for (const s of SSDS) await seedSsd(s);
+  for (const p of PSUS) await seedPsu(p);
+  for (const c of CASES) await seedCase(c);
   console.info(
-    `Seeded ${CPUS.length} CPUs, ${GPUS.length} GPUs, ${MOBOS.length} motherboards, ${RAMS.length} RAM kits.`,
+    `Seeded ${CPUS.length} CPUs, ${GPUS.length} GPUs, ${MOBOS.length} motherboards, ${RAMS.length} RAM, ${SSDS.length} SSD, ${PSUS.length} PSU, ${CASES.length} cases.`,
   );
 }
 

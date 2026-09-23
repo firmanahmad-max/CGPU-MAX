@@ -408,8 +408,8 @@
   },
   "components": {
     "database": "Database",
-    "title": "Motherboards & RAM",
-    "subtitle": "Boards and memory kits with real Indonesian street prices.",
+    "title": "PC Components",
+    "subtitle": "Motherboards, RAM, SSD, PSU and cases with real Indonesian street prices.",
     "motherboard": "Motherboard",
     "ram": "RAM",
     "brand": "Brand",
@@ -423,6 +423,13 @@
     "price": "Price",
     "part": "Part",
     "match": "{count} match",
-    "empty": "No components match."
+    "empty": "No components match.",
+    "ssd": "SSD",
+    "psu": "PSU",
+    "casing": "Case",
+    "interface": "Interface",
+    "wattage": "Wattage",
+    "efficiency": "Efficiency",
+    "modular": "Modular"
   }
 }

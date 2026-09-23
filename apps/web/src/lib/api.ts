@@ -308,8 +308,8 @@ export async function calculateBottleneck(
   return res.json() as Promise<BottleneckPayload>;
 }
 
-// Components (motherboards / RAM)
-export type ComponentKind = 'MOTHERBOARD' | 'RAM';
+// Components (motherboards / RAM / SSD / PSU / case)
+export type ComponentKind = 'MOTHERBOARD' | 'RAM' | 'SSD' | 'PSU' | 'CASING';
 
 export interface ComponentRow {
   slug: string;
@@ -326,6 +326,10 @@ export interface ComponentRow {
   moduleCount: number | null;
   speedMhz: number | null;
   casLatency: number | null;
+  interface: string | null;
+  wattage: number | null;
+  efficiency: string | null;
+  modular: string | null;
 }
 
 export interface ComponentFacets {
@@ -336,6 +340,9 @@ export interface ComponentFacets {
   memoryTypes: { name: string; count: number }[];
   capacities: { gb: number; count: number }[];
   speeds: { mhz: number; count: number }[];
+  interfaces: { name: string; count: number }[];
+  wattages: { w: number; count: number }[];
+  efficiencies: { name: string; count: number }[];
   priceMin: number | null;
   priceMax: number | null;
 }

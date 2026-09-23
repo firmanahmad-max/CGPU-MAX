@@ -6,51 +6,55 @@ import { getComponents, type ComponentKind, type ComponentRow } from '@/lib/api'
 
 export const dynamic = 'force-dynamic';
 
+const TYPES: ComponentKind[] = ['MOTHERBOARD', 'RAM', 'SSD', 'PSU', 'CASING'];
+const TYPE_LABEL: Record<ComponentKind, string> = {
+  MOTHERBOARD: 'motherboard',
+  RAM: 'ram',
+  SSD: 'ssd',
+  PSU: 'psu',
+  CASING: 'casing',
+};
+
 interface PageProps {
-  searchParams: {
-    type?: string;
-    brand?: string;
-    socket?: string;
-    chipset?: string;
-    formFactor?: string;
-    memoryType?: string;
-    capacityGb?: string;
-  };
+  searchParams: Record<string, string | undefined>;
 }
 
+const fmtCap = (gb: number) => (gb >= 1024 ? `${gb / 1024} TB` : `${gb} GB`);
+
 export default async function ComponentsPage({ searchParams }: PageProps) {
-  const type: ComponentKind = searchParams.type === 'RAM' ? 'RAM' : 'MOTHERBOARD';
+  const type: ComponentKind = TYPES.includes(searchParams.type as ComponentKind)
+    ? (searchParams.type as ComponentKind)
+    : 'MOTHERBOARD';
   const t = await getTranslations('components');
+
+  const FILTER_KEYS = [
+    'brand',
+    'socket',
+    'chipset',
+    'formFactor',
+    'memoryType',
+    'capacityGb',
+    'interface',
+    'wattage',
+    'efficiency',
+  ] as const;
 
   const data = await getComponents({
     type,
-    brand: searchParams.brand,
-    socket: searchParams.socket,
-    chipset: searchParams.chipset,
-    formFactor: searchParams.formFactor,
-    memoryType: searchParams.memoryType,
-    capacityGb: searchParams.capacityGb,
+    ...Object.fromEntries(FILTER_KEYS.map((k) => [k, searchParams[k]])),
     limit: 200,
   }).catch(() => null);
 
-  // Build a URL that keeps `type` but toggles one facet (click again to clear).
-  const withParam = (key: string, value: string | undefined) => {
+  const withParam = (key: string, value: string) => {
     const p = new URLSearchParams();
     p.set('type', type);
-    const cur: Record<string, string | undefined> = {
-      brand: searchParams.brand,
-      socket: searchParams.socket,
-      chipset: searchParams.chipset,
-      formFactor: searchParams.formFactor,
-      memoryType: searchParams.memoryType,
-      capacityGb: searchParams.capacityGb,
-    };
-    for (const [k, v] of Object.entries(cur)) if (v && k !== key) p.set(k, v);
-    if (value !== undefined && cur[key] !== value) p.set(key, value);
+    for (const k of FILTER_KEYS) if (searchParams[k] && k !== key) p.set(k, searchParams[k]!);
+    if (searchParams[key] !== value) p.set(key, value);
     return `/components?${p.toString()}`;
   };
+  const on = (key: string, value: string) => searchParams[key] === value;
 
-  const active = (key: keyof typeof searchParams, value: string) => searchParams[key] === value;
+  const f = data?.facets;
 
   return (
     <main className="mx-auto max-w-5xl px-6 py-10">
@@ -63,8 +67,8 @@ export default async function ComponentsPage({ searchParams }: PageProps) {
       </header>
 
       {/* Type toggle */}
-      <div className="mb-5 flex gap-2">
-        {(['MOTHERBOARD', 'RAM'] as ComponentKind[]).map((k) => (
+      <div className="mb-5 flex flex-wrap gap-2">
+        {TYPES.map((k) => (
           <Link
             key={k}
             href={`/components?type=${k}`}
@@ -75,83 +79,115 @@ export default async function ComponentsPage({ searchParams }: PageProps) {
                 : 'border-hairline bg-panel text-ink-faint hover:text-ink')
             }
           >
-            {k === 'MOTHERBOARD' ? t('motherboard') : t('ram')}
+            {t(TYPE_LABEL[k])}
           </Link>
         ))}
       </div>
 
-      {/* Facet filters */}
-      {data && (
+      {/* Facets */}
+      {f && (
         <div className="mb-5 space-y-3">
           <FacetRow label={t('brand')}>
-            {data.facets.brands.map((f) => (
-              <Chip key={f.name} href={withParam('brand', f.name)} on={active('brand', f.name)}>
-                {f.name} <span className="text-ink-faint">{f.count}</span>
+            {f.brands.map((x) => (
+              <Chip key={x.name} href={withParam('brand', x.name)} on={on('brand', x.name)}>
+                {x.name} <span className="text-ink-faint">{x.count}</span>
               </Chip>
             ))}
           </FacetRow>
 
-          {type === 'MOTHERBOARD' ? (
+          {type === 'MOTHERBOARD' && (
             <>
-              <FacetRow label={t('socket')}>
-                {data.facets.sockets.map((f) => (
-                  <Chip
-                    key={f.name}
-                    href={withParam('socket', f.name)}
-                    on={active('socket', f.name)}
-                  >
-                    {f.name} <span className="text-ink-faint">{f.count}</span>
-                  </Chip>
-                ))}
-              </FacetRow>
-              <FacetRow label={t('chipset')}>
-                {data.facets.chipsets.map((f) => (
-                  <Chip
-                    key={f.name}
-                    href={withParam('chipset', f.name)}
-                    on={active('chipset', f.name)}
-                  >
-                    {f.name} <span className="text-ink-faint">{f.count}</span>
-                  </Chip>
-                ))}
-              </FacetRow>
-              <FacetRow label={t('formFactor')}>
-                {data.facets.formFactors.map((f) => (
-                  <Chip
-                    key={f.name}
-                    href={withParam('formFactor', f.name)}
-                    on={active('formFactor', f.name)}
-                  >
-                    {f.name} <span className="text-ink-faint">{f.count}</span>
-                  </Chip>
-                ))}
-              </FacetRow>
+              <NamedFacet label={t('socket')} items={f.sockets} k="socket" wp={withParam} on={on} />
+              <NamedFacet
+                label={t('chipset')}
+                items={f.chipsets}
+                k="chipset"
+                wp={withParam}
+                on={on}
+              />
+              <NamedFacet
+                label={t('formFactor')}
+                items={f.formFactors}
+                k="formFactor"
+                wp={withParam}
+                on={on}
+              />
             </>
-          ) : (
+          )}
+          {type === 'RAM' && (
             <>
-              <FacetRow label={t('memory')}>
-                {data.facets.memoryTypes.map((f) => (
-                  <Chip
-                    key={f.name}
-                    href={withParam('memoryType', f.name)}
-                    on={active('memoryType', f.name)}
-                  >
-                    {f.name} <span className="text-ink-faint">{f.count}</span>
-                  </Chip>
-                ))}
-              </FacetRow>
+              <NamedFacet
+                label={t('memory')}
+                items={f.memoryTypes}
+                k="memoryType"
+                wp={withParam}
+                on={on}
+              />
               <FacetRow label={t('capacity')}>
-                {data.facets.capacities.map((f) => (
+                {f.capacities.map((x) => (
                   <Chip
-                    key={f.gb}
-                    href={withParam('capacityGb', String(f.gb))}
-                    on={active('capacityGb', String(f.gb))}
+                    key={x.gb}
+                    href={withParam('capacityGb', String(x.gb))}
+                    on={on('capacityGb', String(x.gb))}
                   >
-                    {f.gb} GB <span className="text-ink-faint">{f.count}</span>
+                    {fmtCap(x.gb)} <span className="text-ink-faint">{x.count}</span>
                   </Chip>
                 ))}
               </FacetRow>
             </>
+          )}
+          {type === 'SSD' && (
+            <>
+              <NamedFacet
+                label={t('interface')}
+                items={f.interfaces}
+                k="interface"
+                wp={withParam}
+                on={on}
+              />
+              <FacetRow label={t('capacity')}>
+                {f.capacities.map((x) => (
+                  <Chip
+                    key={x.gb}
+                    href={withParam('capacityGb', String(x.gb))}
+                    on={on('capacityGb', String(x.gb))}
+                  >
+                    {fmtCap(x.gb)} <span className="text-ink-faint">{x.count}</span>
+                  </Chip>
+                ))}
+              </FacetRow>
+            </>
+          )}
+          {type === 'PSU' && (
+            <>
+              <FacetRow label={t('wattage')}>
+                {f.wattages.map((x) => (
+                  <Chip
+                    key={x.w}
+                    href={withParam('wattage', String(x.w))}
+                    on={on('wattage', String(x.w))}
+                  >
+                    {x.w}W <span className="text-ink-faint">{x.count}</span>
+                  </Chip>
+                ))}
+              </FacetRow>
+              <NamedFacet
+                label={t('efficiency')}
+                items={f.efficiencies}
+                k="efficiency"
+                wp={withParam}
+                on={on}
+              />
+            </>
+          )}
+          {type === 'CASING' && (
+            <NamedFacet
+              label={t('formFactor')}
+              items={f.formFactors}
+              k="formFactor"
+              wp={withParam}
+              on={on}
+            />
           )}
         </div>
       )}
@@ -162,31 +198,36 @@ export default async function ComponentsPage({ searchParams }: PageProps) {
         <>
           <p className="label mb-3">{t('match', { count: data.total })}</p>
           <div className="panel overflow-x-auto !p-0">
-            <table className="w-full min-w-[640px] text-[12.5px]">
+            <table className="w-full min-w-[560px] text-[12.5px]">
               <thead className="bg-panel-2 tracking-label text-ink-muted text-left text-[10px] uppercase">
-                {type === 'MOTHERBOARD' ? (
-                  <tr>
-                    <th className="px-4 py-3">{t('part')}</th>
-                    <th className="px-4 py-3">{t('socket')}</th>
-                    <th className="px-4 py-3">{t('chipset')}</th>
-                    <th className="px-4 py-3">{t('formFactor')}</th>
-                    <th className="px-4 py-3">{t('memory')}</th>
-                    <th className="px-4 py-3 text-right">{t('price')}</th>
-                  </tr>
-                ) : (
-                  <tr>
-                    <th className="px-4 py-3">{t('part')}</th>
-                    <th className="px-4 py-3">{t('memory')}</th>
-                    <th className="px-4 py-3">{t('capacity')}</th>
-                    <th className="px-4 py-3">{t('speed')}</th>
-                    <th className="px-4 py-3">{t('cas')}</th>
-                    <th className="px-4 py-3 text-right">{t('price')}</th>
-                  </tr>
-                )}
+                <tr>
+                  <th className="px-4 py-3">{t('part')}</th>
+                  {colHeads(type, t).map((h) => (
+                    <th key={h} className="px-4 py-3">
+                      {h}
+                    </th>
+                  ))}
+                  <th className="px-4 py-3 text-right">{t('price')}</th>
+                </tr>
               </thead>
               <tbody>
                 {data.items.map((r) => (
-                  <Row key={r.slug} r={r} type={type} />
+                  <tr key={r.slug} className="border-hairline border-t">
+                    <td className="px-4 py-3">
+                      <span className="text-ink-faint tracking-label mr-2 text-[9px] font-bold uppercase">
+                        {r.brand}
+                      </span>
+                      <span className="text-ink-hi font-medium">{r.modelName}</span>
+                    </td>
+                    {colCells(type, r).map((c, i) => (
+                      <td key={i} className="text-ink-mid px-4 py-3 font-mono text-[11.5px]">
+                        {c}
+                      </td>
+                    ))}
+                    <td className="text-ink-hi px-4 py-3 text-right font-mono">
+                      <Price usd={r.msrpUsd} idr={r.priceIdr} />
+                    </td>
+                  </tr>
                 ))}
               </tbody>
             </table>
@@ -197,43 +238,67 @@ export default async function ComponentsPage({ searchParams }: PageProps) {
   );
 }
 
-function Row({ r, type }: { r: ComponentRow; type: ComponentKind }) {
+function colHeads(type: ComponentKind, t: (k: string) => string): string[] {
+  switch (type) {
+    case 'MOTHERBOARD':
+      return [t('socket'), t('chipset'), t('formFactor'), t('memory')];
+    case 'RAM':
+      return [t('memory'), t('capacity'), t('speed'), t('cas')];
+    case 'SSD':
+      return [t('capacity'), t('interface'), t('formFactor')];
+    case 'PSU':
+      return [t('wattage'), t('efficiency'), t('modular')];
+    case 'CASING':
+      return [t('formFactor')];
+  }
+}
+
+function colCells(type: ComponentKind, r: ComponentRow): (string | number)[] {
+  const cap = r.capacityGb
+    ? r.capacityGb >= 1024
+      ? `${r.capacityGb / 1024} TB`
+      : `${r.capacityGb} GB`
+    : '—';
+  switch (type) {
+    case 'MOTHERBOARD':
+      return [r.socket ?? '—', r.chipset ?? '—', r.formFactor ?? '—', r.memoryType ?? '—'];
+    case 'RAM':
+      return [
+        r.memoryType ?? '—',
+        `${cap}${r.moduleCount ? ` (${r.moduleCount}×)` : ''}`,
+        r.speedMhz ?? '—',
+        r.casLatency ? `CL${r.casLatency}` : '—',
+      ];
+    case 'SSD':
+      return [cap, r.interface ?? '—', r.formFactor ?? '—'];
+    case 'PSU':
+      return [r.wattage ? `${r.wattage}W` : '—', r.efficiency ?? '—', r.modular ?? '—'];
+    case 'CASING':
+      return [r.formFactor ?? '—'];
+  }
+}
+
+function NamedFacet({
+  label,
+  items,
+  k,
+  wp,
+  on,
+}: {
+  label: string;
+  items: { name: string; count: number }[];
+  k: string;
+  wp: (key: string, value: string) => string;
+  on: (key: string, value: string) => boolean;
+}) {
   return (
-    <tr className="border-hairline border-t">
-      <td className="px-4 py-3">
-        <span className="text-ink-faint tracking-label mr-2 text-[9px] font-bold uppercase">
-          {r.brand}
-        </span>
-        <span className="text-ink-hi font-medium">{r.modelName}</span>
-      </td>
-      {type === 'MOTHERBOARD' ? (
-        <>
-          <td className="text-ink-mid px-4 py-3 font-mono text-[11.5px]">{r.socket ?? '—'}</td>
-          <td className="text-ink-mid px-4 py-3 font-mono text-[11.5px]">{r.chipset ?? '—'}</td>
-          <td className="text-ink-faint px-4 py-3 text-[11.5px]">{r.formFactor ?? '—'}</td>
-          <td className="text-ink-faint px-4 py-3 font-mono text-[11.5px]">
-            {r.memoryType ?? '—'}
-          </td>
-        </>
-      ) : (
-        <>
-          <td className="text-ink-mid px-4 py-3 font-mono text-[11.5px]">{r.memoryType ?? '—'}</td>
-          <td className="text-ink-mid px-4 py-3 font-mono text-[11.5px]">
-            {r.capacityGb ? `${r.capacityGb} GB` : '—'}
-            {r.moduleCount ? <span className="text-ink-faint"> ({r.moduleCount}×)</span> : null}
-          </td>
-          <td className="text-ink-mid px-4 py-3 font-mono text-[11.5px]">
-            {r.speedMhz ? `${r.speedMhz}` : '—'}
-          </td>
-          <td className="text-ink-faint px-4 py-3 font-mono text-[11.5px]">
-            {r.casLatency ? `CL${r.casLatency}` : '—'}
-          </td>
-        </>
-      )}
-      <td className="text-ink-hi px-4 py-3 text-right font-mono">
-        <Price usd={r.msrpUsd} idr={r.priceIdr} />
-      </td>
-    </tr>
+    <FacetRow label={label}>
+      {items.map((x) => (
+        <Chip key={x.name} href={wp(k, x.name)} on={on(k, x.name)}>
+          {x.name} <span className="text-ink-faint">{x.count}</span>
+        </Chip>
+      ))}
+    </FacetRow>
   );
 }
 

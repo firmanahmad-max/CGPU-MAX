@@ -408,8 +408,8 @@
   },
   "components": {
     "database": "Database",
-    "title": "Motherboard & RAM",
-    "subtitle": "Motherboard & kit memori dengan harga pasar Indonesia.",
+    "title": "Komponen PC",
+    "subtitle": "Motherboard, RAM, SSD, PSU & casing dengan harga pasar Indonesia.",
     "motherboard": "Motherboard",
     "ram": "RAM",
     "brand": "Merek",
@@ -423,6 +423,13 @@
     "price": "Harga",
     "part": "Part",
     "match": "{count} cocok",
-    "empty": "Tak ada komponen cocok."
+    "empty": "Tak ada komponen cocok.",
+    "ssd": "SSD",
+    "psu": "PSU",
+    "casing": "Casing",
+    "interface": "Interface",
+    "wattage": "Daya",
+    "efficiency": "Efisiensi",
+    "modular": "Modular"
   }
 }
