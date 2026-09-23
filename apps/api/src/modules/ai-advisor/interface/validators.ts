@@ -6,6 +6,7 @@ export const adviceBody = z.object({
   resolution: z.enum(['1080p', '1440p', '4K']),
   preferences: z.string().max(500).optional(),
   language: z.enum(['en', 'id']).optional(),
+  includeMonitor: z.coerce.boolean().optional(),
 });
 
 export const shareSlugParam = z.object({

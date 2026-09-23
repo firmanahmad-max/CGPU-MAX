@@ -28,6 +28,7 @@ export default function AdvisorPage() {
   const [budget, setBudget] = useState(1500);
   const [purpose, setPurpose] = useState<BuildPurpose>('gaming');
   const [resolution, setResolution] = useState<Resolution>('1440p');
+  const [includeMonitor, setIncludeMonitor] = useState(false);
   const [preferences, setPreferences] = useState('');
   const [advice, setAdvice] = useState<BuildAdvice | null>(null);
   const [loading, setLoading] = useState(false);
@@ -47,6 +48,7 @@ export default function AdvisorPage() {
           resolution,
           preferences,
           language: locale,
+          includeMonitor,
         }),
       });
       if (res.status === 402) {
@@ -157,6 +159,36 @@ export default function AdvisorPage() {
                     {r}
                   </button>
                 ))}
+              </div>
+            </div>
+
+            <div>
+              <p className="label mb-2">{t('scope')}</p>
+              <div className="flex gap-2">
+                <button
+                  type="button"
+                  onClick={() => setIncludeMonitor(false)}
+                  className={
+                    'rounded-pill tracking-label border px-4 py-1 text-xs font-medium uppercase transition ' +
+                    (!includeMonitor
+                      ? 'border-lime/45 bg-lime/[0.14] text-lime-bright'
+                      : 'border-hairline bg-panel text-ink-faint hover:text-ink')
+                  }
+                >
+                  {t('scopePcOnly')}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setIncludeMonitor(true)}
+                  className={
+                    'rounded-pill tracking-label border px-4 py-1 text-xs font-medium uppercase transition ' +
+                    (includeMonitor
+                      ? 'border-lime/45 bg-lime/[0.14] text-lime-bright'
+                      : 'border-hairline bg-panel text-ink-faint hover:text-ink')
+                  }
+                >
+                  {t('scopePcMonitor')}
+                </button>
               </div>
             </div>
 

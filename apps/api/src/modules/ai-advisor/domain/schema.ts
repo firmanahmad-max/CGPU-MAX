@@ -4,8 +4,20 @@
 
 import { z } from 'zod';
 
+const PICK_CATEGORIES = [
+  'cpu',
+  'gpu',
+  'motherboard',
+  'ram',
+  'ssd',
+  'psu',
+  'case',
+  'cooler',
+  'monitor',
+] as const;
+
 const componentPickZod = z.object({
-  category: z.enum(['cpu', 'gpu']),
+  category: z.enum(PICK_CATEGORIES),
   modelName: z.string(),
   slug: z.string().nullable(),
   approxPriceUsd: z.number(),
@@ -14,10 +26,19 @@ const componentPickZod = z.object({
 
 // Runtime validation for provider responses that arrive as raw JSON (the
 // OpenAI-compatible path), since those aren't parsed against the schema for us.
+// `monitor` is always present in the model output (kept required for strict
+// structured-output compatibility); the app nulls it when not requested.
 export const buildAdviceZod = z.object({
   summary: z.string(),
   cpu: componentPickZod,
   gpu: componentPickZod,
+  motherboard: componentPickZod,
+  ram: componentPickZod,
+  ssd: componentPickZod,
+  psu: componentPickZod,
+  case: componentPickZod,
+  cooler: componentPickZod,
+  monitor: componentPickZod,
   estimatedTotalUsd: z.number(),
   withinBudget: z.boolean(),
   expectedPerformance: z.string(),
@@ -26,13 +47,22 @@ export const buildAdviceZod = z.object({
   warnings: z.array(z.string()),
 });
 
+const pickRef = { $ref: '#/$defs/componentPick' } as const;
+
 export const buildAdviceJsonSchema = {
   type: 'object',
   additionalProperties: false,
   properties: {
     summary: { type: 'string' },
-    cpu: { $ref: '#/$defs/componentPick' },
-    gpu: { $ref: '#/$defs/componentPick' },
+    cpu: pickRef,
+    gpu: pickRef,
+    motherboard: pickRef,
+    ram: pickRef,
+    ssd: pickRef,
+    psu: pickRef,
+    case: pickRef,
+    cooler: pickRef,
+    monitor: pickRef,
     estimatedTotalUsd: { type: 'number' },
     withinBudget: { type: 'boolean' },
     expectedPerformance: { type: 'string' },
@@ -44,6 +74,13 @@ export const buildAdviceJsonSchema = {
     'summary',
     'cpu',
     'gpu',
+    'motherboard',
+    'ram',
+    'ssd',
+    'psu',
+    'case',
+    'cooler',
+    'monitor',
     'estimatedTotalUsd',
     'withinBudget',
     'expectedPerformance',
@@ -56,7 +93,7 @@ export const buildAdviceJsonSchema = {
       type: 'object',
       additionalProperties: false,
       properties: {
-        category: { type: 'string', enum: ['cpu', 'gpu'] },
+        category: { type: 'string', enum: PICK_CATEGORIES },
         modelName: { type: 'string' },
         slug: { type: ['string', 'null'] },
         approxPriceUsd: { type: 'number' },

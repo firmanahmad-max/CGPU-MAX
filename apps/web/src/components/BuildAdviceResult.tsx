@@ -31,7 +31,20 @@ export function BuildAdviceResult({ advice }: { advice: BuildAdvice }) {
       <div className="grid gap-4 sm:grid-cols-2">
         <PickCard pick={advice.cpu} />
         <PickCard pick={advice.gpu} />
+        <PickCard pick={advice.motherboard} />
+        <PickCard pick={advice.ram} />
+        <PickCard pick={advice.ssd} />
+        <PickCard pick={advice.psu} />
+        <PickCard pick={advice.case} />
+        <PickCard pick={advice.cooler} />
       </div>
+
+      {advice.monitor && (
+        <div>
+          <p className="label mb-2">{t('matchedMonitor')}</p>
+          <PickCard pick={advice.monitor} />
+        </div>
+      )}
 
       <div className="grid gap-4 sm:grid-cols-3">
         <Stat label={t('estimatedTotal')} value={format(advice.estimatedTotalUsd)} />
@@ -66,7 +79,7 @@ function PickCard({ pick }: { pick: ComponentPick }) {
         <p className="label">{pick.category.toUpperCase()}</p>
         <span className="text-ink-mid font-mono text-sm">~{format(pick.approxPriceUsd)}</span>
       </div>
-      {pick.slug ? (
+      {pick.slug && (pick.category === 'cpu' || pick.category === 'gpu') ? (
         <Link
           href={`/processors/${pick.slug}`}
           className="font-display hover:text-lime-bright text-ink-hi text-lg font-semibold"

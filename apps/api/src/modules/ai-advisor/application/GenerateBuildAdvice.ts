@@ -5,13 +5,14 @@ import { env } from '../../../shared/config/env.js';
 import { AppError } from '../../../shared/errors/AppError.js';
 import { logger } from '../../../shared/logging/logger.js';
 import { EnforceUsageLimit } from '../../subscriptions/application/EnforceUsageLimit.js';
-import type { BuildAdvice } from '../domain/BuildAdvice.js';
+import type { BuildAdvice, ComponentPick } from '../domain/BuildAdvice.js';
 import {
   buildCatalogContext,
   buildUserMessage,
   SYSTEM_PROMPT,
   type AdvisorRequest,
   type CatalogPart,
+  type ComponentCatalogPart,
 } from '../domain/promptBuilder.js';
 import { buildAdviceJsonSchema, buildAdviceZod } from '../domain/schema.js';
 import { anthropic } from '../infrastructure/AnthropicClient.js';
@@ -52,14 +53,17 @@ export class GenerateBuildAdvice {
       feature: 'aiRecommendations',
     });
 
-    const catalog = await this.loadCatalog(req.budgetUsd);
-    const catalogContext = buildCatalogContext(catalog);
+    const [catalog, components] = await Promise.all([
+      this.loadCatalog(req.budgetUsd),
+      this.loadComponents(),
+    ]);
+    const catalogContext = buildCatalogContext(catalog, components);
     const userMessage = buildUserMessage(req, catalogContext);
 
     const advice = useOpenAI()
       ? await this.callOpenAI(userMessage)
       : await this.callClaude(userMessage);
-    const validated = this.validateAndGround(advice, catalog);
+    const validated = this.validateAndGround(advice, catalog, components, req);
 
     const modelUsed = activeModel();
     const shareSlug = `build-${auth.userId.slice(0, 8)}-${Date.now().toString(36)}`;
@@ -94,6 +98,7 @@ export class GenerateBuildAdvice {
         manufacturer: true,
         msrpUsd: true,
         tdpWatts: true,
+        cpuSpecs: { select: { socket: true } },
       },
     });
     return rows.map((r) => ({
@@ -103,6 +108,55 @@ export class GenerateBuildAdvice {
       manufacturer: r.manufacturer,
       msrpUsd: r.msrpUsd ? Number(r.msrpUsd) : null,
       tdpWatts: r.tdpWatts,
+      socket: r.cpuSpecs?.socket ?? null,
+    }));
+  }
+
+  // Full non-processor catalog (motherboards, RAM, SSD, PSU, case, cooler,
+  // monitor). Small enough (~90 rows) to feed in full so the model can enforce
+  // socket / memory / wattage compatibility.
+  private async loadComponents(): Promise<ComponentCatalogPart[]> {
+    const rows = await this.prisma.component.findMany({
+      where: { deletedAt: null },
+      orderBy: [{ type: 'asc' }, { msrpUsd: 'asc' }],
+      select: {
+        slug: true,
+        type: true,
+        brand: true,
+        modelName: true,
+        msrpUsd: true,
+        socket: true,
+        chipset: true,
+        formFactor: true,
+        memoryType: true,
+        capacityGb: true,
+        interface: true,
+        wattage: true,
+        efficiency: true,
+        sizeInch: true,
+        resolution: true,
+        refreshHz: true,
+        panel: true,
+      },
+    });
+    return rows.map((r) => ({
+      slug: r.slug,
+      type: String(r.type),
+      brand: r.brand,
+      modelName: r.modelName,
+      approxPriceUsd: r.msrpUsd ? Number(r.msrpUsd) : null,
+      socket: r.socket,
+      chipset: r.chipset,
+      formFactor: r.formFactor,
+      memoryType: r.memoryType,
+      capacityGb: r.capacityGb,
+      interface: r.interface,
+      wattage: r.wattage,
+      efficiency: r.efficiency,
+      sizeInch: r.sizeInch,
+      resolution: r.resolution,
+      refreshHz: r.refreshHz,
+      panel: r.panel,
     }));
   }
 
@@ -173,19 +227,66 @@ export class GenerateBuildAdvice {
     }
   }
 
-  // Trust-but-verify: clamp the model's slug claims to the catalog and recompute
-  // the within-budget flag from the prices we control.
-  private validateAndGround(advice: BuildAdvice, catalog: CatalogPart[]): BuildAdvice {
-    const bySlug = new Map(catalog.map((p) => [p.slug, p]));
-    const ground = (pick: BuildAdvice['cpu']) => {
-      if (pick.slug && !bySlug.has(pick.slug)) {
+  // Trust-but-verify: clamp the model's slug claims to the catalog, replace the
+  // claimed prices with the ones we control for known parts, then recompute the
+  // total and within-budget flag. Strip the monitor when it wasn't requested.
+  private validateAndGround(
+    advice: BuildAdvice,
+    catalog: CatalogPart[],
+    components: ComponentCatalogPart[],
+    req: AdvisorRequest,
+  ): BuildAdvice {
+    const priceBySlug = new Map<string, number>();
+    for (const p of catalog) if (p.msrpUsd !== null) priceBySlug.set(p.slug, p.msrpUsd);
+    for (const c of components)
+      if (c.approxPriceUsd !== null) priceBySlug.set(c.slug, c.approxPriceUsd);
+    const knownSlug = new Set<string>([
+      ...catalog.map((p) => p.slug),
+      ...components.map((c) => c.slug),
+    ]);
+
+    const ground = (pick: ComponentPick): ComponentPick => {
+      if (pick.slug && !knownSlug.has(pick.slug)) {
         // Model hallucinated a slug — drop it rather than emit a dead link.
         return { ...pick, slug: null };
       }
+      // Prefer our controlled price when the part is known.
+      if (pick.slug && priceBySlug.has(pick.slug)) {
+        return { ...pick, approxPriceUsd: priceBySlug.get(pick.slug)! };
+      }
       return pick;
     };
+
     const cpu = ground(advice.cpu);
     const gpu = ground(advice.gpu);
-    return { ...advice, cpu, gpu };
+    const motherboard = ground(advice.motherboard);
+    const ram = ground(advice.ram);
+    const ssd = ground(advice.ssd);
+    const psu = ground(advice.psu);
+    const pcCase = ground(advice.case);
+    const cooler = ground(advice.cooler);
+    const monitor = req.includeMonitor && advice.monitor ? ground(advice.monitor) : null;
+
+    const parts = [cpu, gpu, motherboard, ram, ssd, psu, pcCase, cooler];
+    if (monitor) parts.push(monitor);
+    const estimatedTotalUsd = Math.round(
+      parts.reduce((sum, p) => sum + (Number.isFinite(p.approxPriceUsd) ? p.approxPriceUsd : 0), 0),
+    );
+    const withinBudget = estimatedTotalUsd <= req.budgetUsd;
+
+    return {
+      ...advice,
+      cpu,
+      gpu,
+      motherboard,
+      ram,
+      ssd,
+      psu,
+      case: pcCase,
+      cooler,
+      monitor,
+      estimatedTotalUsd,
+      withinBudget,
+    };
   }
 }
