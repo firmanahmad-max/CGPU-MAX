@@ -563,6 +563,41 @@ const PSUS: PsuSeed[] = [
   { slug: 'adata-xpg-core-reactor-ii-1200w', brand: 'ADATA', modelName: 'XPG Core Reactor II 1200W', wattage: 1200, efficiency: '80+ Gold', modular: 'Full Modular', priceIdr: 2685000 },
   { slug: 'lian-li-sp1000p-1000w', brand: 'Lian Li', modelName: 'SP1000P 1000W', wattage: 1000, efficiency: '80+ Platinum', modular: 'Non-Modular', priceIdr: 3020000 },
   { slug: 'adata-xpg-cybercore-ii-1300w', brand: 'ADATA', modelName: 'XPG Cybercore II 1300W', wattage: 1300, efficiency: '80+ Platinum', modular: 'Full Modular', priceIdr: 3370000 },
+  // Cooler Master
+  { slug: 'cm-mwe-bronze-650-v3', brand: 'Cooler Master', modelName: 'MWE Bronze 650W V3', wattage: 650, efficiency: '80+ Bronze', modular: 'Non-Modular', priceIdr: 753000 },
+  { slug: 'cm-mwe-gold-750-v3', brand: 'Cooler Master', modelName: 'MWE Gold 750W V3', wattage: 750, efficiency: '80+ Gold', modular: 'Non-Modular', priceIdr: 1058000 },
+  { slug: 'cm-mwe-gold-850-v3-atx31', brand: 'Cooler Master', modelName: 'MWE Gold 850W V3 ATX 3.1', wattage: 850, efficiency: '80+ Gold', modular: 'Full Modular', priceIdr: 1669000 },
+  { slug: 'cm-elite-gold-1000-atx31', brand: 'Cooler Master', modelName: 'Elite Gold 1000W ATX 3.1', wattage: 1000, efficiency: '80+ Gold', modular: 'Full Modular', priceIdr: 1692000 },
+  { slug: 'cm-v-platinum-1100-v2', brand: 'Cooler Master', modelName: 'V Platinum 1100W V2 ATX 3.1', wattage: 1100, efficiency: '80+ Platinum', modular: 'Full Modular', priceIdr: 3330000 },
+  { slug: 'cm-v-platinum-1300-v2', brand: 'Cooler Master', modelName: 'V Platinum 1300W V2 ATX 3.1', wattage: 1300, efficiency: '80+ Platinum', modular: 'Full Modular', priceIdr: 3725000 },
+  // Corsair
+  { slug: 'corsair-cx550', brand: 'Corsair', modelName: 'CX550 550W', wattage: 550, efficiency: '80+ Bronze', modular: 'Non-Modular', priceIdr: 887000 },
+  { slug: 'corsair-rm650e', brand: 'Corsair', modelName: 'RM650e 650W ATX 3.1', wattage: 650, efficiency: '80+ Gold', modular: 'Full Modular', priceIdr: 1482000 },
+  { slug: 'corsair-rm750e', brand: 'Corsair', modelName: 'RM750e 750W ATX 3.1', wattage: 750, efficiency: '80+ Gold', modular: 'Full Modular', priceIdr: 1794000 },
+  { slug: 'corsair-rm850e', brand: 'Corsair', modelName: 'RM850e 850W ATX 3.1', wattage: 850, efficiency: '80+ Gold', modular: 'Full Modular', priceIdr: 2180000 },
+  { slug: 'corsair-rm1000e', brand: 'Corsair', modelName: 'RM1000e 1000W ATX 3.1', wattage: 1000, efficiency: '80+ Gold', modular: 'Full Modular', priceIdr: 2807000 },
+  { slug: 'corsair-hx1200i', brand: 'Corsair', modelName: 'HX1200i 1200W ATX 3.1', wattage: 1200, efficiency: '80+ Platinum', modular: 'Full Modular', priceIdr: 5235000 },
+  // Seasonic
+  { slug: 'seasonic-s12iii-550', brand: 'Seasonic', modelName: 'S12III-550 550W', wattage: 550, efficiency: '80+ Bronze', modular: 'Non-Modular', priceIdr: 890000 },
+  { slug: 'seasonic-focus-gx-650', brand: 'Seasonic', modelName: 'Focus GX-650 650W', wattage: 650, efficiency: '80+ Gold', modular: 'Full Modular', priceIdr: 1300000 },
+  { slug: 'seasonic-focus-gx-750-atx31', brand: 'Seasonic', modelName: 'Focus GX-750 750W ATX 3.1', wattage: 750, efficiency: '80+ Gold', modular: 'Full Modular', priceIdr: 2300000 },
+  { slug: 'seasonic-focus-gx-850-atx31', brand: 'Seasonic', modelName: 'Focus GX-850 850W ATX 3.1', wattage: 850, efficiency: '80+ Gold', modular: 'Full Modular', priceIdr: 2700000 },
+  { slug: 'seasonic-vertex-px-1000', brand: 'Seasonic', modelName: 'Vertex PX-1000 1000W ATX 3.1', wattage: 1000, efficiency: '80+ Platinum', modular: 'Full Modular', priceIdr: 3900000 },
+  { slug: 'seasonic-prime-tx-1300', brand: 'Seasonic', modelName: 'Prime TX-1300 1300W ATX 3.1', wattage: 1300, efficiency: '80+ Titanium', modular: 'Full Modular', priceIdr: 7400000 },
+  // Super Flower
+  { slug: 'superflower-zillion-db-650', brand: 'Super Flower', modelName: 'Zillion DB 650W', wattage: 650, efficiency: '80+ Bronze', modular: 'Non-Modular', priceIdr: 750000 },
+  { slug: 'superflower-zillion-fg-750', brand: 'Super Flower', modelName: 'Zillion FG Gold 750W ATX 3.1', wattage: 750, efficiency: '80+ Gold', modular: 'Full Modular', priceIdr: 1460000 },
+  { slug: 'superflower-leadex-iii-850', brand: 'Super Flower', modelName: 'Leadex III Gold 850W ATX 3.1', wattage: 850, efficiency: '80+ Gold', modular: 'Full Modular', priceIdr: 1750000 },
+  { slug: 'superflower-leadex-iii-1000', brand: 'Super Flower', modelName: 'Leadex III Gold 1000W ATX 3.1', wattage: 1000, efficiency: '80+ Gold', modular: 'Full Modular', priceIdr: 2200000 },
+  { slug: 'superflower-leadex-viii-1200', brand: 'Super Flower', modelName: 'Leadex VIII Platinum PRO 1200W ATX 3.1', wattage: 1200, efficiency: '80+ Platinum', modular: 'Full Modular', priceIdr: 3150000 },
+  { slug: 'superflower-leadex-titanium-1700', brand: 'Super Flower', modelName: 'Leadex Titanium 1700W ATX 3.1', wattage: 1700, efficiency: '80+ Titanium', modular: 'Full Modular', priceIdr: 6500000 },
+  // MSI
+  { slug: 'msi-mag-a550bn', brand: 'MSI', modelName: 'MAG A550BN 550W', wattage: 550, efficiency: '80+ Bronze', modular: 'Non-Modular', priceIdr: 727000 },
+  { slug: 'msi-mag-a650bn', brand: 'MSI', modelName: 'MAG A650BN 650W', wattage: 650, efficiency: '80+ Bronze', modular: 'Non-Modular', priceIdr: 808000 },
+  { slug: 'msi-mag-a750gl', brand: 'MSI', modelName: 'MAG A750GL PCIe5 750W', wattage: 750, efficiency: '80+ Gold', modular: 'Full Modular', priceIdr: 1682000 },
+  { slug: 'msi-mag-a850gl', brand: 'MSI', modelName: 'MAG A850GL PCIe5 850W', wattage: 850, efficiency: '80+ Gold', modular: 'Full Modular', priceIdr: 1820000 },
+  { slug: 'msi-mpg-a1000gs', brand: 'MSI', modelName: 'MPG A1000GS PCIe5 1000W', wattage: 1000, efficiency: '80+ Gold', modular: 'Full Modular', priceIdr: 2631000 },
+  { slug: 'msi-meg-ai1300p', brand: 'MSI', modelName: 'MEG Ai1300P PCIe5 1300W', wattage: 1300, efficiency: '80+ Platinum', modular: 'Full Modular', priceIdr: 4467000 },
 ];
 
 // prettier-ignore
