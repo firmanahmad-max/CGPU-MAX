@@ -688,6 +688,35 @@ const MONITORS: MonitorSeed[] = [
   { slug: 'samsung-odyssey-g5-s27cg552', brand: 'Samsung', modelName: 'Odyssey G5 S27CG552 QHD 165Hz Curved', sizeInch: 27, resolution: 'QHD', refreshHz: 165, panel: 'VA', priceIdr: 2175000 },
   { slug: 'samsung-odyssey-g5-s32cg552', brand: 'Samsung', modelName: 'Odyssey G5 S32CG552 QHD 165Hz Curved', sizeInch: 32, resolution: 'QHD', refreshHz: 165, panel: 'VA', priceIdr: 2958000 },
   { slug: 'acer-nitro-xv273k-v3', brand: 'Acer', modelName: 'Nitro XV273K V3 4K UHD IPS 144Hz', sizeInch: 27, resolution: '4K UHD', refreshHz: 144, panel: 'IPS', priceIdr: 6095000 },
+  // AOC
+  { slug: 'aoc-22b40hm', brand: 'AOC', modelName: '22B40HM FHD 120Hz', sizeInch: 22, resolution: 'FHD', refreshHz: 120, panel: 'VA', priceIdr: 988000 },
+  { slug: 'aoc-25b36x', brand: 'AOC', modelName: '25B36X FHD IPS 144Hz HDR10', sizeInch: 24, resolution: 'FHD', refreshHz: 144, panel: 'IPS', priceIdr: 1305000 },
+  { slug: 'aoc-24g42e', brand: 'AOC', modelName: '24G42E FHD Fast IPS 180Hz', sizeInch: 24, resolution: 'FHD', refreshHz: 180, panel: 'IPS', priceIdr: 1375000 },
+  { slug: 'aoc-27g4', brand: 'AOC', modelName: '27G4 FHD IPS 180Hz HDR10', sizeInch: 27, resolution: 'FHD', refreshHz: 180, panel: 'IPS', priceIdr: 1800000 },
+  { slug: 'aoc-q27g4', brand: 'AOC', modelName: 'Q27G4 QHD Fast IPS 180Hz', sizeInch: 27, resolution: 'QHD', refreshHz: 180, panel: 'IPS', priceIdr: 3125000 },
+  { slug: 'aoc-q32g3se', brand: 'AOC', modelName: 'Q32G3SE QHD 165Hz HDR10', sizeInch: 32, resolution: 'QHD', refreshHz: 165, panel: 'VA', priceIdr: 3690000 },
+  { slug: 'aoc-cu34g3s', brand: 'AOC', modelName: 'CU34G3S UWQHD 165Hz Curved', sizeInch: 34, resolution: 'UWQHD', refreshHz: 165, panel: 'VA', priceIdr: 6099000 },
+  // Asus
+  { slug: 'asus-vp229hf', brand: 'Asus', modelName: 'VP229HF FHD IPS 100Hz', sizeInch: 22, resolution: 'FHD', refreshHz: 100, panel: 'IPS', priceIdr: 1105000 },
+  { slug: 'asus-tuf-vg259q3a', brand: 'Asus', modelName: 'TUF Gaming VG259Q3A FHD 180Hz', sizeInch: 24, resolution: 'FHD', refreshHz: 180, panel: 'IPS', priceIdr: 1520000 },
+  { slug: 'asus-vy279hg2', brand: 'Asus', modelName: 'VY279HG2 FHD IPS 144Hz', sizeInch: 27, resolution: 'FHD', refreshHz: 144, panel: 'IPS', priceIdr: 1790000 },
+  { slug: 'asus-tuf-vg27aql3a', brand: 'Asus', modelName: 'TUF Gaming VG27AQL3A QHD 180Hz', sizeInch: 27, resolution: 'QHD', refreshHz: 180, panel: 'IPS', priceIdr: 2920000 },
+  { slug: 'asus-rog-xg27ucs', brand: 'Asus', modelName: 'ROG Strix XG27UCS 4K 160Hz', sizeInch: 27, resolution: '4K UHD', refreshHz: 160, panel: 'IPS', priceIdr: 6080000 },
+  { slug: 'asus-rog-pg27aqdp', brand: 'Asus', modelName: 'ROG Swift OLED PG27AQDP QHD 480Hz', sizeInch: 27, resolution: 'QHD', refreshHz: 480, panel: 'OLED', priceIdr: 14450000 },
+  // Gigabyte
+  { slug: 'gigabyte-gs25f14', brand: 'Gigabyte', modelName: 'GS25F14 FHD IPS 144Hz HDR10', sizeInch: 24, resolution: 'FHD', refreshHz: 144, panel: 'IPS', priceIdr: 1210000 },
+  { slug: 'gigabyte-gs27fa', brand: 'Gigabyte', modelName: 'GS27FA FHD IPS 180Hz', sizeInch: 27, resolution: 'FHD', refreshHz: 180, panel: 'IPS', priceIdr: 1735000 },
+  { slug: 'gigabyte-gs27qa', brand: 'Gigabyte', modelName: 'GS27QA QHD IPS 180Hz', sizeInch: 27, resolution: 'QHD', refreshHz: 180, panel: 'IPS', priceIdr: 2405000 },
+  { slug: 'gigabyte-gs27u', brand: 'Gigabyte', modelName: 'GS27U 4K IPS 160Hz HDR400', sizeInch: 27, resolution: '4K UHD', refreshHz: 160, panel: 'IPS', priceIdr: 6450000 },
+  { slug: 'gigabyte-aorus-fo27q3', brand: 'Gigabyte', modelName: 'Aorus FO27Q3 QHD OLED 360Hz', sizeInch: 27, resolution: 'QHD', refreshHz: 360, panel: 'OLED', priceIdr: 9450000 },
+  { slug: 'gigabyte-g34wqc2', brand: 'Gigabyte', modelName: 'G34WQC2 UWQHD 200Hz Curved', sizeInch: 34, resolution: 'UWQHD', refreshHz: 200, panel: 'VA', priceIdr: 3939000 },
+  // ViewSonic
+  { slug: 'viewsonic-va2215-h', brand: 'ViewSonic', modelName: 'VA2215-H FHD 100Hz', sizeInch: 22, resolution: 'FHD', refreshHz: 100, panel: 'VA', priceIdr: 925000 },
+  { slug: 'viewsonic-va2432-h', brand: 'ViewSonic', modelName: 'VA2432-H FHD IPS 100Hz', sizeInch: 24, resolution: 'FHD', refreshHz: 100, panel: 'IPS', priceIdr: 1060000 },
+  { slug: 'viewsonic-xg2409', brand: 'ViewSonic', modelName: 'XG2409 FHD IPS 180Hz', sizeInch: 24, resolution: 'FHD', refreshHz: 180, panel: 'IPS', priceIdr: 1575000 },
+  { slug: 'viewsonic-vx2758a-2k', brand: 'ViewSonic', modelName: 'OMNI VX2758A-2K QHD IPS 240Hz', sizeInch: 27, resolution: 'QHD', refreshHz: 240, panel: 'IPS', priceIdr: 3588000 },
+  { slug: 'viewsonic-xg275d1-4k', brand: 'ViewSonic', modelName: 'XG275D1-4K UHD Fast IPS 160Hz', sizeInch: 27, resolution: '4K UHD', refreshHz: 160, panel: 'IPS', priceIdr: 6100000 },
+  { slug: 'viewsonic-vx3418-2kpc', brand: 'ViewSonic', modelName: 'VX3418-2KPC UWQHD 180Hz Curved', sizeInch: 34, resolution: 'UWQHD', refreshHz: 180, panel: 'VA', priceIdr: 4750000 },
 ];
 /* eslint-enable max-len */
 
