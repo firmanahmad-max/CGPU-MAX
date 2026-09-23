@@ -409,7 +409,7 @@
   "components": {
     "database": "Database",
     "title": "Komponen PC",
-    "subtitle": "Motherboard, RAM, SSD, PSU & casing dengan harga pasar Indonesia.",
+    "subtitle": "Motherboard, RAM, SSD, PSU, cooler & casing dengan harga pasar Indonesia.",
     "motherboard": "Motherboard",
     "ram": "RAM",
     "brand": "Merek",
@@ -430,6 +430,8 @@
     "interface": "Interface",
     "wattage": "Daya",
     "efficiency": "Efisiensi",
-    "modular": "Modular"
+    "modular": "Modular",
+    "cooler": "Cooler",
+    "coolerType": "Tipe"
   }
 }

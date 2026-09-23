@@ -6,13 +6,14 @@ import { getComponents, type ComponentKind, type ComponentRow } from '@/lib/api'
 
 export const dynamic = 'force-dynamic';
 
-const TYPES: ComponentKind[] = ['MOTHERBOARD', 'RAM', 'SSD', 'PSU', 'CASING'];
+const TYPES: ComponentKind[] = ['MOTHERBOARD', 'RAM', 'SSD', 'PSU', 'CASING', 'COOLER'];
 const TYPE_LABEL: Record<ComponentKind, string> = {
   MOTHERBOARD: 'motherboard',
   RAM: 'ram',
   SSD: 'ssd',
   PSU: 'psu',
   CASING: 'casing',
+  COOLER: 'cooler',
 };
 
 interface PageProps {
@@ -189,6 +190,15 @@ export default async function ComponentsPage({ searchParams }: PageProps) {
               on={on}
             />
           )}
+          {type === 'COOLER' && (
+            <NamedFacet
+              label={t('coolerType')}
+              items={f.formFactors}
+              k="formFactor"
+              wp={withParam}
+              on={on}
+            />
+          )}
         </div>
       )}
 
@@ -250,6 +260,8 @@ function colHeads(type: ComponentKind, t: (k: string) => string): string[] {
       return [t('wattage'), t('efficiency'), t('modular')];
     case 'CASING':
       return [t('formFactor')];
+    case 'COOLER':
+      return [t('coolerType')];
   }
 }
 
@@ -274,6 +286,8 @@ function colCells(type: ComponentKind, r: ComponentRow): (string | number)[] {
     case 'PSU':
       return [r.wattage ? `${r.wattage}W` : '—', r.efficiency ?? '—', r.modular ?? '—'];
     case 'CASING':
+      return [r.formFactor ?? '—'];
+    case 'COOLER':
       return [r.formFactor ?? '—'];
   }
 }

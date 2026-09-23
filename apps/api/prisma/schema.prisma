@@ -25,6 +25,7 @@ enum ComponentType {
   SSD
   PSU
   CASING
+  COOLER
 }
 
 enum Manufacturer {

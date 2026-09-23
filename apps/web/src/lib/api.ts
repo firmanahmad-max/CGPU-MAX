@@ -309,7 +309,7 @@ export async function calculateBottleneck(
 }
 
 // Components (motherboards / RAM / SSD / PSU / case)
-export type ComponentKind = 'MOTHERBOARD' | 'RAM' | 'SSD' | 'PSU' | 'CASING';
+export type ComponentKind = 'MOTHERBOARD' | 'RAM' | 'SSD' | 'PSU' | 'CASING' | 'COOLER';
 
 export interface ComponentRow {
   slug: string;

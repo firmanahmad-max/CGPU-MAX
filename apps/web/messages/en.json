@@ -409,7 +409,7 @@
   "components": {
     "database": "Database",
     "title": "PC Components",
-    "subtitle": "Motherboards, RAM, SSD, PSU and cases with real Indonesian street prices.",
+    "subtitle": "Motherboards, RAM, SSD, PSU, coolers and cases with real Indonesian street prices.",
     "motherboard": "Motherboard",
     "ram": "RAM",
     "brand": "Brand",
@@ -430,6 +430,8 @@
     "interface": "Interface",
     "wattage": "Wattage",
     "efficiency": "Efficiency",
-    "modular": "Modular"
+    "modular": "Modular",
+    "cooler": "Cooler",
+    "coolerType": "Type"
   }
 }

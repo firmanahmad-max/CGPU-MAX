@@ -531,6 +531,7 @@ interface CaseSeed {
   formFactor: string;
   priceIdr: number;
 }
+type CoolerSeed = CaseSeed;
 
 /* eslint-disable max-len */
 // prettier-ignore
@@ -630,6 +631,41 @@ async function seedCase(c: CaseSeed) {
   });
 }
 
+/* eslint-disable max-len */
+// prettier-ignore
+const COOLERS: CoolerSeed[] = [
+  { slug: 'cooler-master-hyper-212-flow-argb', brand: 'Cooler Master', modelName: 'Hyper 212 Flow ARGB', formFactor: 'Air', priceIdr: 275000 },
+  { slug: 'thermaltake-ux400-argb', brand: 'Thermaltake', modelName: 'UX400 ARGB', formFactor: 'Air', priceIdr: 285000 },
+  { slug: 'gamdias-boreas-m1-620', brand: 'Gamdias', modelName: 'Boreas M1-620 Dual Tower', formFactor: 'Air', priceIdr: 410000 },
+  { slug: 'deepcool-le720-360', brand: 'Deepcool', modelName: 'LE720 360mm', formFactor: 'AIO 360mm', priceIdr: 815000 },
+  { slug: 'antec-neptune-120', brand: 'Antec', modelName: 'Neptune 120 ARGB', formFactor: 'AIO 120mm', priceIdr: 1060000 },
+  { slug: '1stplayer-mt240', brand: '1STPLAYER', modelName: 'MT240 ARGB', formFactor: 'AIO 240mm', priceIdr: 1110000 },
+  { slug: 'antec-vortex-240', brand: 'Antec', modelName: 'Vortex 240 ARGB', formFactor: 'AIO 240mm', priceIdr: 1250000 },
+  { slug: 'corsair-nautilus-ii-240-rs', brand: 'Corsair', modelName: 'Nautilus II 240 RS ARGB', formFactor: 'AIO 240mm', priceIdr: 1385000 },
+  { slug: 'lian-li-galahad-ii-lite-240', brand: 'Lian Li', modelName: 'Galahad II Lite 240', formFactor: 'AIO 240mm', priceIdr: 1550000 },
+  { slug: 'antec-symphony-360', brand: 'Antec', modelName: 'Symphony 360 ARGB', formFactor: 'AIO 360mm', priceIdr: 1550000 },
+  { slug: 'cooler-master-v8-ace-3dhp', brand: 'Cooler Master', modelName: 'V8 ACE 3DHP', formFactor: 'Air', priceIdr: 1655000 },
+  { slug: 'corsair-nautilus-ii-360-rs', brand: 'Corsair', modelName: 'Nautilus II 360 RS ARGB', formFactor: 'AIO 360mm', priceIdr: 1735000 },
+  { slug: 'asus-tuf-gaming-lc-iii-360', brand: 'Asus', modelName: 'TUF Gaming LC III 360 ARGB', formFactor: 'AIO 360mm', priceIdr: 2840000 },
+];
+/* eslint-enable max-len */
+
+async function seedCooler(c: CoolerSeed) {
+  await prisma.component.upsert({
+    where: { slug: c.slug },
+    update: { priceIdr: c.priceIdr, msrpUsd: usdFromIdr(c.priceIdr) },
+    create: {
+      type: 'COOLER',
+      brand: c.brand,
+      modelName: c.modelName,
+      slug: c.slug,
+      priceIdr: c.priceIdr,
+      msrpUsd: usdFromIdr(c.priceIdr),
+      formFactor: c.formFactor,
+    },
+  });
+}
+
 async function main() {
   for (const c of CPUS) await seedCpu(c);
   for (const g of GPUS) await seedGpu(g);
@@ -638,8 +674,9 @@ async function main() {
   for (const s of SSDS) await seedSsd(s);
   for (const p of PSUS) await seedPsu(p);
   for (const c of CASES) await seedCase(c);
+  for (const c of COOLERS) await seedCooler(c);
   console.info(
-    `Seeded ${CPUS.length} CPUs, ${GPUS.length} GPUs, ${MOBOS.length} motherboards, ${RAMS.length} RAM, ${SSDS.length} SSD, ${PSUS.length} PSU, ${CASES.length} cases.`,
+    `Seeded ${CPUS.length} CPUs, ${GPUS.length} GPUs, ${MOBOS.length} motherboards, ${RAMS.length} RAM, ${SSDS.length} SSD, ${PSUS.length} PSU, ${CASES.length} cases, ${COOLERS.length} coolers.`,
   );
 }
 
