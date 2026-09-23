@@ -7,7 +7,9 @@ import { GetComponents } from '../application/GetComponents.js';
 const useCase = new GetComponents(prisma);
 
 const query = z.object({
-  type: z.enum(['MOTHERBOARD', 'RAM', 'SSD', 'PSU', 'CASING', 'COOLER']).default('MOTHERBOARD'),
+  type: z
+    .enum(['MOTHERBOARD', 'RAM', 'SSD', 'PSU', 'CASING', 'COOLER', 'MONITOR'])
+    .default('MOTHERBOARD'),
   brand: z.string().trim().max(40).optional(),
   socket: z.string().trim().max(20).optional(),
   chipset: z.string().trim().max(20).optional(),
@@ -17,6 +19,9 @@ const query = z.object({
   interface: z.string().trim().max(20).optional(),
   wattage: z.coerce.number().int().positive().optional(),
   efficiency: z.string().trim().max(20).optional(),
+  resolution: z.string().trim().max(20).optional(),
+  sizeInch: z.coerce.number().int().positive().optional(),
+  refreshHz: z.coerce.number().int().positive().optional(),
   sort: z.enum(['price', 'name']).default('price'),
   dir: z.enum(['asc', 'desc']).default('asc'),
   limit: z.coerce.number().int().min(1).max(200).default(100),

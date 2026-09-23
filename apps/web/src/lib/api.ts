@@ -309,7 +309,7 @@ export async function calculateBottleneck(
 }
 
 // Components (motherboards / RAM / SSD / PSU / case)
-export type ComponentKind = 'MOTHERBOARD' | 'RAM' | 'SSD' | 'PSU' | 'CASING' | 'COOLER';
+export type ComponentKind = 'MOTHERBOARD' | 'RAM' | 'SSD' | 'PSU' | 'CASING' | 'COOLER' | 'MONITOR';
 
 export interface ComponentRow {
   slug: string;
@@ -330,6 +330,10 @@ export interface ComponentRow {
   wattage: number | null;
   efficiency: string | null;
   modular: string | null;
+  sizeInch: number | null;
+  resolution: string | null;
+  refreshHz: number | null;
+  panel: string | null;
 }
 
 export interface ComponentFacets {
@@ -343,6 +347,9 @@ export interface ComponentFacets {
   interfaces: { name: string; count: number }[];
   wattages: { w: number; count: number }[];
   efficiencies: { name: string; count: number }[];
+  resolutions: { name: string; count: number }[];
+  sizes: { inch: number; count: number }[];
+  refreshRates: { hz: number; count: number }[];
   priceMin: number | null;
   priceMax: number | null;
 }

@@ -26,6 +26,7 @@ enum ComponentType {
   PSU
   CASING
   COOLER
+  MONITOR
 }
 
 enum Manufacturer {
@@ -145,6 +146,12 @@ model Component {
   wattage    Int?
   efficiency String? // 80+ Gold
   modular    String? // Full / Semi / Non Modular
+
+  // Monitor-specific
+  sizeInch   Int?    @map("size_inch")
+  resolution String? // FHD / QHD / 4K UHD
+  refreshHz  Int?    @map("refresh_hz")
+  panel      String? // IPS / VA / TN / OLED
 
   createdAt DateTime  @default(now()) @map("created_at")
   updatedAt DateTime  @updatedAt @map("updated_at")

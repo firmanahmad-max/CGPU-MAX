@@ -666,6 +666,50 @@ async function seedCooler(c: CoolerSeed) {
   });
 }
 
+interface MonitorSeed {
+  slug: string;
+  brand: string;
+  modelName: string;
+  sizeInch: number;
+  resolution: string;
+  refreshHz: number;
+  panel: string;
+  priceIdr: number;
+}
+
+/* eslint-disable max-len */
+// prettier-ignore
+const MONITORS: MonitorSeed[] = [
+  { slug: 'acer-ek251q-e', brand: 'Acer', modelName: 'EK251Q E FHD IPS 100Hz', sizeInch: 24, resolution: 'FHD', refreshHz: 100, panel: 'IPS', priceIdr: 1155000 },
+  { slug: 'lg-24gs60f-b-ultragear', brand: 'LG', modelName: 'UltraGear 24GS60F-B FHD IPS 180Hz', sizeInch: 24, resolution: 'FHD', refreshHz: 180, panel: 'IPS', priceIdr: 1625000 },
+  { slug: 'samsung-odyssey-g3-s27dg302', brand: 'Samsung', modelName: 'Odyssey G3 S27DG302 FHD 180Hz', sizeInch: 27, resolution: 'FHD', refreshHz: 180, panel: 'VA', priceIdr: 1740000 },
+  { slug: 'cube-gaming-iris-27gqi180', brand: 'Cube Gaming', modelName: 'Iris 27GQI180 QHD IPS Frameless 180Hz', sizeInch: 27, resolution: 'QHD', refreshHz: 180, panel: 'IPS', priceIdr: 2150000 },
+  { slug: 'cube-gaming-chamber-ns27fi', brand: 'Cube Gaming', modelName: 'Chamber NS27FI FHD IPS Frameless 240Hz', sizeInch: 27, resolution: 'FHD', refreshHz: 240, panel: 'IPS', priceIdr: 2150000 },
+  { slug: 'samsung-odyssey-g5-s27cg552', brand: 'Samsung', modelName: 'Odyssey G5 S27CG552 QHD 165Hz Curved', sizeInch: 27, resolution: 'QHD', refreshHz: 165, panel: 'VA', priceIdr: 2175000 },
+  { slug: 'samsung-odyssey-g5-s32cg552', brand: 'Samsung', modelName: 'Odyssey G5 S32CG552 QHD 165Hz Curved', sizeInch: 32, resolution: 'QHD', refreshHz: 165, panel: 'VA', priceIdr: 2958000 },
+  { slug: 'acer-nitro-xv273k-v3', brand: 'Acer', modelName: 'Nitro XV273K V3 4K UHD IPS 144Hz', sizeInch: 27, resolution: '4K UHD', refreshHz: 144, panel: 'IPS', priceIdr: 6095000 },
+];
+/* eslint-enable max-len */
+
+async function seedMonitor(m: MonitorSeed) {
+  await prisma.component.upsert({
+    where: { slug: m.slug },
+    update: { priceIdr: m.priceIdr, msrpUsd: usdFromIdr(m.priceIdr) },
+    create: {
+      type: 'MONITOR',
+      brand: m.brand,
+      modelName: m.modelName,
+      slug: m.slug,
+      priceIdr: m.priceIdr,
+      msrpUsd: usdFromIdr(m.priceIdr),
+      sizeInch: m.sizeInch,
+      resolution: m.resolution,
+      refreshHz: m.refreshHz,
+      panel: m.panel,
+    },
+  });
+}
+
 async function main() {
   for (const c of CPUS) await seedCpu(c);
   for (const g of GPUS) await seedGpu(g);
@@ -675,8 +719,9 @@ async function main() {
   for (const p of PSUS) await seedPsu(p);
   for (const c of CASES) await seedCase(c);
   for (const c of COOLERS) await seedCooler(c);
+  for (const m of MONITORS) await seedMonitor(m);
   console.info(
-    `Seeded ${CPUS.length} CPUs, ${GPUS.length} GPUs, ${MOBOS.length} motherboards, ${RAMS.length} RAM, ${SSDS.length} SSD, ${PSUS.length} PSU, ${CASES.length} cases, ${COOLERS.length} coolers.`,
+    `Seeded ${CPUS.length} CPUs, ${GPUS.length} GPUs, ${MOBOS.length} motherboards, ${RAMS.length} RAM, ${SSDS.length} SSD, ${PSUS.length} PSU, ${CASES.length} cases, ${COOLERS.length} coolers, ${MONITORS.length} monitors.`,
   );
 }
 

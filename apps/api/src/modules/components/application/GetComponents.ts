@@ -13,6 +13,9 @@ export interface ComponentsInput {
   interface?: string;
   wattage?: number;
   efficiency?: string;
+  resolution?: string;
+  sizeInch?: number;
+  refreshHz?: number;
   sort: ComponentSort;
   dir: 'asc' | 'desc';
   limit: number;
@@ -37,6 +40,10 @@ export interface ComponentRow {
   wattage: number | null;
   efficiency: string | null;
   modular: string | null;
+  sizeInch: number | null;
+  resolution: string | null;
+  refreshHz: number | null;
+  panel: string | null;
 }
 
 export interface ComponentFacets {
@@ -50,6 +57,9 @@ export interface ComponentFacets {
   interfaces: { name: string; count: number }[];
   wattages: { w: number; count: number }[];
   efficiencies: { name: string; count: number }[];
+  resolutions: { name: string; count: number }[];
+  sizes: { inch: number; count: number }[];
+  refreshRates: { hz: number; count: number }[];
   priceMin: number | null;
   priceMax: number | null;
 }
@@ -89,6 +99,10 @@ export class GetComponents {
       wattage: r.wattage,
       efficiency: r.efficiency,
       modular: r.modular,
+      sizeInch: r.sizeInch,
+      resolution: r.resolution,
+      refreshHz: r.refreshHz,
+      panel: r.panel,
     }));
 
     const prices = base.map((r) => r.priceIdr).filter((p): p is number => p !== null);
@@ -123,6 +137,15 @@ export class GetComponents {
       efficiencies: tally(base.map((r) => r.efficiency))
         .map((x) => ({ name: x.value, count: x.count }))
         .sort((a, b) => a.name.localeCompare(b.name)),
+      resolutions: tally(base.map((r) => r.resolution))
+        .map((x) => ({ name: x.value, count: x.count }))
+        .sort((a, b) => a.name.localeCompare(b.name)),
+      sizes: tally(base.map((r) => r.sizeInch))
+        .map((x) => ({ inch: x.value, count: x.count }))
+        .sort((a, b) => a.inch - b.inch),
+      refreshRates: tally(base.map((r) => r.refreshHz))
+        .map((x) => ({ hz: x.value, count: x.count }))
+        .sort((a, b) => a.hz - b.hz),
       priceMin: prices.length ? Math.min(...prices) : null,
       priceMax: prices.length ? Math.max(...prices) : null,
     };
@@ -137,6 +160,9 @@ export class GetComponents {
       if (input.interface && r.interface !== input.interface) return false;
       if (input.wattage && r.wattage !== input.wattage) return false;
       if (input.efficiency && r.efficiency !== input.efficiency) return false;
+      if (input.resolution && r.resolution !== input.resolution) return false;
+      if (input.sizeInch && r.sizeInch !== input.sizeInch) return false;
+      if (input.refreshHz && r.refreshHz !== input.refreshHz) return false;
       return true;
     });
 

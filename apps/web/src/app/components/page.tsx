@@ -6,7 +6,7 @@ import { getComponents, type ComponentKind, type ComponentRow } from '@/lib/api'
 
 export const dynamic = 'force-dynamic';
 
-const TYPES: ComponentKind[] = ['MOTHERBOARD', 'RAM', 'SSD', 'PSU', 'CASING', 'COOLER'];
+const TYPES: ComponentKind[] = ['MOTHERBOARD', 'RAM', 'SSD', 'PSU', 'CASING', 'COOLER', 'MONITOR'];
 const TYPE_LABEL: Record<ComponentKind, string> = {
   MOTHERBOARD: 'motherboard',
   RAM: 'ram',
@@ -14,6 +14,7 @@ const TYPE_LABEL: Record<ComponentKind, string> = {
   PSU: 'psu',
   CASING: 'casing',
   COOLER: 'cooler',
+  MONITOR: 'monitor',
 };
 
 interface PageProps {
@@ -38,6 +39,9 @@ export default async function ComponentsPage({ searchParams }: PageProps) {
     'interface',
     'wattage',
     'efficiency',
+    'resolution',
+    'sizeInch',
+    'refreshHz',
   ] as const;
 
   const data = await getComponents({
@@ -199,6 +203,39 @@ export default async function ComponentsPage({ searchParams }: PageProps) {
               on={on}
             />
           )}
+          {type === 'MONITOR' && (
+            <>
+              <NamedFacet
+                label={t('resolution')}
+                items={f.resolutions}
+                k="resolution"
+                wp={withParam}
+                on={on}
+              />
+              <FacetRow label={t('size')}>
+                {f.sizes.map((x) => (
+                  <Chip
+                    key={x.inch}
+                    href={withParam('sizeInch', String(x.inch))}
+                    on={on('sizeInch', String(x.inch))}
+                  >
+                    {x.inch}&quot; <span className="text-ink-faint">{x.count}</span>
+                  </Chip>
+                ))}
+              </FacetRow>
+              <FacetRow label={t('refresh')}>
+                {f.refreshRates.map((x) => (
+                  <Chip
+                    key={x.hz}
+                    href={withParam('refreshHz', String(x.hz))}
+                    on={on('refreshHz', String(x.hz))}
+                  >
+                    {x.hz}Hz <span className="text-ink-faint">{x.count}</span>
+                  </Chip>
+                ))}
+              </FacetRow>
+            </>
+          )}
         </div>
       )}
 
@@ -262,6 +299,8 @@ function colHeads(type: ComponentKind, t: (k: string) => string): string[] {
       return [t('formFactor')];
     case 'COOLER':
       return [t('coolerType')];
+    case 'MONITOR':
+      return [t('size'), t('resolution'), t('refresh'), t('panel')];
   }
 }
 
@@ -289,6 +328,13 @@ function colCells(type: ComponentKind, r: ComponentRow): (string | number)[] {
       return [r.formFactor ?? '—'];
     case 'COOLER':
       return [r.formFactor ?? '—'];
+    case 'MONITOR':
+      return [
+        r.sizeInch ? `${r.sizeInch}"` : '—',
+        r.resolution ?? '—',
+        r.refreshHz ? `${r.refreshHz}Hz` : '—',
+        r.panel ?? '—',
+      ];
   }
 }
 

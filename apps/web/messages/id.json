@@ -409,7 +409,7 @@
   "components": {
     "database": "Database",
     "title": "Komponen PC",
-    "subtitle": "Motherboard, RAM, SSD, PSU, cooler & casing dengan harga pasar Indonesia.",
+    "subtitle": "Motherboard, RAM, SSD, PSU, cooler, casing & monitor dengan harga pasar Indonesia.",
     "motherboard": "Motherboard",
     "ram": "RAM",
     "brand": "Merek",
@@ -432,6 +432,11 @@
     "efficiency": "Efisiensi",
     "modular": "Modular",
     "cooler": "Cooler",
-    "coolerType": "Tipe"
+    "coolerType": "Tipe",
+    "monitor": "Monitor",
+    "size": "Ukuran",
+    "resolution": "Resolusi",
+    "refresh": "Refresh",
+    "panel": "Panel"
   }
 }
