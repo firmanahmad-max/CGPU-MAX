@@ -445,6 +445,27 @@ const MOBOS: MoboSeed[] = [
   { slug: 'asrock-z890-pro-a', brand: 'ASRock', modelName: 'Z890 Pro-A', socket: 'LGA1851', chipset: 'Z890', memoryType: 'DDR5', formFactor: 'ATX', priceIdr: 3045000 },
   { slug: 'asrock-b860-steel-legend-wifi', brand: 'ASRock', modelName: 'B860 Steel Legend WiFi', socket: 'LGA1851', chipset: 'B860', memoryType: 'DDR5', formFactor: 'ATX', priceIdr: 3535000 },
   { slug: 'gigabyte-z890-ai-top', brand: 'Gigabyte', modelName: 'Z890 AI TOP', socket: 'LGA1851', chipset: 'Z890', memoryType: 'DDR5', formFactor: 'ATX', priceIdr: 10190000 },
+  // AMD AM4 B550 / B550M
+  { slug: 'asrock-b550m-hdv', brand: 'ASRock', modelName: 'B550M-HDV', socket: 'AM4', chipset: 'B550', memoryType: 'DDR4', formFactor: 'Micro-ATX', priceIdr: 1199000 },
+  { slug: 'asrock-b550m-phantom-gaming-4', brand: 'ASRock', modelName: 'B550M Phantom Gaming 4', socket: 'AM4', chipset: 'B550', memoryType: 'DDR4', formFactor: 'Micro-ATX', priceIdr: 1515000 },
+  { slug: 'asrock-b550m-pro-se', brand: 'ASRock', modelName: 'B550M Pro SE', socket: 'AM4', chipset: 'B550', memoryType: 'DDR4', formFactor: 'Micro-ATX', priceIdr: 1590000 },
+  { slug: 'asrock-b550m-wifi-se', brand: 'ASRock', modelName: 'B550M WiFi SE', socket: 'AM4', chipset: 'B550', memoryType: 'DDR4', formFactor: 'Micro-ATX', priceIdr: 1610000 },
+  { slug: 'asrock-b550m-pro4', brand: 'ASRock', modelName: 'B550M Pro4', socket: 'AM4', chipset: 'B550', memoryType: 'DDR4', formFactor: 'Micro-ATX', priceIdr: 1649000 },
+  { slug: 'asrock-b550-pg-riptide', brand: 'ASRock', modelName: 'B550 PG Riptide', socket: 'AM4', chipset: 'B550', memoryType: 'DDR4', formFactor: 'ATX', priceIdr: 2051000 },
+  { slug: 'asrock-b550m-itx-ac', brand: 'ASRock', modelName: 'B550M-ITX/ac', socket: 'AM4', chipset: 'B550', memoryType: 'DDR4', formFactor: 'Mini-ITX', priceIdr: 2395000 },
+  { slug: 'asus-prime-b550m-k-argb', brand: 'Asus', modelName: 'PRIME B550M-K ARGB', socket: 'AM4', chipset: 'B550', memoryType: 'DDR4', formFactor: 'Micro-ATX', priceIdr: 1275000 },
+  { slug: 'asus-prime-b550m-k-wifi', brand: 'Asus', modelName: 'PRIME B550M-K WiFi', socket: 'AM4', chipset: 'B550', memoryType: 'DDR4', formFactor: 'Micro-ATX', priceIdr: 1625000 },
+  { slug: 'asus-prime-b550m-a-wifi-ii', brand: 'Asus', modelName: 'PRIME B550M-A WiFi II', socket: 'AM4', chipset: 'B550', memoryType: 'DDR4', formFactor: 'Micro-ATX', priceIdr: 1765000 },
+  { slug: 'asus-rog-strix-b550-f-gaming-wifi-ii', brand: 'Asus', modelName: 'ROG Strix B550-F Gaming WiFi II', socket: 'AM4', chipset: 'B550', memoryType: 'DDR4', formFactor: 'ATX', priceIdr: 2890000 },
+  { slug: 'gigabyte-b550m-k', brand: 'Gigabyte', modelName: 'B550M K', socket: 'AM4', chipset: 'B550', memoryType: 'DDR4', formFactor: 'Micro-ATX', priceIdr: 1335000 },
+  { slug: 'gigabyte-b550m-ds3h-r2', brand: 'Gigabyte', modelName: 'B550M DS3H R2', socket: 'AM4', chipset: 'B550', memoryType: 'DDR4', formFactor: 'Micro-ATX', priceIdr: 1590000 },
+  { slug: 'gigabyte-b550m-ds3h-ac-r2', brand: 'Gigabyte', modelName: 'B550M DS3H AC R2', socket: 'AM4', chipset: 'B550', memoryType: 'DDR4', formFactor: 'Micro-ATX', priceIdr: 1630000 },
+  { slug: 'msi-b550m-a-pro', brand: 'MSI', modelName: 'B550M-A PRO', socket: 'AM4', chipset: 'B550', memoryType: 'DDR4', formFactor: 'Micro-ATX', priceIdr: 1275000 },
+  { slug: 'msi-pro-b550m-p', brand: 'MSI', modelName: 'PRO B550M-P', socket: 'AM4', chipset: 'B550', memoryType: 'DDR4', formFactor: 'Micro-ATX', priceIdr: 1555000 },
+  { slug: 'msi-b550m-pro-vdh-wifi', brand: 'MSI', modelName: 'B550M Pro-VDH WiFi', socket: 'AM4', chipset: 'B550', memoryType: 'DDR4', formFactor: 'Micro-ATX', priceIdr: 1705000 },
+  { slug: 'msi-pro-b550-s', brand: 'MSI', modelName: 'PRO B550-S', socket: 'AM4', chipset: 'B550', memoryType: 'DDR4', formFactor: 'ATX', priceIdr: 2040000 },
+  { slug: 'msi-mpg-b550-gaming-plus', brand: 'MSI', modelName: 'MPG B550 Gaming Plus', socket: 'AM4', chipset: 'B550', memoryType: 'DDR4', formFactor: 'ATX', priceIdr: 2540000 },
+  { slug: 'msi-mag-b550-tomahawk-max-wifi', brand: 'MSI', modelName: 'MAG B550 Tomahawk MAX WiFi', socket: 'AM4', chipset: 'B550', memoryType: 'DDR4', formFactor: 'ATX', priceIdr: 3075000 },
 ];
 
 // prettier-ignore
