@@ -399,11 +399,120 @@ async function refreshSignals(
   await prisma.priceHistory.createMany({ data: priceHistory });
 }
 
+// Motherboards & RAM — real parts + Indonesian street prices (enterkomputer).
+interface MoboSeed {
+  slug: string;
+  brand: string;
+  modelName: string;
+  socket: string;
+  chipset: string;
+  memoryType: string;
+  formFactor: string;
+  priceIdr: number;
+}
+interface RamSeed {
+  slug: string;
+  brand: string;
+  modelName: string;
+  memoryType: string;
+  capacityGb: number;
+  moduleCount: number;
+  speedMhz: number;
+  casLatency: number | null;
+  priceIdr: number;
+}
+
+/* eslint-disable max-len */
+// prettier-ignore
+const MOBOS: MoboSeed[] = [
+  { slug: 'asrock-a520m-hvs', brand: 'ASRock', modelName: 'A520M-HVS', socket: 'AM4', chipset: 'A520', memoryType: 'DDR4', formFactor: 'Micro-ATX', priceIdr: 840000 },
+  { slug: 'asrock-a620m-hdv-m2', brand: 'ASRock', modelName: 'A620M-HDV/M.2', socket: 'AM5', chipset: 'A620', memoryType: 'DDR5', formFactor: 'Micro-ATX', priceIdr: 1524000 },
+  { slug: 'asrock-b650m-h-m2', brand: 'ASRock', modelName: 'B650M-H/M.2+', socket: 'AM5', chipset: 'B650', memoryType: 'DDR5', formFactor: 'Micro-ATX', priceIdr: 1730000 },
+  { slug: 'asrock-b850m-a', brand: 'ASRock', modelName: 'B850M-A', socket: 'AM5', chipset: 'B850', memoryType: 'DDR5', formFactor: 'Micro-ATX', priceIdr: 1795000 },
+  { slug: 'asrock-b650-pg-lightning', brand: 'ASRock', modelName: 'B650 PG Lightning', socket: 'AM5', chipset: 'B650', memoryType: 'DDR5', formFactor: 'ATX', priceIdr: 2930000 },
+  { slug: 'asrock-b850-challenger-wifi', brand: 'ASRock', modelName: 'B850 Challenger WiFi', socket: 'AM5', chipset: 'B850', memoryType: 'DDR5', formFactor: 'ATX', priceIdr: 3520000 },
+  { slug: 'asrock-x870-pro-a-wifi', brand: 'ASRock', modelName: 'X870 Pro-A WiFi', socket: 'AM5', chipset: 'X870', memoryType: 'DDR5', formFactor: 'ATX', priceIdr: 3660000 },
+  { slug: 'asrock-x870e-taichi-ocf', brand: 'ASRock', modelName: 'X870E Taichi OCF', socket: 'AM5', chipset: 'X870E', memoryType: 'DDR5', formFactor: 'ATX', priceIdr: 8940000 },
+  { slug: 'msi-h510m-a-pro', brand: 'MSI', modelName: 'H510M-A PRO', socket: 'LGA1200', chipset: 'H510', memoryType: 'DDR4', formFactor: 'Micro-ATX', priceIdr: 969000 },
+  { slug: 'asrock-h610m-h2-m2', brand: 'ASRock', modelName: 'H610M-H2/M.2', socket: 'LGA1700', chipset: 'H610', memoryType: 'DDR4', formFactor: 'Micro-ATX', priceIdr: 975000 },
+  { slug: 'asrock-b660m-hdv', brand: 'ASRock', modelName: 'B660M-HDV', socket: 'LGA1700', chipset: 'B660', memoryType: 'DDR4', formFactor: 'Micro-ATX', priceIdr: 1370000 },
+  { slug: 'asrock-b760m-hdv-m2-d4', brand: 'ASRock', modelName: 'B760M-HDV/M.2 D4', socket: 'LGA1700', chipset: 'B760', memoryType: 'DDR4', formFactor: 'Micro-ATX', priceIdr: 1509000 },
+  { slug: 'msi-b760m-gaming-plus-wifi', brand: 'MSI', modelName: 'B760M Gaming Plus WiFi', socket: 'LGA1700', chipset: 'B760', memoryType: 'DDR5', formFactor: 'Micro-ATX', priceIdr: 2929000 },
+  { slug: 'asrock-z790-pro-rs', brand: 'ASRock', modelName: 'Z790 Pro RS', socket: 'LGA1700', chipset: 'Z790', memoryType: 'DDR5', formFactor: 'ATX', priceIdr: 3012000 },
+  { slug: 'asus-tuf-gaming-z790-plus-wifi', brand: 'Asus', modelName: 'TUF Gaming Z790-PLUS WiFi', socket: 'LGA1700', chipset: 'Z790', memoryType: 'DDR5', formFactor: 'ATX', priceIdr: 6167000 },
+  { slug: 'asrock-h810m-h', brand: 'ASRock', modelName: 'H810M-H', socket: 'LGA1851', chipset: 'H810', memoryType: 'DDR5', formFactor: 'Micro-ATX', priceIdr: 1575000 },
+  { slug: 'msi-pro-b860m-e', brand: 'MSI', modelName: 'PRO B860M-E', socket: 'LGA1851', chipset: 'B860', memoryType: 'DDR5', formFactor: 'Micro-ATX', priceIdr: 1865000 },
+  { slug: 'asrock-z890-pro-a', brand: 'ASRock', modelName: 'Z890 Pro-A', socket: 'LGA1851', chipset: 'Z890', memoryType: 'DDR5', formFactor: 'ATX', priceIdr: 3045000 },
+  { slug: 'asrock-b860-steel-legend-wifi', brand: 'ASRock', modelName: 'B860 Steel Legend WiFi', socket: 'LGA1851', chipset: 'B860', memoryType: 'DDR5', formFactor: 'ATX', priceIdr: 3535000 },
+  { slug: 'gigabyte-z890-ai-top', brand: 'Gigabyte', modelName: 'Z890 AI TOP', socket: 'LGA1851', chipset: 'Z890', memoryType: 'DDR5', formFactor: 'ATX', priceIdr: 10190000 },
+];
+
+// prettier-ignore
+const RAMS: RamSeed[] = [
+  { slug: 'pny-performance-ddr4-3200-8gb', brand: 'PNY', modelName: 'Performance DDR4 8GB (1x8)', memoryType: 'DDR4', capacityGb: 8, moduleCount: 1, speedMhz: 3200, casLatency: null, priceIdr: 949000 },
+  { slug: 'kingston-fury-beast-rgb-ddr5-6000-16gb', brand: 'Kingston', modelName: 'FURY Beast RGB DDR5 16GB (2x8)', memoryType: 'DDR5', capacityGb: 16, moduleCount: 2, speedMhz: 6000, casLatency: 30, priceIdr: 1555000 },
+  { slug: 'pny-performance-ddr5-5600-16gb', brand: 'PNY', modelName: 'Performance DDR5 16GB (2x8)', memoryType: 'DDR5', capacityGb: 16, moduleCount: 2, speedMhz: 5600, casLatency: null, priceIdr: 1620000 },
+  { slug: 'pny-performance-ddr4-3200-16gb', brand: 'PNY', modelName: 'Performance DDR4 16GB (1x16)', memoryType: 'DDR4', capacityGb: 16, moduleCount: 1, speedMhz: 3200, casLatency: null, priceIdr: 1720000 },
+  { slug: 'pny-xlr8-epic-x-ddr4-3600-16gb', brand: 'PNY', modelName: 'XLR8 Gaming EPIC-X RGB DDR4 16GB (2x8)', memoryType: 'DDR4', capacityGb: 16, moduleCount: 2, speedMhz: 3600, casLatency: null, priceIdr: 2130000 },
+  { slug: 'patriot-viper-elite-5-ddr5-6000-32gb', brand: 'Patriot', modelName: 'Viper Elite 5 RGB DDR5 32GB (2x16)', memoryType: 'DDR5', capacityGb: 32, moduleCount: 2, speedMhz: 6000, casLatency: 36, priceIdr: 2970000 },
+  { slug: 'pny-xlr8-gaming-ddr4-3200-32gb', brand: 'PNY', modelName: 'XLR8 Gaming DDR4 32GB (2x16)', memoryType: 'DDR4', capacityGb: 32, moduleCount: 2, speedMhz: 3200, casLatency: null, priceIdr: 3940000 },
+  { slug: 'team-t-force-delta-rgb-ddr4-3600-32gb', brand: 'TeamGroup', modelName: 'T-Force Delta RGB DDR4 32GB (2x16)', memoryType: 'DDR4', capacityGb: 32, moduleCount: 2, speedMhz: 3600, casLatency: 18, priceIdr: 4870000 },
+  { slug: 'kingston-fury-beast-ddr5-6400-32gb', brand: 'Kingston', modelName: 'FURY Beast DDR5 32GB (2x16)', memoryType: 'DDR5', capacityGb: 32, moduleCount: 2, speedMhz: 6400, casLatency: 32, priceIdr: 6450000 },
+  { slug: 'adata-xpg-lancer-blade-ddr5-5600-32gb', brand: 'ADATA', modelName: 'XPG Lancer Blade DDR5 32GB (2x16)', memoryType: 'DDR5', capacityGb: 32, moduleCount: 2, speedMhz: 5600, casLatency: 46, priceIdr: 7595000 },
+  { slug: 'klevv-bolt-v-ddr5-7200-32gb', brand: 'KLEVV', modelName: 'BOLT V DDR5 32GB (2x16)', memoryType: 'DDR5', capacityGb: 32, moduleCount: 2, speedMhz: 7200, casLatency: 34, priceIdr: 8870000 },
+  { slug: 'gskill-ripjaws-s5-ddr5-6000-48gb', brand: 'G.Skill', modelName: 'Ripjaws S5 DDR5 48GB (2x24)', memoryType: 'DDR5', capacityGb: 48, moduleCount: 2, speedMhz: 6000, casLatency: 40, priceIdr: 11350000 },
+  { slug: 'crucial-pro-oc-ddr5-6000-64gb', brand: 'Crucial', modelName: 'Pro OC DDR5 64GB (2x32)', memoryType: 'DDR5', capacityGb: 64, moduleCount: 2, speedMhz: 6000, casLatency: 40, priceIdr: 14220000 },
+];
+/* eslint-enable max-len */
+
+const usdFromIdr = (idr: number) => Math.round(idr / 16300);
+
+async function seedMobo(m: MoboSeed) {
+  await prisma.component.upsert({
+    where: { slug: m.slug },
+    update: { priceIdr: m.priceIdr, msrpUsd: usdFromIdr(m.priceIdr) },
+    create: {
+      type: 'MOTHERBOARD',
+      brand: m.brand,
+      modelName: m.modelName,
+      slug: m.slug,
+      priceIdr: m.priceIdr,
+      msrpUsd: usdFromIdr(m.priceIdr),
+      socket: m.socket,
+      chipset: m.chipset,
+      memoryType: m.memoryType,
+      formFactor: m.formFactor,
+    },
+  });
+}
+
+async function seedRam(r: RamSeed) {
+  await prisma.component.upsert({
+    where: { slug: r.slug },
+    update: { priceIdr: r.priceIdr, msrpUsd: usdFromIdr(r.priceIdr) },
+    create: {
+      type: 'RAM',
+      brand: r.brand,
+      modelName: r.modelName,
+      slug: r.slug,
+      priceIdr: r.priceIdr,
+      msrpUsd: usdFromIdr(r.priceIdr),
+      memoryType: r.memoryType,
+      capacityGb: r.capacityGb,
+      moduleCount: r.moduleCount,
+      speedMhz: r.speedMhz,
+      casLatency: r.casLatency,
+    },
+  });
+}
+
 async function main() {
   for (const c of CPUS) await seedCpu(c);
   for (const g of GPUS) await seedGpu(g);
+  for (const m of MOBOS) await seedMobo(m);
+  for (const r of RAMS) await seedRam(r);
   console.info(
-    `Seeded ${CPUS.length} CPUs and ${GPUS.length} GPUs with benchmarks + price history.`,
+    `Seeded ${CPUS.length} CPUs, ${GPUS.length} GPUs, ${MOBOS.length} motherboards, ${RAMS.length} RAM kits.`,
   );
 }
 

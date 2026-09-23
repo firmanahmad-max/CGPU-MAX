@@ -15,7 +15,8 @@
     "pricing": "Harga",
     "account": "Akun",
     "signIn": "Masuk",
-    "about": "Tentang"
+    "about": "Tentang",
+    "components": "Komponen"
   },
   "home": {
     "tagline": "Platform Intelijen Hardware",
@@ -404,5 +405,24 @@
     "generating": "Membuat…",
     "errPro": "Laporan adalah fitur Pro — tingkatkan di Harga.",
     "errFailed": "Ekspor gagal ({status})"
+  },
+  "components": {
+    "database": "Database",
+    "title": "Motherboard & RAM",
+    "subtitle": "Motherboard & kit memori dengan harga pasar Indonesia.",
+    "motherboard": "Motherboard",
+    "ram": "RAM",
+    "brand": "Merek",
+    "socket": "Socket",
+    "chipset": "Chipset",
+    "formFactor": "Form Factor",
+    "memory": "Memori",
+    "capacity": "Kapasitas",
+    "speed": "Speed (MHz)",
+    "cas": "CAS",
+    "price": "Harga",
+    "part": "Part",
+    "match": "{count} cocok",
+    "empty": "Tak ada komponen cocok."
   }
 }

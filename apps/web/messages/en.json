@@ -15,7 +15,8 @@
     "pricing": "Pricing",
     "account": "Account",
     "signIn": "Sign in",
-    "about": "About"
+    "about": "About",
+    "components": "Components"
   },
   "home": {
     "tagline": "Hardware Intelligence Platform",
@@ -404,5 +405,24 @@
     "generating": "Generating…",
     "errPro": "Reports are a Pro feature — upgrade on Pricing.",
     "errFailed": "Export failed ({status})"
+  },
+  "components": {
+    "database": "Database",
+    "title": "Motherboards & RAM",
+    "subtitle": "Boards and memory kits with real Indonesian street prices.",
+    "motherboard": "Motherboard",
+    "ram": "RAM",
+    "brand": "Brand",
+    "socket": "Socket",
+    "chipset": "Chipset",
+    "formFactor": "Form Factor",
+    "memory": "Memory",
+    "capacity": "Capacity",
+    "speed": "Speed (MHz)",
+    "cas": "CAS",
+    "price": "Price",
+    "part": "Part",
+    "match": "{count} match",
+    "empty": "No components match."
   }
 }

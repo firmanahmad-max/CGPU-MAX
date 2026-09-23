@@ -307,3 +307,55 @@ export async function calculateBottleneck(
   }
   return res.json() as Promise<BottleneckPayload>;
 }
+
+// Components (motherboards / RAM)
+export type ComponentKind = 'MOTHERBOARD' | 'RAM';
+
+export interface ComponentRow {
+  slug: string;
+  brand: string;
+  modelName: string;
+  type: string;
+  priceIdr: number | null;
+  msrpUsd: number | null;
+  socket: string | null;
+  chipset: string | null;
+  formFactor: string | null;
+  memoryType: string | null;
+  capacityGb: number | null;
+  moduleCount: number | null;
+  speedMhz: number | null;
+  casLatency: number | null;
+}
+
+export interface ComponentFacets {
+  brands: { name: string; count: number }[];
+  sockets: { name: string; count: number }[];
+  chipsets: { name: string; count: number }[];
+  formFactors: { name: string; count: number }[];
+  memoryTypes: { name: string; count: number }[];
+  capacities: { gb: number; count: number }[];
+  speeds: { mhz: number; count: number }[];
+  priceMin: number | null;
+  priceMax: number | null;
+}
+
+export interface ComponentsResponse {
+  items: ComponentRow[];
+  total: number;
+  facets: ComponentFacets;
+  sort: 'price' | 'name';
+  dir: 'asc' | 'desc';
+}
+
+export async function getComponents(
+  params: Record<string, string | number | undefined>,
+  init?: RequestInit,
+): Promise<ComponentsResponse> {
+  const res = await fetch(buildUrl('/api/v1/components', params), {
+    next: { revalidate: 300, tags: ['components:list'] },
+    ...init,
+  });
+  if (!res.ok) throw new Error(`Failed to list components: ${res.status}`);
+  return res.json() as Promise<ComponentsResponse>;
+}

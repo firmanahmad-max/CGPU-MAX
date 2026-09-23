@@ -10,6 +10,7 @@ import { useCurrency } from '@/lib/currency-context';
 // Route → nav translation key, for the section title.
 const SECTION: Record<string, string> = {
   '/processors': 'processors',
+  '/components': 'components',
   '/rankings': 'rankings',
   '/compare': 'compare',
   '/bottleneck': 'bottleneck',

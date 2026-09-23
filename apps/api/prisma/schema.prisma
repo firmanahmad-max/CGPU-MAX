@@ -19,6 +19,11 @@ enum ProcessorType {
   GPU
 }
 
+enum ComponentType {
+  MOTHERBOARD
+  RAM
+}
+
 enum Manufacturer {
   INTEL
   AMD
@@ -103,6 +108,39 @@ model Processor {
   @@index([type, manufacturer])
   @@index([slug])
   @@map("processors")
+}
+
+// Non-processor PC components (motherboards, RAM). Flat model with nullable
+// type-specific fields — simple to seed and serve for the components catalog.
+model Component {
+  id          String        @id @default(uuid()) @db.Uuid
+  type        ComponentType
+  brand       String
+  modelName   String        @map("model_name")
+  slug        String        @unique
+  releaseYear Int?          @map("release_year")
+  msrpUsd     Decimal?      @map("msrp_usd") @db.Decimal(10, 2)
+  priceIdr    Int?          @map("price_idr")
+
+  // Motherboard-specific
+  socket     String?
+  chipset    String?
+  formFactor String? @map("form_factor")
+  memoryType String? @map("memory_type") // DDR4 / DDR5 (also used by RAM)
+
+  // RAM-specific
+  capacityGb  Int? @map("capacity_gb")
+  moduleCount Int? @map("module_count")
+  speedMhz    Int? @map("speed_mhz")
+  casLatency  Int? @map("cas_latency")
+
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime  @updatedAt @map("updated_at")
+  deletedAt DateTime? @map("deleted_at")
+
+  @@index([type, brand])
+  @@index([slug])
+  @@map("components")
 }
 
 model CpuSpecs {

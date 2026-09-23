@@ -15,6 +15,7 @@ interface RailItem {
 // Icon rail — 2-letter marks, tooltip carries the localized name.
 const ITEMS: RailItem[] = [
   { href: '/processors', abbr: 'KT', key: 'processors' },
+  { href: '/components', abbr: 'MB', key: 'components' },
   { href: '/rankings', abbr: 'RK', key: 'rankings' },
   { href: '/compare', abbr: 'VS', key: 'compare' },
   { href: '/bottleneck', abbr: 'BN', key: 'bottleneck' },
