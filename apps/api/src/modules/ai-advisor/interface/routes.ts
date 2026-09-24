@@ -33,6 +33,27 @@ aiAdvisorRouter.post(
   },
 );
 
+// Compare two tiers (Value vs Premium) for the same requirements. Runs two
+// generations in parallel; each counts against the AI quota like a build.
+aiAdvisorRouter.post(
+  '/compare',
+  advisorDemoBypass,
+  requireAuth,
+  requireFeature('aiAdvisor'),
+  async (req, res, next) => {
+    try {
+      const body = adviceBody.parse(req.body);
+      const [value, premium] = await Promise.all([
+        useCase.execute(req.auth!, { ...body, tier: 'value' }),
+        useCase.execute(req.auth!, { ...body, tier: 'premium' }),
+      ]);
+      res.status(201).json({ value, premium });
+    } catch (err) {
+      next(err);
+    }
+  },
+);
+
 // Recompute deterministic insights for an edited parts list (interactive swap).
 // Pro-gated like the generator, but does not call the AI or consume quota.
 aiAdvisorRouter.post(

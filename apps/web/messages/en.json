@@ -227,7 +227,13 @@
     "fp_platform": "Platform longevity",
     "fp_psu": "PSU upgrade headroom",
     "fp_memory": "Memory",
-    "fp_storage": "Storage"
+    "fp_storage": "Storage",
+    "compareTiers": "Compare tiers",
+    "comparing": "Comparing…",
+    "tierValue": "Value",
+    "tierValueHint": "Best price-to-performance",
+    "tierPremium": "Premium",
+    "tierPremiumHint": "Full budget, max performance"
   },
   "gaming": {
     "pro": "Pro",

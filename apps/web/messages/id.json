@@ -227,7 +227,13 @@
     "fp_platform": "Umur platform",
     "fp_psu": "Headroom upgrade PSU",
     "fp_memory": "Memori",
-    "fp_storage": "Penyimpanan"
+    "fp_storage": "Penyimpanan",
+    "compareTiers": "Bandingkan tier",
+    "comparing": "Membandingkan…",
+    "tierValue": "Hemat",
+    "tierValueHint": "Harga-performa terbaik",
+    "tierPremium": "Premium",
+    "tierPremiumHint": "Anggaran penuh, performa maks"
   },
   "gaming": {
     "pro": "Pro",

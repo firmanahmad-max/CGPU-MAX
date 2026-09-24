@@ -7,6 +7,7 @@ export const adviceBody = z.object({
   preferences: z.string().max(500).optional(),
   language: z.enum(['en', 'id']).optional(),
   includeMonitor: z.coerce.boolean().optional(),
+  tier: z.enum(['value', 'balanced', 'premium']).optional(),
 });
 
 const PICK_CATEGORY = z.enum([

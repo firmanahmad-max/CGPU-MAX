@@ -38,6 +38,8 @@ export interface ComponentCatalogPart {
   panel: string | null;
 }
 
+export type BuildTier = 'value' | 'balanced' | 'premium';
+
 export interface AdvisorRequest {
   budgetUsd: number;
   purpose: BuildPurpose;
@@ -45,6 +47,7 @@ export interface AdvisorRequest {
   preferences?: string;
   language?: 'en' | 'id';
   includeMonitor?: boolean;
+  tier?: BuildTier;
 }
 
 export const SYSTEM_PROMPT = `You are CGPU-MAX's build advisor — an expert PC hardware consultant.
@@ -135,11 +138,18 @@ export function buildUserMessage(req: AdvisorRequest, catalog: string): string {
   const monitorLine = req.includeMonitor
     ? 'The user WANTS a matching monitor — recommend one that suits the build and count it in the total.'
     : 'The user wants a PC build ONLY — do not recommend a monitor (emit the null monitor placeholder as instructed).';
+  const tierLine =
+    req.tier === 'value'
+      ? 'TIER: VALUE — maximize price-to-performance. Aim for roughly 80–90% of the budget (do not overspend); favor last-gen bargains and sensible mid-range parts.'
+      : req.tier === 'premium'
+        ? 'TIER: PREMIUM — spend the full budget for maximum performance and headroom; prefer current-gen platforms, a stronger GPU, and generous PSU/RAM/storage.'
+        : null;
   return [
     `Budget: $${req.budgetUsd} (whole PC build${req.includeMonitor ? ' including monitor' : ''})`,
     `Purpose: ${req.purpose}`,
     `Target resolution: ${req.resolution}`,
     req.preferences ? `Preferences: ${req.preferences}` : null,
+    tierLine,
     '',
     catalog,
     '',

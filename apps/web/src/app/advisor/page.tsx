@@ -32,13 +32,19 @@ export default function AdvisorPage() {
   const [includeMonitor, setIncludeMonitor] = useState(false);
   const [preferences, setPreferences] = useState('');
   const [advice, setAdvice] = useState<BuildAdvice | null>(null);
+  const [pair, setPair] = useState<{ value: BuildAdvice; premium: BuildAdvice } | null>(null);
   const [loading, setLoading] = useState(false);
+  const [comparing, setComparing] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  const errFor = (status: number) =>
+    status === 402 ? t('errProFeature') : status === 429 ? t('errLimit') : null;
 
   const onGenerate = async (extra?: string) => {
     setLoading(true);
     setError(null);
     setAdvice(null);
+    setPair(null);
     const mergedPreferences = [preferences, extra].filter(Boolean).join('; ');
     try {
       const res = await authedFetch('/api/v1/advisor/build', {
@@ -53,18 +59,43 @@ export default function AdvisorPage() {
           includeMonitor,
         }),
       });
-      if (res.status === 402) {
-        throw new Error(t('errProFeature'));
-      }
-      if (res.status === 429) {
-        throw new Error(t('errLimit'));
-      }
+      const msg = errFor(res.status);
+      if (msg) throw new Error(msg);
       if (!res.ok) throw new Error(await res.text());
       setAdvice((await res.json()) as BuildAdvice);
     } catch (err) {
       setError((err as Error).message);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const onCompare = async () => {
+    setComparing(true);
+    setError(null);
+    setAdvice(null);
+    setPair(null);
+    try {
+      const res = await authedFetch('/api/v1/advisor/compare', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          budgetUsd: budget,
+          purpose,
+          resolution,
+          preferences,
+          language: locale,
+          includeMonitor,
+        }),
+      });
+      const msg = errFor(res.status);
+      if (msg) throw new Error(msg);
+      if (!res.ok) throw new Error(await res.text());
+      setPair((await res.json()) as { value: BuildAdvice; premium: BuildAdvice });
+    } catch (err) {
+      setError((err as Error).message);
+    } finally {
+      setComparing(false);
     }
   };
 
@@ -206,16 +237,59 @@ export default function AdvisorPage() {
               />
             </div>
 
-            <button
-              type="button"
-              onClick={() => onGenerate()}
-              disabled={loading}
-              className="rounded-control bg-lime text-lime-ink px-6 py-2 text-sm font-semibold transition hover:brightness-110 disabled:opacity-50"
-            >
-              {loading ? t('generating') : t('generate')}
-            </button>
+            <div className="flex flex-wrap items-center gap-3">
+              <button
+                type="button"
+                onClick={() => onGenerate()}
+                disabled={loading || comparing}
+                className="rounded-control bg-lime text-lime-ink px-6 py-2 text-sm font-semibold transition hover:brightness-110 disabled:opacity-50"
+              >
+                {loading ? t('generating') : t('generate')}
+              </button>
+              <button
+                type="button"
+                onClick={onCompare}
+                disabled={loading || comparing}
+                className="rounded-control border-hairline text-ink hover:border-lime/45 border px-6 py-2 text-sm font-semibold transition disabled:opacity-50"
+              >
+                {comparing ? t('comparing') : t('compareTiers')}
+              </button>
+            </div>
             {error && <p className="text-cred text-sm">{error}</p>}
           </div>
+
+          {pair && (
+            <div className="mt-10 grid gap-6 lg:grid-cols-2">
+              <div>
+                <div className="mb-3 flex items-center gap-2">
+                  <span className="rounded-pill border-cblue/40 bg-cblue/10 text-cblue-bright border px-3 py-1 text-xs font-semibold uppercase">
+                    {t('tierValue')}
+                  </span>
+                  <span className="text-ink-faint text-xs">{t('tierValueHint')}</span>
+                </div>
+                <BuildAdviceResult
+                  advice={pair.value}
+                  resolution={resolution}
+                  budgetUsd={budget}
+                  readOnly
+                />
+              </div>
+              <div>
+                <div className="mb-3 flex items-center gap-2">
+                  <span className="rounded-pill border-lime/45 bg-lime/[0.14] text-lime-bright border px-3 py-1 text-xs font-semibold uppercase">
+                    {t('tierPremium')}
+                  </span>
+                  <span className="text-ink-faint text-xs">{t('tierPremiumHint')}</span>
+                </div>
+                <BuildAdviceResult
+                  advice={pair.premium}
+                  resolution={resolution}
+                  budgetUsd={budget}
+                  readOnly
+                />
+              </div>
+            </div>
+          )}
 
           {advice && !loading && (
             <div className="mt-6">
