@@ -8,6 +8,7 @@ import {
   computeBudget,
   computeCompatibility,
   computeEconomics,
+  computeFutureProofing,
   toPerformanceInsight,
   type BuildInsights,
 } from '../domain/BuildInsights.js';
@@ -55,6 +56,7 @@ export async function computeBuildInsights(
       power: compat.power,
       budget,
       economics,
+      futureProofing: compat.futureProofing,
     },
   };
 }
@@ -83,7 +85,7 @@ async function computeCompatibilitySlots(
   prisma: PrismaClient,
   bySlot: Map<PickCategory, ResolvedPick>,
 ) {
-  const componentSlugs = (['motherboard', 'ram', 'psu', 'case', 'cooler'] as PickCategory[])
+  const componentSlugs = (['motherboard', 'ram', 'ssd', 'psu', 'case', 'cooler'] as PickCategory[])
     .map((c) => bySlot.get(c)?.slug)
     .filter((s): s is string => Boolean(s));
   const procSlugs = (['cpu', 'gpu'] as PickCategory[])
@@ -100,6 +102,7 @@ async function computeCompatibilitySlots(
             memoryType: true,
             formFactor: true,
             wattage: true,
+            capacityGb: true,
           },
         })
       : Promise.resolve([]),
@@ -126,11 +129,13 @@ async function computeCompatibilitySlots(
   const psu = get('psu');
   const pcCase = get('case');
   const cooler = get('cooler');
+  const ssd = get('ssd');
   const cpuRow = procs.find((p) => p.type === 'CPU');
   const gpuRow = procs.find((p) => p.type === 'GPU');
+  const cpuSocket = cpuRow?.cpuSpecs?.socket ?? null;
 
-  return computeCompatibility({
-    cpuSocket: cpuRow?.cpuSpecs?.socket ?? null,
+  const { checks, power } = computeCompatibility({
+    cpuSocket,
     cpuTdp: cpuRow?.tdpWatts ?? null,
     gpuTdp: gpuRow?.tdpWatts ?? null,
     moboSocket: mobo?.socket ?? null,
@@ -141,4 +146,14 @@ async function computeCompatibilitySlots(
     psuWatts: psu?.wattage ?? null,
     coolerType: cooler?.formFactor ?? null,
   });
+
+  const futureProofing = computeFutureProofing({
+    cpuSocket,
+    ramMemory: ram?.memoryType ?? null,
+    ramCapacityGb: ram?.capacityGb ?? null,
+    ssdCapacityGb: ssd?.capacityGb ?? null,
+    psuHeadroomPct: power?.headroomPct ?? null,
+  });
+
+  return { checks, power, futureProofing };
 }

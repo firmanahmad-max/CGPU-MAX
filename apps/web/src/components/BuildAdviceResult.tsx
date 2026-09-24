@@ -13,6 +13,7 @@ import type {
   CompatibilityCheck,
   ComponentPick,
   EconomicsInsight,
+  FutureProofingInsight,
   PerformanceInsight,
   PowerInsight,
 } from '@/lib/advisorTypes';
@@ -242,6 +243,10 @@ export function BuildAdviceResult({
         />
       )}
 
+      {current.insights?.futureProofing && (
+        <FutureProofingPanel fp={current.insights.futureProofing} />
+      )}
+
       <div className="card">
         <p className="label mb-2">{t('upgradePath')}</p>
         <p className="text-ink-mid text-sm">{current.upgradePathNote}</p>
@@ -364,6 +369,37 @@ const CAT_TONE: Record<string, string> = {
   cooler: 'bg-cblue/50',
   monitor: 'bg-lime/50',
 };
+
+function FutureProofingPanel({ fp }: { fp: FutureProofingInsight }) {
+  const t = useTranslations('advisor');
+  const scoreTone =
+    fp.score >= 70 ? 'text-lime-bright' : fp.score >= 45 ? 'text-camber-bright' : 'text-cred';
+  const scoreBar = fp.score >= 70 ? 'bg-lime' : fp.score >= 45 ? 'bg-camber' : 'bg-cred';
+  const ratingTone = (r: string) =>
+    r === 'good' ? 'text-lime-bright' : r === 'ok' ? 'text-camber-bright' : 'text-ink-faint';
+  const dot = (r: string) => (r === 'good' ? '●' : r === 'ok' ? '◐' : '○');
+
+  return (
+    <div className="card">
+      <div className="mb-3 flex items-baseline justify-between">
+        <p className="label">{t('futureProofing')}</p>
+        <span className={`font-mono text-lg font-bold ${scoreTone}`}>{fp.score}/100</span>
+      </div>
+      <div className="bg-panel-2 mb-4 h-2.5 w-full overflow-hidden rounded-full">
+        <div className={`${scoreBar} h-full rounded-full`} style={{ width: `${fp.score}%` }} />
+      </div>
+      <ul className="grid gap-2 sm:grid-cols-2">
+        {fp.factors.map((f) => (
+          <li key={f.code} className="flex items-center gap-2 text-[12.5px]">
+            <span className={`font-mono ${ratingTone(f.rating)}`}>{dot(f.rating)}</span>
+            <span className="text-ink-mid">{t(`fp_${f.code}`)}</span>
+            {f.a && <span className="text-ink-faint ml-auto font-mono text-[11px]">{f.a}</span>}
+          </li>
+        ))}
+      </ul>
+    </div>
+  );
+}
 
 function BudgetPanel({
   budget,

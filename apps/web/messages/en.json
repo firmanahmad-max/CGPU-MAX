@@ -222,7 +222,12 @@
     "sharedTitle": "Shared build",
     "sharedSubtitle": "A build recommendation shared from CGPU-MAX.",
     "sharedNotFound": "This build could not be found.",
-    "buildYourOwn": "Build your own"
+    "buildYourOwn": "Build your own",
+    "futureProofing": "Future-proofing",
+    "fp_platform": "Platform longevity",
+    "fp_psu": "PSU upgrade headroom",
+    "fp_memory": "Memory",
+    "fp_storage": "Storage"
   },
   "gaming": {
     "pro": "Pro",

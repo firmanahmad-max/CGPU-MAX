@@ -71,12 +71,23 @@ export interface EconomicsInsight {
   costPerFrameUsd: number | null;
 }
 
+export interface FutureProofingFactor {
+  code: 'platform' | 'psu' | 'memory' | 'storage';
+  rating: 'good' | 'ok' | 'weak';
+  a: string | null;
+}
+export interface FutureProofingInsight {
+  score: number;
+  factors: FutureProofingFactor[];
+}
+
 export interface BuildInsights {
   performance: PerformanceInsight | null;
   compatibility?: CompatibilityCheck[];
   power?: PowerInsight | null;
   budget?: BudgetInsight | null;
   economics?: EconomicsInsight | null;
+  futureProofing?: FutureProofingInsight | null;
 }
 
 export interface BuildAdvice {

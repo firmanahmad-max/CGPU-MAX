@@ -63,12 +63,91 @@ export interface EconomicsInsight {
   costPerFrameUsd: number | null;
 }
 
+export interface FutureProofingFactor {
+  code: 'platform' | 'psu' | 'memory' | 'storage';
+  rating: 'good' | 'ok' | 'weak';
+  a: string | null;
+}
+export interface FutureProofingInsight {
+  score: number; // 0–100
+  factors: FutureProofingFactor[];
+}
+
+export interface FutureProofingInput {
+  cpuSocket: string | null;
+  ramMemory: string | null;
+  ramCapacityGb: number | null;
+  ssdCapacityGb: number | null;
+  psuHeadroomPct: number | null;
+}
+
 export interface BuildInsights {
   performance: PerformanceInsight | null;
   compatibility: CompatibilityCheck[];
   power: PowerInsight | null;
   budget: BudgetInsight | null;
   economics: EconomicsInsight | null;
+  futureProofing: FutureProofingInsight | null;
+}
+
+// Current, long-lived platforms still receiving new CPUs score highest; recent
+// but dead-end sockets are middling; older/EOL sockets score low.
+const CURRENT_SOCKETS = /am5|lga1851/i;
+const MATURE_SOCKETS = /lga1700/i;
+
+// Deterministic 0–100 future-proofing score from platform longevity, PSU
+// headroom, memory, and storage. Each factor also carries its own rating.
+export function computeFutureProofing(input: FutureProofingInput): FutureProofingInsight {
+  const factors: FutureProofingFactor[] = [];
+  let score = 0;
+
+  // Platform / socket longevity (max 30).
+  const socket = input.cpuSocket;
+  let platformRating: FutureProofingFactor['rating'];
+  if (socket && CURRENT_SOCKETS.test(socket)) {
+    score += 30;
+    platformRating = 'good';
+  } else if (socket && MATURE_SOCKETS.test(socket)) {
+    score += 20;
+    platformRating = 'ok';
+  } else {
+    score += socket ? 10 : 0;
+    platformRating = 'weak';
+  }
+  factors.push({ code: 'platform', rating: platformRating, a: socket });
+
+  // Memory: type + capacity (max 25).
+  const isDdr5 = input.ramMemory ? /ddr5/i.test(input.ramMemory) : false;
+  const cap = input.ramCapacityGb ?? 0;
+  score += isDdr5 ? 15 : input.ramMemory ? 7 : 0;
+  score += cap >= 32 ? 10 : cap >= 16 ? 6 : cap > 0 ? 3 : 0;
+  const memoryRating: FutureProofingFactor['rating'] =
+    isDdr5 && cap >= 32 ? 'good' : isDdr5 || cap >= 32 ? 'ok' : 'weak';
+  factors.push({
+    code: 'memory',
+    rating: memoryRating,
+    a: input.ramMemory ? `${input.ramMemory}${cap ? ` ${cap}GB` : ''}` : null,
+  });
+
+  // PSU headroom for future upgrades (max 25).
+  const hr = input.psuHeadroomPct;
+  score += hr === null ? 0 : hr >= 40 ? 25 : hr >= 20 ? 16 : hr >= 0 ? 8 : 0;
+  const psuRating: FutureProofingFactor['rating'] =
+    hr === null ? 'weak' : hr >= 40 ? 'good' : hr >= 20 ? 'ok' : 'weak';
+  factors.push({ code: 'psu', rating: psuRating, a: hr === null ? null : `+${hr}%` });
+
+  // Storage capacity (max 20).
+  const ssd = input.ssdCapacityGb ?? 0;
+  score += ssd >= 2048 ? 20 : ssd >= 1024 ? 14 : ssd >= 512 ? 8 : ssd > 0 ? 4 : 0;
+  const storageRating: FutureProofingFactor['rating'] =
+    ssd >= 2048 ? 'good' : ssd >= 1024 ? 'ok' : 'weak';
+  factors.push({
+    code: 'storage',
+    rating: storageRating,
+    a: ssd ? (ssd >= 1024 ? `${ssd / 1024}TB` : `${ssd}GB`) : null,
+  });
+
+  return { score: Math.max(0, Math.min(100, Math.round(score))), factors };
 }
 
 // Group the picks' prices into a budget-allocation breakdown (% of total).

@@ -222,7 +222,12 @@
     "sharedTitle": "Rakitan dibagikan",
     "sharedSubtitle": "Rekomendasi rakitan yang dibagikan dari CGPU-MAX.",
     "sharedNotFound": "Rakitan ini tidak ditemukan.",
-    "buildYourOwn": "Buat rakitan sendiri"
+    "buildYourOwn": "Buat rakitan sendiri",
+    "futureProofing": "Ketahanan masa depan",
+    "fp_platform": "Umur platform",
+    "fp_psu": "Headroom upgrade PSU",
+    "fp_memory": "Memori",
+    "fp_storage": "Penyimpanan"
   },
   "gaming": {
     "pro": "Pro",
