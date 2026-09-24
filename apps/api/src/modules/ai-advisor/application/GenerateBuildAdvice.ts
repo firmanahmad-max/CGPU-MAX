@@ -4,8 +4,11 @@ import type { AuthContext } from '../../../shared/auth/AuthContext.js';
 import { env } from '../../../shared/config/env.js';
 import { AppError } from '../../../shared/errors/AppError.js';
 import { logger } from '../../../shared/logging/logger.js';
+import { BottleneckAlgorithm } from '../../bottleneck/domain/BottleneckAlgorithm.js';
+import { buildProcessorSnapshot } from '../../comparisons/application/BuildSnapshot.js';
 import { EnforceUsageLimit } from '../../subscriptions/application/EnforceUsageLimit.js';
 import type { BuildAdvice, ComponentPick } from '../domain/BuildAdvice.js';
+import { toPerformanceInsight, type BuildInsights } from '../domain/BuildInsights.js';
 import {
   buildCatalogContext,
   buildUserMessage,
@@ -36,6 +39,7 @@ const CATALOG_LIMIT = 60;
 
 export class GenerateBuildAdvice {
   private readonly usage: EnforceUsageLimit;
+  private readonly bottleneck = new BottleneckAlgorithm();
 
   constructor(private readonly prisma: PrismaClient) {
     this.usage = new EnforceUsageLimit(prisma);
@@ -64,6 +68,8 @@ export class GenerateBuildAdvice {
       ? await this.callOpenAI(userMessage)
       : await this.callClaude(userMessage);
     const validated = this.validateAndGround(advice, catalog, components, req);
+    const insights = await this.computeInsights(validated, req);
+    const enriched = { ...validated, insights };
 
     const modelUsed = activeModel();
     const shareSlug = `build-${auth.userId.slice(0, 8)}-${Date.now().toString(36)}`;
@@ -74,12 +80,45 @@ export class GenerateBuildAdvice {
         budgetUsd: req.budgetUsd,
         purpose: req.purpose,
         resolution: req.resolution,
-        payload: validated as object,
+        payload: enriched as object,
         modelUsed,
       },
     });
 
-    return { ...validated, shareSlug, modelUsed };
+    return { ...enriched, shareSlug, modelUsed };
+  }
+
+  // Deterministic enrichment computed from the grounded picks — never the model.
+  // Phase 1: reuse the bottleneck engine to derive FPS + balance for the chosen
+  // CPU + GPU at the user's target resolution. Silently degrades to null when a
+  // pick is out-of-catalog or its specs are missing.
+  private async computeInsights(advice: BuildAdvice, req: AdvisorRequest): Promise<BuildInsights> {
+    const performance = await this.computePerformance(
+      advice.cpu.slug,
+      advice.gpu.slug,
+      req.resolution,
+    );
+    return { performance };
+  }
+
+  private async computePerformance(
+    cpuSlug: string | null,
+    gpuSlug: string | null,
+    resolution: AdvisorRequest['resolution'],
+  ) {
+    if (!cpuSlug || !gpuSlug) return null;
+    try {
+      const [cpu, gpu] = await Promise.all([
+        buildProcessorSnapshot(this.prisma, cpuSlug),
+        buildProcessorSnapshot(this.prisma, gpuSlug),
+      ]);
+      if (cpu.type !== 'CPU' || gpu.type !== 'GPU') return null;
+      const outcome = this.bottleneck.evaluate(cpu, gpu);
+      return toPerformanceInsight(outcome, resolution);
+    } catch (err) {
+      logger.warn({ err, cpuSlug, gpuSlug }, 'Build performance insight skipped');
+      return null;
+    }
   }
 
   private async loadCatalog(budgetUsd: number): Promise<CatalogPart[]> {

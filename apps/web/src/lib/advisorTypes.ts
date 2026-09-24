@@ -20,6 +20,29 @@ export interface ComponentPick {
   rationale: string;
 }
 
+export interface FpsEstimate {
+  profile: string;
+  label: string;
+  min: number;
+  max: number;
+}
+
+export interface PerformanceInsight {
+  targetResolution: string;
+  cpuPower: number;
+  gpuPower: number;
+  bottleneckPercentage: number;
+  limitingComponent: 'cpu' | 'gpu' | 'balanced';
+  severity: 'optimal' | 'minor' | 'moderate' | 'significant' | 'severe';
+  fps: FpsEstimate[];
+  note: string | null;
+  algorithmVersion: string;
+}
+
+export interface BuildInsights {
+  performance: PerformanceInsight | null;
+}
+
 export interface BuildAdvice {
   summary: string;
   cpu: ComponentPick;
@@ -37,6 +60,7 @@ export interface BuildAdvice {
   recommendedPsuWatts: number;
   upgradePathNote: string;
   warnings: string[];
+  insights?: BuildInsights;
   shareSlug: string;
   modelUsed: string;
 }

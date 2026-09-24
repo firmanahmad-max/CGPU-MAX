@@ -175,7 +175,16 @@
     "performance": "Performance",
     "upgradePath": "Upgrade path",
     "warnings": "Warnings",
-    "poweredBy": "Powered by Arta"
+    "poweredBy": "Powered by Arta",
+    "estimatedFps": "Estimated FPS",
+    "algoNote": "Computed by our bottleneck engine, not the AI",
+    "workload": "Workload",
+    "fpsRange": "FPS range",
+    "balanced": "Well balanced",
+    "cpuLimited": "CPU-limited {pct}%",
+    "gpuLimited": "GPU-limited {pct}%",
+    "cpuPower": "CPU power",
+    "gpuPower": "GPU power"
   },
   "gaming": {
     "pro": "Pro",

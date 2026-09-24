@@ -175,7 +175,16 @@
     "performance": "Performa",
     "upgradePath": "Jalur upgrade",
     "warnings": "Peringatan",
-    "poweredBy": "Powered by Arta"
+    "poweredBy": "Powered by Arta",
+    "estimatedFps": "Estimasi FPS",
+    "algoNote": "Dihitung mesin bottleneck kami, bukan AI",
+    "workload": "Beban",
+    "fpsRange": "Rentang FPS",
+    "balanced": "Seimbang",
+    "cpuLimited": "Dibatasi CPU {pct}%",
+    "gpuLimited": "Dibatasi GPU {pct}%",
+    "cpuPower": "Daya CPU",
+    "gpuPower": "Daya GPU"
   },
   "gaming": {
     "pro": "Pro",
