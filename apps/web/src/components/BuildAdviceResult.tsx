@@ -3,7 +3,13 @@
 import { useTranslations } from 'next-intl';
 import Link from 'next/link';
 
-import type { BuildAdvice, ComponentPick, PerformanceInsight } from '@/lib/advisorTypes';
+import type {
+  BuildAdvice,
+  CompatibilityCheck,
+  ComponentPick,
+  PerformanceInsight,
+  PowerInsight,
+} from '@/lib/advisorTypes';
 import { useCurrency } from '@/lib/currency-context';
 
 import { Pill } from './Pill';
@@ -52,6 +58,13 @@ export function BuildAdviceResult({ advice }: { advice: BuildAdvice }) {
         <Stat label={t('performance')} value={advice.expectedPerformance} small />
       </div>
 
+      {advice.insights?.compatibility && advice.insights.compatibility.length > 0 && (
+        <CompatibilityPanel
+          checks={advice.insights.compatibility}
+          power={advice.insights.power ?? null}
+        />
+      )}
+
       {advice.insights?.performance && <PerformancePanel p={advice.insights.performance} />}
 
       <div className="card">
@@ -92,6 +105,101 @@ function PickCard({ pick }: { pick: ComponentPick }) {
         <p className="font-display text-ink-hi text-lg font-semibold">{pick.modelName}</p>
       )}
       <p className="text-ink-muted mt-2 text-sm">{pick.rationale}</p>
+    </div>
+  );
+}
+
+function CompatibilityPanel({
+  checks,
+  power,
+}: {
+  checks: CompatibilityCheck[];
+  power: PowerInsight | null;
+}) {
+  const t = useTranslations('advisor');
+
+  const line = (c: CompatibilityCheck): string => {
+    const a = c.a ?? '—';
+    const b = c.b ?? '—';
+    switch (c.code) {
+      case 'socket':
+        return c.status === 'unknown'
+          ? t('compatSocketUnknown')
+          : t('compatSocket', { cpu: a, mobo: b });
+      case 'memory':
+        return c.status === 'unknown'
+          ? t('compatMemoryUnknown')
+          : t('compatMemory', { ram: a, mobo: b });
+      case 'formFactor':
+        return c.status === 'unknown'
+          ? t('compatFormUnknown')
+          : t('compatForm', { case: a, mobo: b });
+      case 'psu':
+        return c.status === 'unknown'
+          ? t('compatPsuUnknown')
+          : t('compatPsu', { chosen: a, needed: b });
+      case 'cooler':
+        return c.status === 'unknown'
+          ? t('compatCoolerUnknown')
+          : c.status === 'warn'
+            ? t('compatCoolerWarn', { cooler: a, tdp: b })
+            : t('compatCoolerOk', { cooler: a, tdp: b });
+    }
+  };
+
+  const icon = (s: CompatibilityCheck['status']) => (s === 'ok' ? '✓' : s === 'warn' ? '!' : '·');
+  const tone = (s: CompatibilityCheck['status']) =>
+    s === 'ok' ? 'text-lime-bright' : s === 'warn' ? 'text-camber-bright' : 'text-ink-faint';
+
+  const headroom = power?.headroomPct ?? null;
+  const headroomTone =
+    headroom === null
+      ? 'bg-ink-faint'
+      : headroom >= 30
+        ? 'bg-lime'
+        : headroom >= 10
+          ? 'bg-camber'
+          : 'bg-cred';
+
+  return (
+    <div className="card">
+      <p className="label mb-3">{t('compatibility')}</p>
+      <ul className="space-y-2">
+        {checks.map((c) => (
+          <li key={c.code} className="flex items-start gap-2 text-[13px]">
+            <span className={`mt-[1px] font-mono font-bold ${tone(c.status)}`}>
+              {icon(c.status)}
+            </span>
+            <span className="text-ink-mid">{line(c)}</span>
+          </li>
+        ))}
+      </ul>
+
+      {power && (
+        <div className="border-hairline mt-4 border-t pt-4">
+          <div className="mb-1 flex items-center justify-between text-[12px]">
+            <span className="label">{t('psuHeadroom')}</span>
+            <span className="text-ink-mid font-mono">
+              {power.chosenPsuW ? `${power.chosenPsuW}W` : '—'} /{' '}
+              <span className="text-ink-faint">
+                {t('draw')} ~{power.estimatedDrawW}W
+              </span>
+              {headroom !== null && <span className="text-ink-hi"> · +{headroom}%</span>}
+            </span>
+          </div>
+          <div className="bg-panel-2 h-2.5 w-full overflow-hidden rounded-full">
+            <div
+              className={`${headroomTone} h-full rounded-full`}
+              style={{
+                width: `${Math.max(
+                  4,
+                  Math.min(100, headroom === null ? 0 : Math.min(100, 50 + headroom)),
+                )}%`,
+              }}
+            />
+          </div>
+        </div>
+      )}
     </div>
   );
 }

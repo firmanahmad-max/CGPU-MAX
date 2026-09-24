@@ -39,8 +39,24 @@ export interface PerformanceInsight {
   algorithmVersion: string;
 }
 
+export interface CompatibilityCheck {
+  code: 'socket' | 'memory' | 'formFactor' | 'psu' | 'cooler';
+  status: 'ok' | 'warn' | 'unknown';
+  a: string | null;
+  b: string | null;
+}
+
+export interface PowerInsight {
+  estimatedDrawW: number;
+  recommendedPsuW: number;
+  chosenPsuW: number | null;
+  headroomPct: number | null;
+}
+
 export interface BuildInsights {
   performance: PerformanceInsight | null;
+  compatibility?: CompatibilityCheck[];
+  power?: PowerInsight | null;
 }
 
 export interface BuildAdvice {

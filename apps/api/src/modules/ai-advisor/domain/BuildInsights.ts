@@ -26,8 +26,142 @@ export interface PerformanceInsight {
   algorithmVersion: string;
 }
 
+// One deterministic compatibility verdict. `a`/`b` carry the compared values so
+// the UI can localize a sentence around them (e.g. "AM4 = AM4").
+export interface CompatibilityCheck {
+  code: 'socket' | 'memory' | 'formFactor' | 'psu' | 'cooler';
+  status: 'ok' | 'warn' | 'unknown';
+  a: string | null;
+  b: string | null;
+}
+
+export interface PowerInsight {
+  estimatedDrawW: number;
+  recommendedPsuW: number;
+  chosenPsuW: number | null;
+  headroomPct: number | null;
+}
+
 export interface BuildInsights {
   performance: PerformanceInsight | null;
+  compatibility: CompatibilityCheck[];
+  power: PowerInsight | null;
+}
+
+export interface CompatibilityInput {
+  cpuSocket: string | null;
+  cpuTdp: number | null;
+  gpuTdp: number | null;
+  moboSocket: string | null;
+  moboMemory: string | null;
+  moboForm: string | null;
+  ramMemory: string | null;
+  caseForm: string | null;
+  psuWatts: number | null;
+  coolerType: string | null;
+}
+
+// How much a case can physically hold, and how big a board is. Higher = larger.
+function caseCapacityRank(form: string | null): number | null {
+  if (!form) return null;
+  if (/full tower|e-atx/i.test(form)) return 4;
+  if (/mid tower|^atx$/i.test(form)) return 3;
+  if (/micro|matx|m-atx/i.test(form)) return 2;
+  if (/mini|itx/i.test(form)) return 1;
+  return null;
+}
+function boardRank(form: string | null): number | null {
+  if (!form) return null;
+  if (/e-atx/i.test(form)) return 4;
+  if (/micro|matx|m-atx/i.test(form)) return 2;
+  if (/mini|itx/i.test(form)) return 1;
+  if (/atx/i.test(form)) return 3;
+  return null;
+}
+
+// Rough non-CPU/GPU system overhead (board, RAM, drives, fans) in watts.
+const REST_OF_SYSTEM_W = 150;
+
+export function computeCompatibility(input: CompatibilityInput): {
+  checks: CompatibilityCheck[];
+  power: PowerInsight | null;
+} {
+  const checks: CompatibilityCheck[] = [];
+
+  // Socket: CPU vs motherboard.
+  checks.push({
+    code: 'socket',
+    a: input.cpuSocket,
+    b: input.moboSocket,
+    status:
+      input.cpuSocket && input.moboSocket
+        ? input.cpuSocket === input.moboSocket
+          ? 'ok'
+          : 'warn'
+        : 'unknown',
+  });
+
+  // Memory: RAM type vs motherboard support.
+  checks.push({
+    code: 'memory',
+    a: input.ramMemory,
+    b: input.moboMemory,
+    status:
+      input.ramMemory && input.moboMemory
+        ? input.ramMemory === input.moboMemory
+          ? 'ok'
+          : 'warn'
+        : 'unknown',
+  });
+
+  // Form factor: does the case fit the board?
+  const cap = caseCapacityRank(input.caseForm);
+  const brd = boardRank(input.moboForm);
+  checks.push({
+    code: 'formFactor',
+    a: input.caseForm,
+    b: input.moboForm,
+    status: cap !== null && brd !== null ? (cap >= brd ? 'ok' : 'warn') : 'unknown',
+  });
+
+  // PSU headroom vs estimated draw.
+  let power: PowerInsight | null = null;
+  if (input.cpuTdp !== null && input.gpuTdp !== null) {
+    const estimatedDrawW = input.cpuTdp + input.gpuTdp + REST_OF_SYSTEM_W;
+    const recommendedPsuW = Math.ceil((estimatedDrawW * 1.3) / 50) * 50;
+    const chosenPsuW = input.psuWatts ?? null;
+    const headroomPct =
+      chosenPsuW !== null
+        ? Math.round(((chosenPsuW - estimatedDrawW) / estimatedDrawW) * 100)
+        : null;
+    power = { estimatedDrawW, recommendedPsuW, chosenPsuW, headroomPct };
+    checks.push({
+      code: 'psu',
+      a: chosenPsuW !== null ? `${chosenPsuW}W` : null,
+      b: `${recommendedPsuW}W`,
+      status: chosenPsuW === null ? 'unknown' : chosenPsuW >= recommendedPsuW ? 'ok' : 'warn',
+    });
+  } else {
+    checks.push({
+      code: 'psu',
+      a: input.psuWatts ? `${input.psuWatts}W` : null,
+      b: null,
+      status: 'unknown',
+    });
+  }
+
+  // Cooler adequacy: a plain air cooler on a high-TDP CPU gets a soft warning.
+  const highTdp = (input.cpuTdp ?? 0) >= 125;
+  const isAir = input.coolerType ? /air/i.test(input.coolerType) : false;
+  checks.push({
+    code: 'cooler',
+    a: input.coolerType,
+    b: input.cpuTdp !== null ? `${input.cpuTdp}W` : null,
+    status:
+      !input.coolerType || input.cpuTdp === null ? 'unknown' : highTdp && isAir ? 'warn' : 'ok',
+  });
+
+  return { checks, power };
 }
 
 // Gaming-relevant profiles shown in the FPS table (skip VR to stay focused).

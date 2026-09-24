@@ -184,7 +184,21 @@
     "cpuLimited": "CPU-limited {pct}%",
     "gpuLimited": "GPU-limited {pct}%",
     "cpuPower": "CPU power",
-    "gpuPower": "GPU power"
+    "gpuPower": "GPU power",
+    "compatibility": "Compatibility check",
+    "compatSocket": "CPU socket {cpu} matches motherboard {mobo}",
+    "compatSocketUnknown": "CPU/motherboard socket not verified",
+    "compatMemory": "{ram} RAM matches motherboard ({mobo})",
+    "compatMemoryUnknown": "RAM/motherboard memory type not verified",
+    "compatForm": "{mobo} board fits the {case} case",
+    "compatFormUnknown": "Case/board form factor not verified",
+    "compatPsu": "PSU {chosen} covers the recommended {needed}",
+    "compatPsuUnknown": "PSU wattage not verified",
+    "compatCoolerOk": "{cooler} cooler is adequate for the CPU ({tdp})",
+    "compatCoolerWarn": "{cooler} cooler may be light for a {tdp} CPU",
+    "compatCoolerUnknown": "Cooler adequacy not verified",
+    "psuHeadroom": "PSU headroom",
+    "draw": "draw"
   },
   "gaming": {
     "pro": "Pro",

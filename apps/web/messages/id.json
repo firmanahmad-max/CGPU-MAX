@@ -184,7 +184,21 @@
     "cpuLimited": "Dibatasi CPU {pct}%",
     "gpuLimited": "Dibatasi GPU {pct}%",
     "cpuPower": "Daya CPU",
-    "gpuPower": "Daya GPU"
+    "gpuPower": "Daya GPU",
+    "compatibility": "Cek kompatibilitas",
+    "compatSocket": "Socket CPU {cpu} cocok dengan motherboard {mobo}",
+    "compatSocketUnknown": "Socket CPU/motherboard belum terverifikasi",
+    "compatMemory": "RAM {ram} cocok dengan motherboard ({mobo})",
+    "compatMemoryUnknown": "Tipe memori RAM/motherboard belum terverifikasi",
+    "compatForm": "Board {mobo} muat di casing {case}",
+    "compatFormUnknown": "Form factor casing/board belum terverifikasi",
+    "compatPsu": "PSU {chosen} memenuhi rekomendasi {needed}",
+    "compatPsuUnknown": "Watt PSU belum terverifikasi",
+    "compatCoolerOk": "Cooler {cooler} memadai untuk CPU ({tdp})",
+    "compatCoolerWarn": "Cooler {cooler} mungkin kurang untuk CPU {tdp}",
+    "compatCoolerUnknown": "Kecukupan cooler belum terverifikasi",
+    "psuHeadroom": "Headroom PSU",
+    "draw": "konsumsi"
   },
   "gaming": {
     "pro": "Pro",
