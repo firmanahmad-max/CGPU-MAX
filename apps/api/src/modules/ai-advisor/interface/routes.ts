@@ -5,11 +5,13 @@ import { requireFeature } from '../../../shared/auth/requireFeature.js';
 import { NotFoundError } from '../../../shared/errors/AppError.js';
 import { prisma } from '../../../shared/persistence/prisma.js';
 import { GenerateBuildAdvice } from '../application/GenerateBuildAdvice.js';
+import { RecomputeBuildInsights } from '../application/RecomputeBuildInsights.js';
 
 import { advisorDemoBypass } from './demoBypass.js';
-import { adviceBody, shareSlugParam } from './validators.js';
+import { adviceBody, recomputeBody, shareSlugParam } from './validators.js';
 
 const useCase = new GenerateBuildAdvice(prisma);
+const recompute = new RecomputeBuildInsights(prisma);
 
 export const aiAdvisorRouter = Router();
 
@@ -25,6 +27,22 @@ aiAdvisorRouter.post(
       const body = adviceBody.parse(req.body);
       const result = await useCase.execute(req.auth!, body);
       res.status(201).json(result);
+    } catch (err) {
+      next(err);
+    }
+  },
+);
+
+// Recompute deterministic insights for an edited parts list (interactive swap).
+// Pro-gated like the generator, but does not call the AI or consume quota.
+aiAdvisorRouter.post(
+  '/insights',
+  requireAuth,
+  requireFeature('aiAdvisor'),
+  async (req, res, next) => {
+    try {
+      const body = recomputeBody.parse(req.body);
+      res.json(await recompute.execute(body));
     } catch (err) {
       next(err);
     }

@@ -204,7 +204,12 @@
     "electricity": "Electricity",
     "perMonthShort": "mo",
     "powerDraw": "Power draw",
-    "hoursAssumption": "assumes {h}h/day"
+    "hoursAssumption": "assumes {h}h/day",
+    "swap": "Swap",
+    "close": "Close",
+    "swapHint": "Swap any part below to see the numbers update live.",
+    "loadingAlts": "Loading options…",
+    "noAlts": "No alternatives found."
   },
   "gaming": {
     "pro": "Pro",

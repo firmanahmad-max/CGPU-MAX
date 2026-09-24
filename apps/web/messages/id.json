@@ -204,7 +204,12 @@
     "electricity": "Listrik",
     "perMonthShort": "bln",
     "powerDraw": "Konsumsi daya",
-    "hoursAssumption": "asumsi {h} jam/hari"
+    "hoursAssumption": "asumsi {h} jam/hari",
+    "swap": "Ganti",
+    "close": "Tutup",
+    "swapHint": "Ganti komponen di bawah untuk melihat angka diperbarui langsung.",
+    "loadingAlts": "Memuat opsi…",
+    "noAlts": "Tidak ada alternatif."
   },
   "gaming": {
     "pro": "Pro",

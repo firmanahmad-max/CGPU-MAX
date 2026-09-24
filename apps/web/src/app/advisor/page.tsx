@@ -215,7 +215,9 @@ export default function AdvisorPage() {
             {error && <p className="text-cred text-sm">{error}</p>}
           </div>
 
-          {advice && <BuildAdviceResult advice={advice} />}
+          {advice && (
+            <BuildAdviceResult advice={advice} resolution={resolution} budgetUsd={budget} />
+          )}
         </SignedIn>
       </main>
     </>

@@ -4,17 +4,8 @@ import type { AuthContext } from '../../../shared/auth/AuthContext.js';
 import { env } from '../../../shared/config/env.js';
 import { AppError } from '../../../shared/errors/AppError.js';
 import { logger } from '../../../shared/logging/logger.js';
-import { BottleneckAlgorithm } from '../../bottleneck/domain/BottleneckAlgorithm.js';
-import { buildProcessorSnapshot } from '../../comparisons/application/BuildSnapshot.js';
 import { EnforceUsageLimit } from '../../subscriptions/application/EnforceUsageLimit.js';
 import type { BuildAdvice, ComponentPick } from '../domain/BuildAdvice.js';
-import {
-  computeBudget,
-  computeCompatibility,
-  computeEconomics,
-  toPerformanceInsight,
-  type BuildInsights,
-} from '../domain/BuildInsights.js';
 import {
   buildCatalogContext,
   buildUserMessage,
@@ -26,6 +17,8 @@ import {
 import { buildAdviceJsonSchema, buildAdviceZod } from '../domain/schema.js';
 import { anthropic } from '../infrastructure/AnthropicClient.js';
 import { openAICompatible } from '../infrastructure/OpenAICompatibleClient.js';
+
+import { computeBuildInsights, type ResolvedPick } from './BuildInsightsService.js';
 
 // Prefer an OpenAI-compatible gateway (e.g. Sumopod) when configured; otherwise
 // fall back to Anthropic. The advisor is disabled unless one is set.
@@ -45,7 +38,6 @@ const CATALOG_LIMIT = 60;
 
 export class GenerateBuildAdvice {
   private readonly usage: EnforceUsageLimit;
-  private readonly bottleneck = new BottleneckAlgorithm();
 
   constructor(private readonly prisma: PrismaClient) {
     this.usage = new EnforceUsageLimit(prisma);
@@ -74,7 +66,18 @@ export class GenerateBuildAdvice {
       ? await this.callOpenAI(userMessage)
       : await this.callClaude(userMessage);
     const validated = this.validateAndGround(advice, catalog, components, req);
-    const insights = await this.computeInsights(validated, req, components);
+    const pickList: ResolvedPick[] = [
+      validated.cpu,
+      validated.gpu,
+      validated.motherboard,
+      validated.ram,
+      validated.ssd,
+      validated.psu,
+      validated.case,
+      validated.cooler,
+      ...(validated.monitor ? [validated.monitor] : []),
+    ].map((p) => ({ category: p.category, slug: p.slug, priceUsd: p.approxPriceUsd }));
+    const { insights } = await computeBuildInsights(this.prisma, pickList, req.resolution);
     const enriched = { ...validated, insights };
 
     const modelUsed = activeModel();
@@ -92,111 +95,6 @@ export class GenerateBuildAdvice {
     });
 
     return { ...enriched, shareSlug, modelUsed };
-  }
-
-  // Deterministic enrichment computed from the grounded picks — never the model.
-  // Phase 1: reuse the bottleneck engine to derive FPS + balance for the chosen
-  // CPU + GPU at the user's target resolution. Silently degrades to null when a
-  // pick is out-of-catalog or its specs are missing.
-  private async computeInsights(
-    advice: BuildAdvice,
-    req: AdvisorRequest,
-    components: ComponentCatalogPart[],
-  ): Promise<BuildInsights> {
-    const [performance, compat] = await Promise.all([
-      this.computePerformance(advice.cpu.slug, advice.gpu.slug, req.resolution),
-      this.computeCompatibility(advice, components),
-    ]);
-
-    // Budget allocation across every recommended part.
-    const picks = [
-      advice.cpu,
-      advice.gpu,
-      advice.motherboard,
-      advice.ram,
-      advice.ssd,
-      advice.psu,
-      advice.case,
-      advice.cooler,
-      ...(advice.monitor ? [advice.monitor] : []),
-    ].map((p) => ({ category: p.category, priceUsd: p.approxPriceUsd }));
-    const budget = computeBudget(picks);
-
-    // Economics: electricity/month + cost-per-frame, when we have both a power
-    // draw and an FPS figure.
-    const aaaMaxFps = performance?.fps.find((f) => f.profile === 'aaa')?.max ?? 0;
-    const economics = compat.power
-      ? computeEconomics(budget.totalUsd, compat.power.estimatedDrawW, aaaMaxFps)
-      : null;
-
-    return {
-      performance,
-      compatibility: compat.checks,
-      power: compat.power,
-      budget,
-      economics,
-    };
-  }
-
-  // Look up the grounded picks' real specs and run the deterministic
-  // compatibility + PSU-headroom checks. Missing specs degrade to 'unknown'.
-  private async computeCompatibility(advice: BuildAdvice, components: ComponentCatalogPart[]) {
-    const bySlug = new Map(components.map((c) => [c.slug, c]));
-    const comp = (slug: string | null) => (slug ? (bySlug.get(slug) ?? null) : null);
-    const mobo = comp(advice.motherboard.slug);
-    const ram = comp(advice.ram.slug);
-    const psu = comp(advice.psu.slug);
-    const pcCase = comp(advice.case.slug);
-    const cooler = comp(advice.cooler.slug);
-
-    // CPU socket + CPU/GPU TDP come from the processor table.
-    const slugs = [advice.cpu.slug, advice.gpu.slug].filter((s): s is string => Boolean(s));
-    const procs = slugs.length
-      ? await this.prisma.processor.findMany({
-          where: { slug: { in: slugs } },
-          select: {
-            slug: true,
-            type: true,
-            tdpWatts: true,
-            cpuSpecs: { select: { socket: true } },
-          },
-        })
-      : [];
-    const cpuRow = procs.find((p) => p.type === 'CPU');
-    const gpuRow = procs.find((p) => p.type === 'GPU');
-
-    return computeCompatibility({
-      cpuSocket: cpuRow?.cpuSpecs?.socket ?? null,
-      cpuTdp: cpuRow?.tdpWatts ?? null,
-      gpuTdp: gpuRow?.tdpWatts ?? null,
-      moboSocket: mobo?.socket ?? null,
-      moboMemory: mobo?.memoryType ?? null,
-      moboForm: mobo?.formFactor ?? null,
-      ramMemory: ram?.memoryType ?? null,
-      caseForm: pcCase?.formFactor ?? null,
-      psuWatts: psu?.wattage ?? null,
-      coolerType: cooler?.formFactor ?? null,
-    });
-  }
-
-  private async computePerformance(
-    cpuSlug: string | null,
-    gpuSlug: string | null,
-    resolution: AdvisorRequest['resolution'],
-  ) {
-    if (!cpuSlug || !gpuSlug) return null;
-    try {
-      const [cpu, gpu] = await Promise.all([
-        buildProcessorSnapshot(this.prisma, cpuSlug),
-        buildProcessorSnapshot(this.prisma, gpuSlug),
-      ]);
-      if (cpu.type !== 'CPU' || gpu.type !== 'GPU') return null;
-      const outcome = this.bottleneck.evaluate(cpu, gpu);
-      return toPerformanceInsight(outcome, resolution);
-    } catch (err) {
-      logger.warn({ err, cpuSlug, gpuSlug }, 'Build performance insight skipped');
-      return null;
-    }
   }
 
   private async loadCatalog(budgetUsd: number): Promise<CatalogPart[]> {

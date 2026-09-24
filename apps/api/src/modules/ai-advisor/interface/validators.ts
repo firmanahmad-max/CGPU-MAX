@@ -9,6 +9,26 @@ export const adviceBody = z.object({
   includeMonitor: z.coerce.boolean().optional(),
 });
 
+const PICK_CATEGORY = z.enum([
+  'cpu',
+  'gpu',
+  'motherboard',
+  'ram',
+  'ssd',
+  'psu',
+  'case',
+  'cooler',
+  'monitor',
+]);
+
+export const recomputeBody = z.object({
+  picks: z
+    .array(z.object({ category: PICK_CATEGORY, slug: z.string().trim().min(1).max(120) }))
+    .min(1)
+    .max(9),
+  resolution: z.enum(['1080p', '1440p', '4K']),
+});
+
 export const shareSlugParam = z.object({
   shareSlug: z
     .string()
