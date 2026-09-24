@@ -198,7 +198,13 @@
     "compatCoolerWarn": "{cooler} cooler may be light for a {tdp} CPU",
     "compatCoolerUnknown": "Cooler adequacy not verified",
     "psuHeadroom": "PSU headroom",
-    "draw": "draw"
+    "draw": "draw",
+    "budgetBreakdown": "Budget breakdown",
+    "costPerFrame": "Cost / FPS",
+    "electricity": "Electricity",
+    "perMonthShort": "mo",
+    "powerDraw": "Power draw",
+    "hoursAssumption": "assumes {h}h/day"
   },
   "gaming": {
     "pro": "Pro",

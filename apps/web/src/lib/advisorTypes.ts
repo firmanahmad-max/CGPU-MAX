@@ -53,10 +53,30 @@ export interface PowerInsight {
   headroomPct: number | null;
 }
 
+export interface BudgetLine {
+  category: PickCategory;
+  priceUsd: number;
+  pct: number;
+}
+export interface BudgetInsight {
+  totalUsd: number;
+  lines: BudgetLine[];
+}
+
+export interface EconomicsInsight {
+  loadDrawW: number;
+  hoursPerDay: number;
+  kwhPerMonth: number;
+  electricityIdrPerMonth: number;
+  costPerFrameUsd: number | null;
+}
+
 export interface BuildInsights {
   performance: PerformanceInsight | null;
   compatibility?: CompatibilityCheck[];
   power?: PowerInsight | null;
+  budget?: BudgetInsight | null;
+  economics?: EconomicsInsight | null;
 }
 
 export interface BuildAdvice {

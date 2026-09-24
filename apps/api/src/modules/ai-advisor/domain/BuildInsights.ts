@@ -7,6 +7,8 @@ import type { GameProfile, LimitingComponent, Resolution } from '@cgpu-max/types
 
 import type { BottleneckOutcome } from '../../bottleneck/domain/BottleneckAlgorithm.js';
 
+import type { PickCategory } from './BuildAdvice.js';
+
 export interface FpsEstimate {
   profile: GameProfile;
   label: string;
@@ -42,10 +44,66 @@ export interface PowerInsight {
   headroomPct: number | null;
 }
 
+export interface BudgetLine {
+  category: PickCategory;
+  priceUsd: number;
+  pct: number;
+}
+export interface BudgetInsight {
+  totalUsd: number;
+  lines: BudgetLine[];
+}
+
+export interface EconomicsInsight {
+  loadDrawW: number;
+  hoursPerDay: number;
+  kwhPerMonth: number;
+  electricityIdrPerMonth: number;
+  // Value: build price divided by AAA FPS at the target resolution.
+  costPerFrameUsd: number | null;
+}
+
 export interface BuildInsights {
   performance: PerformanceInsight | null;
   compatibility: CompatibilityCheck[];
   power: PowerInsight | null;
+  budget: BudgetInsight | null;
+  economics: EconomicsInsight | null;
+}
+
+// Group the picks' prices into a budget-allocation breakdown (% of total).
+export function computeBudget(
+  picks: { category: PickCategory; priceUsd: number }[],
+): BudgetInsight {
+  const total = picks.reduce((s, p) => s + (Number.isFinite(p.priceUsd) ? p.priceUsd : 0), 0);
+  const lines: BudgetLine[] = picks.map((p) => ({
+    category: p.category,
+    priceUsd: Math.round(p.priceUsd),
+    pct: total > 0 ? Math.round((p.priceUsd / total) * 100) : 0,
+  }));
+  return { totalUsd: Math.round(total), lines };
+}
+
+// Indonesian electricity tariff (~PLN R1/R2, Rp/kWh) and a realistic daily load
+// window; both surfaced so the UI can show the assumption.
+const TARIFF_IDR_PER_KWH = 1700;
+const LOAD_HOURS_PER_DAY = 6;
+const LOAD_FACTOR = 0.7; // average draw is well below peak TDP
+
+export function computeEconomics(
+  totalUsd: number,
+  drawW: number,
+  aaaMaxFps: number,
+): EconomicsInsight {
+  const kwhPerMonth =
+    Math.round(((drawW * LOAD_FACTOR) / 1000) * LOAD_HOURS_PER_DAY * 30 * 10) / 10;
+  return {
+    loadDrawW: drawW,
+    hoursPerDay: LOAD_HOURS_PER_DAY,
+    kwhPerMonth,
+    electricityIdrPerMonth: Math.round(kwhPerMonth * TARIFF_IDR_PER_KWH),
+    costPerFrameUsd: aaaMaxFps > 0 ? Math.round((totalUsd / aaaMaxFps) * 100) / 100 : null,
+  };
 }
 
 export interface CompatibilityInput {

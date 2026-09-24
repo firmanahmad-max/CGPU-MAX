@@ -9,7 +9,9 @@ import { buildProcessorSnapshot } from '../../comparisons/application/BuildSnaps
 import { EnforceUsageLimit } from '../../subscriptions/application/EnforceUsageLimit.js';
 import type { BuildAdvice, ComponentPick } from '../domain/BuildAdvice.js';
 import {
+  computeBudget,
   computeCompatibility,
+  computeEconomics,
   toPerformanceInsight,
   type BuildInsights,
 } from '../domain/BuildInsights.js';
@@ -105,7 +107,35 @@ export class GenerateBuildAdvice {
       this.computePerformance(advice.cpu.slug, advice.gpu.slug, req.resolution),
       this.computeCompatibility(advice, components),
     ]);
-    return { performance, compatibility: compat.checks, power: compat.power };
+
+    // Budget allocation across every recommended part.
+    const picks = [
+      advice.cpu,
+      advice.gpu,
+      advice.motherboard,
+      advice.ram,
+      advice.ssd,
+      advice.psu,
+      advice.case,
+      advice.cooler,
+      ...(advice.monitor ? [advice.monitor] : []),
+    ].map((p) => ({ category: p.category, priceUsd: p.approxPriceUsd }));
+    const budget = computeBudget(picks);
+
+    // Economics: electricity/month + cost-per-frame, when we have both a power
+    // draw and an FPS figure.
+    const aaaMaxFps = performance?.fps.find((f) => f.profile === 'aaa')?.max ?? 0;
+    const economics = compat.power
+      ? computeEconomics(budget.totalUsd, compat.power.estimatedDrawW, aaaMaxFps)
+      : null;
+
+    return {
+      performance,
+      compatibility: compat.checks,
+      power: compat.power,
+      budget,
+      economics,
+    };
   }
 
   // Look up the grounded picks' real specs and run the deterministic

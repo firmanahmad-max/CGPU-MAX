@@ -4,12 +4,15 @@ import { useTranslations } from 'next-intl';
 import Link from 'next/link';
 
 import type {
+  BudgetInsight,
   BuildAdvice,
   CompatibilityCheck,
   ComponentPick,
+  EconomicsInsight,
   PerformanceInsight,
   PowerInsight,
 } from '@/lib/advisorTypes';
+import { formatIdrValue } from '@/lib/currency';
 import { useCurrency } from '@/lib/currency-context';
 
 import { Pill } from './Pill';
@@ -67,6 +70,13 @@ export function BuildAdviceResult({ advice }: { advice: BuildAdvice }) {
 
       {advice.insights?.performance && <PerformancePanel p={advice.insights.performance} />}
 
+      {advice.insights?.budget && advice.insights.budget.lines.length > 0 && (
+        <BudgetPanel
+          budget={advice.insights.budget}
+          economics={advice.insights.economics ?? null}
+        />
+      )}
+
       <div className="card">
         <p className="label mb-2">{t('upgradePath')}</p>
         <p className="text-ink-mid text-sm">{advice.upgradePathNote}</p>
@@ -105,6 +115,90 @@ function PickCard({ pick }: { pick: ComponentPick }) {
         <p className="font-display text-ink-hi text-lg font-semibold">{pick.modelName}</p>
       )}
       <p className="text-ink-muted mt-2 text-sm">{pick.rationale}</p>
+    </div>
+  );
+}
+
+const CAT_TONE: Record<string, string> = {
+  cpu: 'bg-cblue',
+  gpu: 'bg-lime',
+  motherboard: 'bg-camber',
+  ram: 'bg-cblue/70',
+  ssd: 'bg-lime/70',
+  psu: 'bg-camber/70',
+  case: 'bg-ink-faint',
+  cooler: 'bg-cblue/50',
+  monitor: 'bg-lime/50',
+};
+
+function BudgetPanel({
+  budget,
+  economics,
+}: {
+  budget: BudgetInsight;
+  economics: EconomicsInsight | null;
+}) {
+  const t = useTranslations('advisor');
+  const { format } = useCurrency();
+  const lines = [...budget.lines].sort((a, b) => b.priceUsd - a.priceUsd);
+
+  return (
+    <div className="card">
+      <p className="label mb-3">{t('budgetBreakdown')}</p>
+
+      {/* Stacked allocation bar */}
+      <div className="bg-panel-2 mb-4 flex h-3 w-full overflow-hidden rounded-full">
+        {lines.map((l) => (
+          <div
+            key={l.category}
+            className={`${CAT_TONE[l.category] ?? 'bg-ink-faint'} h-full`}
+            style={{ width: `${l.pct}%` }}
+            title={`${l.category} ${l.pct}%`}
+          />
+        ))}
+      </div>
+
+      <ul className="space-y-1.5">
+        {lines.map((l) => (
+          <li key={l.category} className="flex items-center gap-3 text-[12.5px]">
+            <span
+              className={`${CAT_TONE[l.category] ?? 'bg-ink-faint'} h-2.5 w-2.5 flex-shrink-0 rounded-sm`}
+            />
+            <span className="text-ink-mid w-24 flex-shrink-0 capitalize">{l.category}</span>
+            <span className="text-ink-faint w-10 flex-shrink-0 font-mono text-[11px]">
+              {l.pct}%
+            </span>
+            <span className="text-ink-hi ml-auto font-mono">{format(l.priceUsd)}</span>
+          </li>
+        ))}
+      </ul>
+
+      {economics && (
+        <div className="border-hairline mt-4 grid grid-cols-2 gap-3 border-t pt-4 sm:grid-cols-3">
+          {economics.costPerFrameUsd !== null && (
+            <MiniStat label={t('costPerFrame')} value={`${format(economics.costPerFrameUsd)}`} />
+          )}
+          <MiniStat
+            label={t('electricity')}
+            value={`${formatIdrValue(economics.electricityIdrPerMonth)}/${t('perMonthShort')}`}
+          />
+          <MiniStat
+            label={t('powerDraw')}
+            value={`~${economics.loadDrawW}W`}
+            hint={t('hoursAssumption', { h: economics.hoursPerDay })}
+          />
+        </div>
+      )}
+    </div>
+  );
+}
+
+function MiniStat({ label, value, hint }: { label: string; value: string; hint?: string }) {
+  return (
+    <div>
+      <p className="label">{label}</p>
+      <p className="text-ink-hi mt-1 font-mono text-sm">{value}</p>
+      {hint && <p className="text-ink-faint mt-0.5 text-[10px]">{hint}</p>}
     </div>
   );
 }

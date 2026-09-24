@@ -198,7 +198,13 @@
     "compatCoolerWarn": "Cooler {cooler} mungkin kurang untuk CPU {tdp}",
     "compatCoolerUnknown": "Kecukupan cooler belum terverifikasi",
     "psuHeadroom": "Headroom PSU",
-    "draw": "konsumsi"
+    "draw": "konsumsi",
+    "budgetBreakdown": "Rincian anggaran",
+    "costPerFrame": "Harga / FPS",
+    "electricity": "Listrik",
+    "perMonthShort": "bln",
+    "powerDraw": "Konsumsi daya",
+    "hoursAssumption": "asumsi {h} jam/hari"
   },
   "gaming": {
     "pro": "Pro",
