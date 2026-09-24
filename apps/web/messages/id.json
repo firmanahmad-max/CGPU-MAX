@@ -209,7 +209,13 @@
     "close": "Tutup",
     "swapHint": "Ganti komponen di bawah untuk melihat angka diperbarui langsung.",
     "loadingAlts": "Memuat opsi…",
-    "noAlts": "Tidak ada alternatif."
+    "noAlts": "Tidak ada alternatif.",
+    "refine": "Sempurnakan (buat ulang)",
+    "refine_quieter": "Rakitan lebih senyap",
+    "refine_cheaper": "Lebih hemat",
+    "refine_amd": "Utamakan AMD",
+    "refine_intel": "Utamakan Intel",
+    "refine_upgradeRoom": "Sisakan ruang upgrade"
   },
   "gaming": {
     "pro": "Pro",

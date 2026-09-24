@@ -209,7 +209,13 @@
     "close": "Close",
     "swapHint": "Swap any part below to see the numbers update live.",
     "loadingAlts": "Loading options…",
-    "noAlts": "No alternatives found."
+    "noAlts": "No alternatives found.",
+    "refine": "Refine (regenerates)",
+    "refine_quieter": "Quieter build",
+    "refine_cheaper": "Cheaper",
+    "refine_amd": "Prefer AMD",
+    "refine_intel": "Prefer Intel",
+    "refine_upgradeRoom": "Leave upgrade room"
   },
   "gaming": {
     "pro": "Pro",

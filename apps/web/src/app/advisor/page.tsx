@@ -19,6 +19,7 @@ const PURPOSES: { value: BuildPurpose; labelKey: string }[] = [
   { value: 'budget', labelKey: 'purposeBudget' },
 ];
 const RESOLUTIONS: Resolution[] = ['1080p', '1440p', '4K'];
+const REFINEMENTS = ['quieter', 'cheaper', 'amd', 'intel', 'upgradeRoom'] as const;
 
 export default function AdvisorPage() {
   const t = useTranslations('advisor');
@@ -34,10 +35,11 @@ export default function AdvisorPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const onGenerate = async () => {
+  const onGenerate = async (extra?: string) => {
     setLoading(true);
     setError(null);
     setAdvice(null);
+    const mergedPreferences = [preferences, extra].filter(Boolean).join('; ');
     try {
       const res = await authedFetch('/api/v1/advisor/build', {
         method: 'POST',
@@ -46,7 +48,7 @@ export default function AdvisorPage() {
           budgetUsd: budget,
           purpose,
           resolution,
-          preferences,
+          preferences: mergedPreferences,
           language: locale,
           includeMonitor,
         }),
@@ -206,7 +208,7 @@ export default function AdvisorPage() {
 
             <button
               type="button"
-              onClick={onGenerate}
+              onClick={() => onGenerate()}
               disabled={loading}
               className="rounded-control bg-lime text-lime-ink px-6 py-2 text-sm font-semibold transition hover:brightness-110 disabled:opacity-50"
             >
@@ -214,6 +216,24 @@ export default function AdvisorPage() {
             </button>
             {error && <p className="text-cred text-sm">{error}</p>}
           </div>
+
+          {advice && !loading && (
+            <div className="mt-6">
+              <p className="label mb-2">{t('refine')}</p>
+              <div className="flex flex-wrap gap-2">
+                {REFINEMENTS.map((r) => (
+                  <button
+                    key={r}
+                    type="button"
+                    onClick={() => onGenerate(t(`refine_${r}`))}
+                    className="rounded-pill border-hairline bg-panel text-ink-faint hover:text-ink border px-3 py-1 text-xs transition"
+                  >
+                    {t(`refine_${r}`)}
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
 
           {advice && (
             <BuildAdviceResult advice={advice} resolution={resolution} budgetUsd={budget} />
