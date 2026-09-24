@@ -215,7 +215,14 @@
     "refine_cheaper": "Cheaper",
     "refine_amd": "Prefer AMD",
     "refine_intel": "Prefer Intel",
-    "refine_upgradeRoom": "Leave upgrade room"
+    "refine_upgradeRoom": "Leave upgrade room",
+    "shareLink": "Copy share link",
+    "copyList": "Copy parts list",
+    "copied": "Copied ✓",
+    "sharedTitle": "Shared build",
+    "sharedSubtitle": "A build recommendation shared from CGPU-MAX.",
+    "sharedNotFound": "This build could not be found.",
+    "buildYourOwn": "Build your own"
   },
   "gaming": {
     "pro": "Pro",

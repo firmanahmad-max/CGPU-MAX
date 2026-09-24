@@ -215,7 +215,14 @@
     "refine_cheaper": "Lebih hemat",
     "refine_amd": "Utamakan AMD",
     "refine_intel": "Utamakan Intel",
-    "refine_upgradeRoom": "Sisakan ruang upgrade"
+    "refine_upgradeRoom": "Sisakan ruang upgrade",
+    "shareLink": "Salin tautan bagikan",
+    "copyList": "Salin daftar part",
+    "copied": "Tersalin ✓",
+    "sharedTitle": "Rakitan dibagikan",
+    "sharedSubtitle": "Rekomendasi rakitan yang dibagikan dari CGPU-MAX.",
+    "sharedNotFound": "Rakitan ini tidak ditemukan.",
+    "buildYourOwn": "Buat rakitan sendiri"
   },
   "gaming": {
     "pro": "Pro",

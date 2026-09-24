@@ -75,21 +75,50 @@ export function BuildAdviceResult({
   advice,
   resolution,
   budgetUsd,
+  readOnly = false,
 }: {
   advice: BuildAdvice;
   resolution?: '1080p' | '1440p' | '4K';
   budgetUsd?: number;
+  readOnly?: boolean;
 }) {
   const t = useTranslations('advisor');
   const { format } = useCurrency();
   const authedFetch = useAuthedFetch();
   const [current, setCurrent] = useState<BuildAdvice>(advice);
   const [busy, setBusy] = useState(false);
+  const [copied, setCopied] = useState<'link' | 'list' | null>(null);
 
   // Reset when a fresh recommendation arrives.
   useEffect(() => setCurrent(advice), [advice]);
 
   const res = resolution ?? current.insights?.performance?.targetResolution ?? '1440p';
+
+  const copy = async (kind: 'link' | 'list') => {
+    const parts = [
+      current.cpu,
+      current.gpu,
+      current.motherboard,
+      current.ram,
+      current.ssd,
+      current.psu,
+      current.case,
+      current.cooler,
+      ...(current.monitor ? [current.monitor] : []),
+    ];
+    const text =
+      kind === 'link'
+        ? `${window.location.origin}/build/${current.shareSlug}`
+        : parts.map((p) => `${p.category.toUpperCase()}: ${p.modelName}`).join('\n') +
+          `\nTOTAL: ${format(current.estimatedTotalUsd)}`;
+    try {
+      await navigator.clipboard.writeText(text);
+      setCopied(kind);
+      setTimeout(() => setCopied(null), 1500);
+    } catch {
+      /* clipboard blocked — ignore */
+    }
+  };
 
   const onSwap = async (category: string, alt: Alternative) => {
     const key = category as keyof BuildAdvice;
@@ -151,24 +180,43 @@ export function BuildAdviceResult({
           <span className="text-ink-faint text-xs">{t('poweredBy')}</span>
         </div>
         <p className="text-ink text-sm leading-relaxed">{current.summary}</p>
-        <p className="text-ink-faint mt-2 text-[11px]">{t('swapHint')}</p>
+        {!readOnly && <p className="text-ink-faint mt-2 text-[11px]">{t('swapHint')}</p>}
+
+        <div className="mt-3 flex flex-wrap gap-2">
+          {current.shareSlug && (
+            <button
+              type="button"
+              onClick={() => copy('link')}
+              className="rounded-pill border-hairline text-ink-faint hover:text-ink border px-3 py-1 text-[11px] transition"
+            >
+              {copied === 'link' ? t('copied') : t('shareLink')}
+            </button>
+          )}
+          <button
+            type="button"
+            onClick={() => copy('list')}
+            className="rounded-pill border-hairline text-ink-faint hover:text-ink border px-3 py-1 text-[11px] transition"
+          >
+            {copied === 'list' ? t('copied') : t('copyList')}
+          </button>
+        </div>
       </div>
 
       <div className="grid gap-4 sm:grid-cols-2">
-        <PickCard pick={current.cpu} onSwap={onSwap} busy={busy} />
-        <PickCard pick={current.gpu} onSwap={onSwap} busy={busy} />
-        <PickCard pick={current.motherboard} onSwap={onSwap} busy={busy} />
-        <PickCard pick={current.ram} onSwap={onSwap} busy={busy} />
-        <PickCard pick={current.ssd} onSwap={onSwap} busy={busy} />
-        <PickCard pick={current.psu} onSwap={onSwap} busy={busy} />
-        <PickCard pick={current.case} onSwap={onSwap} busy={busy} />
-        <PickCard pick={current.cooler} onSwap={onSwap} busy={busy} />
+        <PickCard pick={current.cpu} onSwap={readOnly ? undefined : onSwap} busy={busy} />
+        <PickCard pick={current.gpu} onSwap={readOnly ? undefined : onSwap} busy={busy} />
+        <PickCard pick={current.motherboard} onSwap={readOnly ? undefined : onSwap} busy={busy} />
+        <PickCard pick={current.ram} onSwap={readOnly ? undefined : onSwap} busy={busy} />
+        <PickCard pick={current.ssd} onSwap={readOnly ? undefined : onSwap} busy={busy} />
+        <PickCard pick={current.psu} onSwap={readOnly ? undefined : onSwap} busy={busy} />
+        <PickCard pick={current.case} onSwap={readOnly ? undefined : onSwap} busy={busy} />
+        <PickCard pick={current.cooler} onSwap={readOnly ? undefined : onSwap} busy={busy} />
       </div>
 
       {current.monitor && (
         <div>
           <p className="label mb-2">{t('matchedMonitor')}</p>
-          <PickCard pick={current.monitor} onSwap={onSwap} busy={busy} />
+          <PickCard pick={current.monitor} onSwap={readOnly ? undefined : onSwap} busy={busy} />
         </div>
       )}
 

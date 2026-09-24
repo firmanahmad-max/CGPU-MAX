@@ -49,6 +49,20 @@ aiAdvisorRouter.post(
   },
 );
 
+// Public, read-only view of a saved build (for sharing). Returns the build
+// payload by its share slug with no owner info and no auth.
+aiAdvisorRouter.get('/build/:shareSlug/shared', async (req, res, next) => {
+  try {
+    const { shareSlug } = shareSlugParam.parse(req.params);
+    const row = await prisma.savedBuild.findUnique({ where: { shareSlug } });
+    if (!row) throw new NotFoundError('Build', shareSlug);
+    res.set('Cache-Control', 'public, max-age=300');
+    res.json({ ...(row.payload as object), shareSlug, modelUsed: row.modelUsed });
+  } catch (err) {
+    next(err);
+  }
+});
+
 // Owner-scoped retrieval of a saved build.
 aiAdvisorRouter.get('/build/:shareSlug', requireAuth, async (req, res, next) => {
   try {

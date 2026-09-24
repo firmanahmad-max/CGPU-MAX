@@ -362,6 +362,20 @@ export interface ComponentsResponse {
   dir: 'asc' | 'desc';
 }
 
+// Public, read-only shared build (no auth). Returns the raw payload shape the
+// advisor result renders; typed loosely to avoid importing advisor types here.
+export async function getSharedBuild(shareSlug: string): Promise<unknown | null> {
+  try {
+    const res = await fetch(buildUrl(`/api/v1/advisor/build/${shareSlug}/shared`), {
+      next: { revalidate: 300 },
+    });
+    if (!res.ok) return null;
+    return await res.json();
+  } catch {
+    return null;
+  }
+}
+
 export async function getComponents(
   params: Record<string, string | number | undefined>,
   init?: RequestInit,
