@@ -17,6 +17,7 @@ export interface PresetFps {
   preset: Preset;
   avgFps: number;
   onePercentLowFps: number;
+  meetsTarget: boolean;
 }
 
 export interface GamingResult {
@@ -26,11 +27,21 @@ export interface GamingResult {
   profile: GameProfile;
   presets: PresetFps[];
   recommendedPreset: Preset;
+  targetFps: number;
+  smoothness: 'smooth' | 'ok' | 'stutter';
   upscaling: {
     recommended: boolean;
     tech: 'DLSS' | 'FSR' | 'XeSS' | 'none';
     noteKey: UpscalingNote;
   };
+  // Estimated avg FPS at the recommended preset with upscaling enabled.
+  upscaledFps: number | null;
+  // GPU memory adequacy for this resolution/profile.
+  vram: { gb: number | null; recommendedGb: number; adequate: boolean };
+  // Monitor refresh rate the recommended preset comfortably drives.
+  refreshTarget: number;
+  // Avg FPS (recommended preset) at each resolution — shows how it scales.
+  resolutionScaling: { resolution: Resolution; avgFps: number }[];
   tipKeys: TipKey[];
   cpuLimited: boolean;
   algorithmVersion: string;
@@ -53,6 +64,17 @@ const PRESET_MULTIPLIER: Record<Preset, number> = {
   ultra: 0.78,
 };
 
+// Common monitor refresh tiers a build can be paired with.
+const REFRESH_TIERS = [60, 75, 100, 120, 144, 165, 180, 240, 360];
+
+// Recommended GPU VRAM (GB) for a resolution; VR/simulation add headroom.
+const VRAM_BY_RESOLUTION: Record<Resolution, number> = { '1080p': 6, '1440p': 8, '4K': 12 };
+
+// Upscaling FPS uplift factor — larger at higher resolutions where it helps most.
+const UPSCALE_UPLIFT: Record<Resolution, number> = { '1080p': 1.35, '1440p': 1.5, '4K': 1.7 };
+
+const ALL_RESOLUTIONS: Resolution[] = ['1080p', '1440p', '4K'];
+
 export class GamingOptimizer {
   evaluate(
     gpu: ProcessorSnapshot,
@@ -65,27 +87,32 @@ export class GamingOptimizer {
 
     const gpuPower = this.scoreGpu(gpu);
     const cpuPower = cpu ? this.scoreCpu(cpu) : null;
-    const baseHigh = REFERENCE_HIGH_FPS[resolution][profile];
+    const target = this.targetFor(profile);
 
-    // CPU sets a frame ceiling that matters most at low resolution / esports.
-    const cpuCeiling =
-      cpuPower !== null
-        ? baseHigh *
-          (cpuPower / 100) *
-          (resolution === '1080p' ? 1.5 : resolution === '1440p' ? 2.0 : 3.0)
-        : Infinity;
-
-    const presets: PresetFps[] = PRESETS.map((preset) => {
-      const raw = baseHigh * (gpuPower / 100) * PRESET_MULTIPLIER[preset];
-      const avg = Math.max(5, Math.round(Math.min(raw, cpuCeiling)));
-      return { preset, avgFps: avg, onePercentLowFps: Math.round(avg * 0.7) };
-    });
-
+    const cpuCeiling = this.cpuCeiling(resolution, profile, cpuPower);
     const cpuLimited =
       cpuPower !== null &&
-      presets.some(
-        (p) => baseHigh * (gpuPower / 100) * PRESET_MULTIPLIER[p.preset] > cpuCeiling + 1,
+      PRESETS.some(
+        (preset) =>
+          REFERENCE_HIGH_FPS[resolution][profile] * (gpuPower / 100) * PRESET_MULTIPLIER[preset] >
+          cpuCeiling + 1,
       );
+
+    const presets: PresetFps[] = PRESETS.map((preset) => {
+      const avg = this.avgFps(resolution, profile, preset, gpuPower, cpuCeiling);
+      // Frame-time consistency dips when the CPU is the limiter.
+      const lowRatio = cpuLimited ? 0.62 : 0.72;
+      return {
+        preset,
+        avgFps: avg,
+        onePercentLowFps: Math.round(avg * lowRatio),
+        meetsTarget: avg >= target,
+      };
+    });
+
+    const recommendedPreset = this.pickPreset(presets, target);
+    const recAvg = presets.find((p) => p.preset === recommendedPreset)?.avgFps ?? 0;
+    const upscaling = this.upscaling(gpu, resolution, presets);
 
     return {
       gpuPower,
@@ -93,17 +120,88 @@ export class GamingOptimizer {
       resolution,
       profile,
       presets,
-      recommendedPreset: this.pickPreset(presets, profile),
-      upscaling: this.upscaling(gpu, resolution, presets),
+      recommendedPreset,
+      targetFps: target,
+      smoothness: this.smoothness(recAvg, target, cpuLimited),
+      upscaling,
+      upscaledFps: upscaling.recommended ? Math.round(recAvg * UPSCALE_UPLIFT[resolution]) : null,
+      vram: this.vram(gpu, resolution, profile),
+      refreshTarget: this.refreshTarget(recAvg),
+      resolutionScaling: ALL_RESOLUTIONS.map((r) => ({
+        resolution: r,
+        avgFps: this.avgFps(
+          r,
+          profile,
+          recommendedPreset,
+          gpuPower,
+          this.cpuCeiling(r, profile, cpuPower),
+        ),
+      })),
       tipKeys: this.tips(resolution, profile, cpuLimited),
       cpuLimited,
       algorithmVersion: GAMING_ALGORITHM_VERSION,
     };
   }
 
+  private targetFor(profile: GameProfile): number {
+    return profile === 'esports' ? 144 : profile === 'vr' ? 90 : 60;
+  }
+
+  // CPU frame ceiling — tighter at low resolution / esports where CPU matters most.
+  private cpuCeiling(
+    resolution: Resolution,
+    profile: GameProfile,
+    cpuPower: number | null,
+  ): number {
+    if (cpuPower === null) return Infinity;
+    const base = REFERENCE_HIGH_FPS[resolution][profile];
+    return (
+      base * (cpuPower / 100) * (resolution === '1080p' ? 1.5 : resolution === '1440p' ? 2.0 : 3.0)
+    );
+  }
+
+  private avgFps(
+    resolution: Resolution,
+    profile: GameProfile,
+    preset: Preset,
+    gpuPower: number,
+    cpuCeiling: number,
+  ): number {
+    const raw =
+      REFERENCE_HIGH_FPS[resolution][profile] * (gpuPower / 100) * PRESET_MULTIPLIER[preset];
+    return Math.max(5, Math.round(Math.min(raw, cpuCeiling)));
+  }
+
+  private smoothness(
+    recAvg: number,
+    target: number,
+    cpuLimited: boolean,
+  ): GamingResult['smoothness'] {
+    if (cpuLimited && recAvg < target) return 'stutter';
+    if (recAvg >= target * 1.25) return 'smooth';
+    if (recAvg >= target) return 'ok';
+    return 'stutter';
+  }
+
+  private vram(
+    gpu: ProcessorSnapshot,
+    resolution: Resolution,
+    profile: GameProfile,
+  ): GamingResult['vram'] {
+    const recommendedGb =
+      VRAM_BY_RESOLUTION[resolution] + (profile === 'vr' || profile === 'simulation' ? 2 : 0);
+    const gb = gpu.gpu?.vramGb ?? null;
+    return { gb, recommendedGb, adequate: gb === null ? true : gb >= recommendedGb };
+  }
+
+  private refreshTarget(recAvg: number): number {
+    let tier = 60;
+    for (const r of REFRESH_TIERS) if (recAvg >= r) tier = r;
+    return tier;
+  }
+
   // Highest preset that still clears the profile's target FPS.
-  private pickPreset(presets: PresetFps[], profile: GameProfile): Preset {
-    const target = profile === 'esports' ? 144 : profile === 'vr' ? 90 : 60;
+  private pickPreset(presets: PresetFps[], target: number): Preset {
     const ordered: Preset[] = ['ultra', 'high', 'medium', 'low'];
     for (const preset of ordered) {
       const p = presets.find((x) => x.preset === preset);
