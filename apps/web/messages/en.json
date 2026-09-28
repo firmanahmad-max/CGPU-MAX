@@ -367,6 +367,7 @@
     "encQ_basic": "Basic encoder",
     "av1Supported": "AV1 ready",
     "av1Note": "Your GPU has a hardware AV1 encoder. Where the platform allows it (YouTube today; Twitch Enhanced Broadcasting), AV1 gives better quality at the same bitrate.",
+    "av1Saving": "Or set AV1 to ~{kbps} kbps for the same quality, freeing up upload.",
     "x264CapableNote": "Your CPU ({cpu}) is also strong enough for software x264 (higher quality) if you have spare headroom or a second PC.",
     "x264NotCapableNote": "Best keep the GPU encoder — software x264 would strain your CPU ({cpu}) while gaming.",
     "errProFeature": "Streaming suite is a Pro feature — upgrade on Pricing.",

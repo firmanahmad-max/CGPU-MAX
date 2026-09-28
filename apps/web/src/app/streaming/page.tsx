@@ -36,6 +36,7 @@ interface StreamingResult {
   dataPerHourGb: number;
   outputResolution: string;
   impactsGameFps: boolean;
+  av1SuggestedKbps: number | null;
   gpu: { modelName: string } | null;
   cpu: { modelName: string } | null;
   x264Capable: boolean | null;
@@ -307,7 +308,17 @@ function StreamingResultView({
         >
           {result.impactsGameFps ? t('impactsFpsNote') : t('noImpactFpsNote')}
         </p>
-        {result.encoder.av1 && <p className="text-ink-muted mt-2 text-[12.5px]">{t('av1Note')}</p>}
+        {result.encoder.av1 && (
+          <p className="text-ink-muted mt-2 text-[12.5px]">
+            {t('av1Note')}
+            {result.av1SuggestedKbps && result.av1SuggestedKbps < result.recommendedBitrateKbps ? (
+              <span className="text-cblue-bright">
+                {' '}
+                {t('av1Saving', { kbps: result.av1SuggestedKbps })}
+              </span>
+            ) : null}
+          </p>
+        )}
         {result.cpu && result.x264Capable !== null && (
           <p className="text-ink-muted mt-2 text-[12.5px]">
             {result.x264Capable

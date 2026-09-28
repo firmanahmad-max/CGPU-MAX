@@ -367,6 +367,7 @@
     "encQ_basic": "Encoder dasar",
     "av1Supported": "Siap AV1",
     "av1Note": "GPU Anda punya encoder AV1 hardware. Di platform yang mendukung (YouTube sekarang; Twitch Enhanced Broadcasting), AV1 memberi kualitas lebih baik pada bitrate yang sama.",
+    "av1Saving": "Atau set AV1 ke ~{kbps} kbps untuk kualitas yang sama, menghemat unggah.",
     "x264CapableNote": "CPU Anda ({cpu}) cukup kuat untuk software x264 (kualitas lebih tinggi) jika ada headroom lebih atau PC kedua.",
     "x264NotCapableNote": "Sebaiknya tetap pakai encoder GPU — software x264 akan membebani CPU ({cpu}) Anda saat main game.",
     "errProFeature": "Paket streaming adalah fitur Pro — upgrade di halaman Harga.",

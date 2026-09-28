@@ -47,6 +47,7 @@ export interface StreamingResult {
   dataPerHourGb: number; // relatable data volume
   outputResolution: StreamResolution; // resolution to actually stream at (may downscale)
   impactsGameFps: boolean; // true for CPU (x264) encoding
+  av1SuggestedKbps: number | null; // lower bitrate for equal quality when AV1-capable
   // Selected parts + whether the CPU is strong enough for software x264.
   gpu: { modelName: string } | null;
   cpu: { modelName: string } | null;
@@ -207,10 +208,19 @@ export function planStream(params: {
     warnings.push({ key: 'twitch4k' });
   }
 
-  // Quality vs the ideal bitrate for the desired resolution.
+  // Quality vs the ideal bitrate for the desired resolution — nudged by the
+  // encoder's real quality (a modern GPU squeezes more image out of the same
+  // bitrate; an old one, less). This is where the GPU model changes the verdict.
   const ratio = ideal > 0 ? recommended / ideal : 1;
+  const qualityFactor =
+    encoder.quality === 'excellent' ? 1.1 : encoder.quality === 'basic' ? 0.85 : 1;
+  const effRatio = ratio * qualityFactor;
   const qualityVerdict: QualityVerdict =
-    ratio >= 0.95 ? 'great' : ratio >= 0.75 ? 'good' : 'limited';
+    effRatio >= 0.95 ? 'great' : effRatio >= 0.75 ? 'good' : 'limited';
+
+  // AV1 is ~30% more efficient than H.264, so an AV1-capable GPU can hit the
+  // same quality at a lower bitrate — a concrete payoff of the model.
+  const av1SuggestedKbps = encoder.av1 ? Math.round(recommended / 1.3 / 50) * 50 : null;
 
   // Highest resolution (no higher than the desired one) the recommended bitrate
   // can actually sustain — tells a beginner to stream at a lower res when capped.
@@ -235,6 +245,7 @@ export function planStream(params: {
     dataPerHourGb: Math.round(((recommended * 3600) / 8 / 1_000_000) * 10) / 10,
     outputResolution,
     impactsGameFps: !encoder.hardware,
+    av1SuggestedKbps,
     gpu: params.gpuModelName ? { modelName: params.gpuModelName } : null,
     cpu: params.cpuModelName ? { modelName: params.cpuModelName } : null,
     // Strong enough to also run software x264 (higher quality) with headroom.
