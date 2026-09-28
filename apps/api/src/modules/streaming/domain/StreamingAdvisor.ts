@@ -28,12 +28,20 @@ export interface EncoderChoice {
   x264Preset?: string;
 }
 
+export type QualityVerdict = 'great' | 'good' | 'limited';
+
 export interface StreamingResult {
   encoder: EncoderChoice;
   recommendedBitrateKbps: number;
   maxPlatformBitrateKbps: number;
   uploadHeadroomMbps: number;
   keyframeIntervalSec: number;
+  // Beginner-friendly, deterministic extras.
+  qualityVerdict: QualityVerdict;
+  uploadUsagePct: number; // share of the user's upload the stream consumes
+  dataPerHourGb: number; // relatable data volume
+  outputResolution: StreamResolution; // resolution to actually stream at (may downscale)
+  impactsGameFps: boolean; // true for CPU (x264) encoding
   warnings: StreamWarning[];
 }
 
@@ -51,6 +59,8 @@ const BASE_BITRATE_60: Record<StreamResolution, number> = {
   '1440p': 13000,
   '4K': 35000,
 };
+
+const RES_ORDER: StreamResolution[] = ['720p', '1080p', '1440p', '4K'];
 
 export function recommendEncoder(gpuManufacturer: Manufacturer | null): EncoderChoice {
   switch (gpuManufacturer) {
@@ -102,12 +112,34 @@ export function planStream(params: {
     warnings.push({ key: 'twitch4k' });
   }
 
+  // Quality vs the ideal bitrate for the desired resolution.
+  const ratio = ideal > 0 ? recommended / ideal : 1;
+  const qualityVerdict: QualityVerdict =
+    ratio >= 0.95 ? 'great' : ratio >= 0.75 ? 'good' : 'limited';
+
+  // Highest resolution (no higher than the desired one) the recommended bitrate
+  // can actually sustain — tells a beginner to stream at a lower res when capped.
+  const inputIdx = RES_ORDER.indexOf(params.resolution);
+  let outputResolution: StreamResolution = '720p';
+  for (let i = 0; i <= inputIdx; i++) {
+    const r = RES_ORDER[i]!;
+    if (BASE_BITRATE_60[r] * fpsFactor <= recommended * 1.15) outputResolution = r;
+  }
+
   return {
     encoder,
     recommendedBitrateKbps: recommended,
     maxPlatformBitrateKbps: platformMax,
     uploadHeadroomMbps: Math.round((params.uploadMbps - recommended / 1000) * 10) / 10,
     keyframeIntervalSec: 2,
+    qualityVerdict,
+    uploadUsagePct:
+      params.uploadMbps > 0
+        ? Math.min(100, Math.round((recommended / 1000 / params.uploadMbps) * 100))
+        : 100,
+    dataPerHourGb: Math.round(((recommended * 3600) / 8 / 1_000_000) * 10) / 10,
+    outputResolution,
+    impactsGameFps: !encoder.hardware,
     warnings,
   };
 }

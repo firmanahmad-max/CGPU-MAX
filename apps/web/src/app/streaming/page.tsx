@@ -18,11 +18,16 @@ interface StreamWarning {
   [param: string]: string | number;
 }
 interface StreamingResult {
-  encoder: { encoder: string; hardware: boolean; reasonKey: string };
+  encoder: { encoder: string; hardware: boolean; reasonKey: string; x264Preset?: string };
   recommendedBitrateKbps: number;
   maxPlatformBitrateKbps: number;
   uploadHeadroomMbps: number;
   keyframeIntervalSec: number;
+  qualityVerdict: 'great' | 'good' | 'limited';
+  uploadUsagePct: number;
+  dataPerHourGb: number;
+  outputResolution: string;
+  impactsGameFps: boolean;
   warnings: StreamWarning[];
 }
 
@@ -68,6 +73,7 @@ export default function StreamingPage() {
           <h1 className="font-display text-ink-hi text-4xl font-semibold tracking-tight">
             {t('title')}
           </h1>
+          <p className="text-ink-muted mt-3 max-w-2xl text-sm leading-relaxed">{t('whatIsThis')}</p>
         </header>
 
         <SignedOut>
@@ -84,28 +90,28 @@ export default function StreamingPage() {
 
         <SignedIn>
           <div className="card space-y-5">
-            <Row label={t('gpuBrand')}>
+            <Row label={t('gpuBrand')} help={t('gpuBrandHelp')}>
               {(['NVIDIA', 'AMD', 'INTEL'] as Mfr[]).map((m) => (
                 <Toggle key={m} active={gpuManufacturer === m} onClick={() => setMfr(m)}>
                   {m}
                 </Toggle>
               ))}
             </Row>
-            <Row label={t('platform')}>
+            <Row label={t('platform')} help={t('platformHelp')}>
               {(['twitch', 'youtube', 'kick'] as Platform[]).map((p) => (
                 <Toggle key={p} active={platform === p} onClick={() => setPlatform(p)}>
                   {p}
                 </Toggle>
               ))}
             </Row>
-            <Row label={t('resolution')}>
+            <Row label={t('resolution')} help={t('resolutionHelp')}>
               {(['720p', '1080p', '1440p', '4K'] as Res[]).map((r) => (
                 <Toggle key={r} active={resolution === r} onClick={() => setResolution(r)}>
                   {r}
                 </Toggle>
               ))}
             </Row>
-            <Row label={t('fps')}>
+            <Row label={t('fps')} help={t('fpsHelp')}>
               {[30, 60, 120].map((f) => (
                 <Toggle key={f} active={fps === f} onClick={() => setFps(f)}>
                   {f}
@@ -113,10 +119,11 @@ export default function StreamingPage() {
               ))}
             </Row>
             <div>
-              <div className="mb-2 flex items-center justify-between">
+              <div className="mb-1 flex items-center justify-between">
                 <p className="label">{t('uploadSpeed')}</p>
                 <span className="text-ink-hi font-mono text-sm">{uploadMbps} Mbps</span>
               </div>
+              <p className="text-ink-faint mb-2 text-[11px]">{t('uploadHelp')}</p>
               <input
                 type="range"
                 min={2}
@@ -140,35 +147,12 @@ export default function StreamingPage() {
           </div>
 
           {result && (
-            <section className="mt-8 space-y-4">
-              <div className="grid gap-4 sm:grid-cols-3">
-                <Stat label={t('encoder')} value={result.encoder.encoder} small />
-                <Stat label={t('bitrate')} value={`${result.recommendedBitrateKbps} kbps`} />
-                <Stat label={t('headroom')} value={`${result.uploadHeadroomMbps} Mbps`} small />
-              </div>
-              <div className="card">
-                <p className="label mb-1">{t('rationale')}</p>
-                <p className="text-ink-mid text-sm">
-                  {t(`encoderReason.${result.encoder.reasonKey}`)}
-                </p>
-                <p className="text-ink-faint mt-2 text-xs">
-                  {t('keyframe', {
-                    sec: result.keyframeIntervalSec,
-                    kbps: result.maxPlatformBitrateKbps,
-                  })}
-                </p>
-              </div>
-              {result.warnings.length > 0 && (
-                <div className="card border-camber/30 bg-camber/5">
-                  <p className="label mb-2 text-amber-300">{t('warnings')}</p>
-                  <ul className="space-y-1 text-sm text-amber-200/90">
-                    {result.warnings.map((w, i) => (
-                      <li key={i}>• {t(`warning.${w.key}`, w)}</li>
-                    ))}
-                  </ul>
-                </div>
-              )}
-            </section>
+            <StreamingResultView
+              result={result}
+              resolution={resolution}
+              fps={fps}
+              upload={uploadMbps}
+            />
           )}
         </SignedIn>
       </main>
@@ -176,10 +160,130 @@ export default function StreamingPage() {
   );
 }
 
-function Row({ label, children }: { label: string; children: React.ReactNode }) {
+function StreamingResultView({
+  result,
+  resolution,
+  fps,
+  upload,
+}: {
+  result: StreamingResult;
+  resolution: string;
+  fps: number;
+  upload: number;
+}) {
+  const t = useTranslations('streaming');
+
+  const qualityCls =
+    result.qualityVerdict === 'great'
+      ? 'border-lime/50 bg-lime/15 text-lime-bright'
+      : result.qualityVerdict === 'good'
+        ? 'border-cblue/50 bg-cblue/15 text-cblue-bright'
+        : 'border-camber/50 bg-camber/15 text-camber-bright';
+
+  const usagePct = result.uploadUsagePct;
+  const usageTone = usagePct <= 70 ? 'bg-lime' : usagePct <= 85 ? 'bg-camber' : 'bg-cred';
+  const downscaled = result.outputResolution !== resolution;
+
+  const settings: { label: string; value: string }[] = [
+    { label: t('obsEncoder'), value: result.encoder.encoder },
+    { label: t('obsRateControl'), value: t('obsRateControlValue') },
+    { label: t('obsBitrate'), value: `${result.recommendedBitrateKbps} kbps` },
+    { label: t('obsOutputRes'), value: result.outputResolution },
+    { label: t('obsFps'), value: String(fps) },
+    { label: t('obsKeyframe'), value: `${result.keyframeIntervalSec}s` },
+    ...(result.encoder.x264Preset
+      ? [{ label: t('obsPreset'), value: result.encoder.x264Preset }]
+      : []),
+  ];
+
+  return (
+    <section className="mt-8 space-y-5">
+      {/* The payoff: exact OBS settings */}
+      <div className="card">
+        <p className="label mb-3">{t('obsTitle')}</p>
+        <div className="border-hairline divide-hairline grid divide-y overflow-hidden rounded-lg border">
+          {settings.map((s) => (
+            <div key={s.label} className="flex items-center justify-between px-4 py-2.5">
+              <span className="text-ink-mid text-[13px]">{s.label}</span>
+              <span className="text-ink-hi font-mono text-[13px] font-medium">{s.value}</span>
+            </div>
+          ))}
+        </div>
+        {downscaled && (
+          <p className="text-camber-bright mt-3 text-[12px]">
+            {t('downscaleNote', { input: resolution, res: result.outputResolution })}
+          </p>
+        )}
+      </div>
+
+      {/* Quality + internet usage */}
+      <div className="grid gap-4 sm:grid-cols-2">
+        <div className="card">
+          <div className="mb-2 flex items-center gap-2">
+            <p className="label">{t('qualityTitle')}</p>
+            <Pill className={qualityCls}>{t(`quality_${result.qualityVerdict}`)}</Pill>
+          </div>
+          <p className="text-ink-muted text-sm">{t(`quality_${result.qualityVerdict}_desc`)}</p>
+        </div>
+
+        <div className="card">
+          <p className="label mb-2">{t('usageTitle')}</p>
+          <div className="bg-panel-2 mb-2 h-2.5 w-full overflow-hidden rounded-full">
+            <div
+              className={`${usageTone} h-full rounded-full`}
+              style={{ width: `${Math.max(4, Math.min(100, usagePct))}%` }}
+            />
+          </div>
+          <p className="text-ink-mid text-[12.5px]">
+            {t('usageLine', { pct: usagePct, mbps: upload })}
+          </p>
+          <p className="text-ink-faint mt-1 font-mono text-[12px]">
+            {t('dataPerHour', { gb: result.dataPerHourGb })}
+          </p>
+        </div>
+      </div>
+
+      {/* How it's encoded (plain language) */}
+      <div className="card">
+        <p className="label mb-1">{t('encoderTitle')}</p>
+        <p className="text-ink-mid text-sm">{t(`encoderReason.${result.encoder.reasonKey}`)}</p>
+        <p
+          className={
+            'mt-2 text-[12.5px] ' +
+            (result.impactsGameFps ? 'text-camber-bright' : 'text-lime-bright')
+          }
+        >
+          {result.impactsGameFps ? t('impactsFpsNote') : t('noImpactFpsNote')}
+        </p>
+      </div>
+
+      {result.warnings.length > 0 && (
+        <div className="card border-camber/30 bg-camber/5">
+          <p className="label text-camber-bright mb-2">{t('warnings')}</p>
+          <ul className="text-camber-bright/90 space-y-1 text-sm">
+            {result.warnings.map((w, i) => (
+              <li key={i}>• {t(`warning.${w.key}`, w)}</li>
+            ))}
+          </ul>
+        </div>
+      )}
+    </section>
+  );
+}
+
+function Row({
+  label,
+  help,
+  children,
+}: {
+  label: string;
+  help?: string;
+  children: React.ReactNode;
+}) {
   return (
     <div>
-      <p className="label mb-2">{label}</p>
+      <p className="label mb-1">{label}</p>
+      {help && <p className="text-ink-faint mb-2 text-[11px]">{help}</p>}
       <div className="flex flex-wrap gap-2">{children}</div>
     </div>
   );
@@ -207,14 +311,5 @@ function Toggle({
     >
       {children}
     </button>
-  );
-}
-
-function Stat({ label, value, small }: { label: string; value: string; small?: boolean }) {
-  return (
-    <div className="card">
-      <p className="label">{label}</p>
-      <p className={small ? 'text-ink-hi mt-2 text-lg font-semibold' : 'metric mt-2'}>{value}</p>
-    </div>
   );
 }
