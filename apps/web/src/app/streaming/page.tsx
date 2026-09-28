@@ -7,18 +7,26 @@ import { SignedIn, SignedOut } from '@/lib/auth';
 import { useState } from 'react';
 
 import { Pill } from '@/components/Pill';
+import { ProcessorPicker } from '@/components/ProcessorPicker';
 import { useAuthedFetch } from '@/lib/useAuthedFetch';
 
 type Platform = 'twitch' | 'youtube' | 'kick';
 type Res = '720p' | '1080p' | '1440p' | '4K';
-type Mfr = 'NVIDIA' | 'AMD' | 'INTEL';
 
 interface StreamWarning {
   key: string;
   [param: string]: string | number;
 }
 interface StreamingResult {
-  encoder: { encoder: string; hardware: boolean; reasonKey: string; x264Preset?: string };
+  encoder: {
+    encoder: string;
+    hardware: boolean;
+    reasonKey: string;
+    x264Preset?: string;
+    generation: string | null;
+    quality: 'excellent' | 'good' | 'basic';
+    av1: boolean;
+  };
   recommendedBitrateKbps: number;
   maxPlatformBitrateKbps: number;
   uploadHeadroomMbps: number;
@@ -28,13 +36,17 @@ interface StreamingResult {
   dataPerHourGb: number;
   outputResolution: string;
   impactsGameFps: boolean;
+  gpu: { modelName: string } | null;
+  cpu: { modelName: string } | null;
+  x264Capable: boolean | null;
   warnings: StreamWarning[];
 }
 
 export default function StreamingPage() {
   const t = useTranslations('streaming');
   const authedFetch = useAuthedFetch();
-  const [gpuManufacturer, setMfr] = useState<Mfr>('NVIDIA');
+  const [gpuSlug, setGpuSlug] = useState<string | null>(null);
+  const [cpuSlug, setCpuSlug] = useState<string | null>(null);
   const [platform, setPlatform] = useState<Platform>('twitch');
   const [resolution, setResolution] = useState<Res>('1080p');
   const [fps, setFps] = useState(60);
@@ -44,13 +56,21 @@ export default function StreamingPage() {
   const [error, setError] = useState<string | null>(null);
 
   const run = async () => {
+    if (!gpuSlug) return;
     setLoading(true);
     setError(null);
     try {
       const res = await authedFetch('/api/v1/streaming/plan', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ gpuManufacturer, platform, resolution, fps, uploadMbps }),
+        body: JSON.stringify({
+          gpuSlug,
+          cpuSlug: cpuSlug ?? undefined,
+          platform,
+          resolution,
+          fps,
+          uploadMbps,
+        }),
       });
       if (res.status === 402) throw new Error(t('errProFeature'));
       if (!res.ok) throw new Error(await res.text());
@@ -90,13 +110,26 @@ export default function StreamingPage() {
 
         <SignedIn>
           <div className="card space-y-5">
-            <Row label={t('gpuBrand')} help={t('gpuBrandHelp')}>
-              {(['NVIDIA', 'AMD', 'INTEL'] as Mfr[]).map((m) => (
-                <Toggle key={m} active={gpuManufacturer === m} onClick={() => setMfr(m)}>
-                  {m}
-                </Toggle>
-              ))}
-            </Row>
+            <div className="grid gap-4 sm:grid-cols-2">
+              <div>
+                <ProcessorPicker
+                  label={t('gpu')}
+                  type="GPU"
+                  value={gpuSlug}
+                  onChange={setGpuSlug}
+                />
+                <p className="text-ink-faint mt-1 text-[11px]">{t('gpuHelp')}</p>
+              </div>
+              <div>
+                <ProcessorPicker
+                  label={t('cpuOptional')}
+                  type="CPU"
+                  value={cpuSlug}
+                  onChange={setCpuSlug}
+                />
+                <p className="text-ink-faint mt-1 text-[11px]">{t('cpuHelp')}</p>
+              </div>
+            </div>
             <Row label={t('platform')} help={t('platformHelp')}>
               {(['twitch', 'youtube', 'kick'] as Platform[]).map((p) => (
                 <Toggle key={p} active={platform === p} onClick={() => setPlatform(p)}>
@@ -138,7 +171,7 @@ export default function StreamingPage() {
             <button
               type="button"
               onClick={run}
-              disabled={loading}
+              disabled={loading || !gpuSlug}
               className="rounded-control bg-lime text-lime-ink px-6 py-2 text-sm font-semibold transition hover:brightness-110 disabled:opacity-40"
             >
               {loading ? t('calculating') : t('build')}
@@ -183,6 +216,13 @@ function StreamingResultView({
   const usagePct = result.uploadUsagePct;
   const usageTone = usagePct <= 70 ? 'bg-lime' : usagePct <= 85 ? 'bg-camber' : 'bg-cred';
   const downscaled = result.outputResolution !== resolution;
+
+  const encQualityCls =
+    result.encoder.quality === 'excellent'
+      ? 'border-lime/50 bg-lime/15 text-lime-bright'
+      : result.encoder.quality === 'good'
+        ? 'border-cblue/50 bg-cblue/15 text-cblue-bright'
+        : 'border-camber/50 bg-camber/15 text-camber-bright';
 
   const settings: { label: string; value: string }[] = [
     { label: t('obsEncoder'), value: result.encoder.encoder },
@@ -245,7 +285,19 @@ function StreamingResultView({
 
       {/* How it's encoded (plain language) */}
       <div className="card">
-        <p className="label mb-1">{t('encoderTitle')}</p>
+        <div className="mb-2 flex flex-wrap items-center gap-2">
+          <p className="label">{t('encoderTitle')}</p>
+          <span className="text-ink-hi font-mono text-[13px] font-semibold">
+            {result.encoder.encoder}
+            {result.encoder.generation ? ` · ${result.encoder.generation}` : ''}
+          </span>
+          <Pill className={encQualityCls}>{t(`encQ_${result.encoder.quality}`)}</Pill>
+          {result.encoder.av1 && (
+            <Pill className="border-cblue/50 bg-cblue/15 text-cblue-bright">
+              {t('av1Supported')}
+            </Pill>
+          )}
+        </div>
         <p className="text-ink-mid text-sm">{t(`encoderReason.${result.encoder.reasonKey}`)}</p>
         <p
           className={
@@ -255,6 +307,14 @@ function StreamingResultView({
         >
           {result.impactsGameFps ? t('impactsFpsNote') : t('noImpactFpsNote')}
         </p>
+        {result.encoder.av1 && <p className="text-ink-muted mt-2 text-[12.5px]">{t('av1Note')}</p>}
+        {result.cpu && result.x264Capable !== null && (
+          <p className="text-ink-muted mt-2 text-[12.5px]">
+            {result.x264Capable
+              ? t('x264CapableNote', { cpu: result.cpu.modelName })
+              : t('x264NotCapableNote', { cpu: result.cpu.modelName })}
+          </p>
+        )}
       </div>
 
       {result.warnings.length > 0 && (

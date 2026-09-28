@@ -7,6 +7,7 @@ export type Platform = 'twitch' | 'youtube' | 'kick';
 export type StreamResolution = '720p' | '1080p' | '1440p' | '4K';
 
 export type EncoderReason = 'nvenc' | 'amf' | 'quicksync' | 'x264';
+export type EncoderQuality = 'excellent' | 'good' | 'basic';
 
 // i18n descriptors — the web layer localizes them (see streaming.warning.*).
 export type StreamWarning =
@@ -26,6 +27,10 @@ export interface EncoderChoice {
   hardware: boolean;
   reasonKey: EncoderReason;
   x264Preset?: string;
+  // Model-derived detail (null when only a vendor brand was given).
+  generation: string | null; // e.g. "Ada (RTX 40)"
+  quality: EncoderQuality;
+  av1: boolean; // GPU has a hardware AV1 encoder
 }
 
 export type QualityVerdict = 'great' | 'good' | 'limited';
@@ -42,6 +47,10 @@ export interface StreamingResult {
   dataPerHourGb: number; // relatable data volume
   outputResolution: StreamResolution; // resolution to actually stream at (may downscale)
   impactsGameFps: boolean; // true for CPU (x264) encoding
+  // Selected parts + whether the CPU is strong enough for software x264.
+  gpu: { modelName: string } | null;
+  cpu: { modelName: string } | null;
+  x264Capable: boolean | null;
   warnings: StreamWarning[];
 }
 
@@ -62,27 +71,113 @@ const BASE_BITRATE_60: Record<StreamResolution, number> = {
 
 const RES_ORDER: StreamResolution[] = ['720p', '1080p', '1440p', '4K'];
 
+// Vendor-only fallback (no model given). Detail fields stay generic.
 export function recommendEncoder(gpuManufacturer: Manufacturer | null): EncoderChoice {
   switch (gpuManufacturer) {
     case 'NVIDIA':
-      return { encoder: 'NVENC', hardware: true, reasonKey: 'nvenc' };
+      return {
+        encoder: 'NVENC',
+        hardware: true,
+        reasonKey: 'nvenc',
+        generation: null,
+        quality: 'good',
+        av1: false,
+      };
     case 'AMD':
-      return { encoder: 'AMF', hardware: true, reasonKey: 'amf' };
+      return {
+        encoder: 'AMF',
+        hardware: true,
+        reasonKey: 'amf',
+        generation: null,
+        quality: 'good',
+        av1: false,
+      };
     case 'INTEL':
-      return { encoder: 'QuickSync', hardware: true, reasonKey: 'quicksync' };
+      return {
+        encoder: 'QuickSync',
+        hardware: true,
+        reasonKey: 'quicksync',
+        generation: null,
+        quality: 'good',
+        av1: false,
+      };
     default:
-      return { encoder: 'x264', hardware: false, reasonKey: 'x264', x264Preset: 'veryfast' };
+      return {
+        encoder: 'x264',
+        hardware: false,
+        reasonKey: 'x264',
+        x264Preset: 'veryfast',
+        generation: null,
+        quality: 'basic',
+        av1: false,
+      };
   }
+}
+
+// Model-aware detection: encoder generation, relative quality, and AV1 support
+// inferred from the GPU family in the model name.
+export function recommendEncoderForModel(
+  manufacturer: Manufacturer | null,
+  modelName: string,
+): EncoderChoice {
+  const n = modelName.toUpperCase();
+  const pick = (
+    generation: string,
+    quality: EncoderQuality,
+    av1: boolean,
+  ): Pick<EncoderChoice, 'generation' | 'quality' | 'av1'> => ({ generation, quality, av1 });
+
+  if (manufacturer === 'NVIDIA') {
+    const d = /RTX\s?50/.test(n)
+      ? pick('Blackwell (RTX 50)', 'excellent', true)
+      : /RTX\s?40/.test(n)
+        ? pick('Ada (RTX 40)', 'excellent', true)
+        : /RTX\s?30/.test(n)
+          ? pick('Ampere (RTX 30)', 'good', false)
+          : /RTX\s?20/.test(n)
+            ? pick('Turing (RTX 20)', 'good', false)
+            : /GTX\s?16/.test(n)
+              ? pick('Turing (GTX 16)', 'good', false)
+              : /GTX\s?10/.test(n)
+                ? pick('Pascal (GTX 10)', 'basic', false)
+                : pick('NVENC', 'good', false);
+    return { encoder: 'NVENC', hardware: true, reasonKey: 'nvenc', ...d };
+  }
+  if (manufacturer === 'AMD') {
+    const d = /RX\s?9\d{3}/.test(n)
+      ? pick('RDNA 4 (RX 9000)', 'excellent', true)
+      : /RX\s?7\d{3}/.test(n)
+        ? pick('RDNA 3 (RX 7000)', 'excellent', true)
+        : /RX\s?6\d{3}/.test(n)
+          ? pick('RDNA 2 (RX 6000)', 'good', false)
+          : /RX\s?5\d{3}/.test(n)
+            ? pick('RDNA (RX 5000)', 'basic', false)
+            : pick('AMF', 'good', false);
+    return { encoder: 'AMF', hardware: true, reasonKey: 'amf', ...d };
+  }
+  if (manufacturer === 'INTEL') {
+    const d = /ARC|\bB\d{3}\b|\bA\d{3}\b/.test(n)
+      ? pick('Arc', 'excellent', true)
+      : pick('Quick Sync', 'good', false);
+    return { encoder: 'QuickSync', hardware: true, reasonKey: 'quicksync', ...d };
+  }
+  return recommendEncoder(null);
 }
 
 export function planStream(params: {
   gpuManufacturer: Manufacturer | null;
+  gpuModelName?: string | null;
+  cpuModelName?: string | null;
+  cpuCores?: number | null;
+  cpuThreads?: number | null;
   platform: Platform;
   resolution: StreamResolution;
   fps: number;
   uploadMbps: number;
 }): StreamingResult {
-  const encoder = recommendEncoder(params.gpuManufacturer);
+  const encoder = params.gpuModelName
+    ? recommendEncoderForModel(params.gpuManufacturer, params.gpuModelName)
+    : recommendEncoder(params.gpuManufacturer);
   const platformMax = PLATFORM_MAX_KBPS[params.platform];
 
   const fpsFactor = params.fps >= 60 ? 1 : 0.7;
@@ -140,6 +235,13 @@ export function planStream(params: {
     dataPerHourGb: Math.round(((recommended * 3600) / 8 / 1_000_000) * 10) / 10,
     outputResolution,
     impactsGameFps: !encoder.hardware,
+    gpu: params.gpuModelName ? { modelName: params.gpuModelName } : null,
+    cpu: params.cpuModelName ? { modelName: params.cpuModelName } : null,
+    // Strong enough to also run software x264 (higher quality) with headroom.
+    x264Capable:
+      params.cpuCores == null && params.cpuThreads == null
+        ? null
+        : (params.cpuCores ?? 0) >= 8 && (params.cpuThreads ?? 0) >= 12,
     warnings,
   };
 }
