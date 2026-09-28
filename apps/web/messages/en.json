@@ -63,7 +63,7 @@
   "bottleneck": {
     "label": "Calculator",
     "title": "Bottleneck Analysis",
-    "subtitle": "Pair a CPU with a GPU to see balance across resolutions and game profiles. The algorithm is deterministic and its weights are auditable in",
+    "subtitle": "A “bottleneck” is when one part (CPU or GPU) can't keep up with the other, capping your frame rate. Pair a CPU with a GPU to see if they're well matched — and the FPS you can expect across resolutions and game types.",
     "back": "Back",
     "button": "Analyze bottleneck",
     "buttonLoading": "Analyzing…",
@@ -75,7 +75,19 @@
     "recommendedPsu": "Recommended PSU",
     "recommendations": "Recommendations",
     "algorithm": "algorithm {version}",
-    "share": "share"
+    "share": "share",
+    "verdictBalancedTitle": "Well balanced",
+    "verdictBalancedDesc": "Your CPU and GPU are well matched — neither noticeably holds the other back.",
+    "verdictCpuTitle": "{level} CPU bottleneck",
+    "verdictCpuDesc": "Your CPU is the limiter here. It shows up most at low resolution / high frame rates; raising resolution or settings shifts more work to the GPU.",
+    "verdictGpuTitle": "{level} GPU bottleneck",
+    "verdictGpuDesc": "Your GPU is the limiter here — normal and usually ideal for gaming. Lower the resolution/settings or enable upscaling to lift FPS.",
+    "level_slight": "Slight",
+    "level_moderate": "Moderate",
+    "level_strong": "Strong",
+    "expectedFps": "Expected FPS",
+    "expectedFpsNote": "AAA game settings, by resolution",
+    "matrixHint": "Each cell shows the bottleneck % and which part limits it. Green = balanced, red = a strong bottleneck."
   },
   "rankings": {
     "title": "Performance Rankings",

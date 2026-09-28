@@ -19,8 +19,69 @@ export function BottleneckResult({ result }: BottleneckResultProps) {
 
   if (!headline) return null;
 
+  const balanced = headline.limitingComponent === 'balanced' || headline.severity === 'optimal';
+  const level =
+    headline.severity === 'minor'
+      ? t('level_slight')
+      : headline.severity === 'moderate'
+        ? t('level_moderate')
+        : t('level_strong');
+  const sevTone =
+    headline.severity === 'minor' ? 'cblue' : headline.severity === 'moderate' ? 'camber' : 'cred';
+  const verdict = balanced
+    ? { title: t('verdictBalancedTitle'), desc: t('verdictBalancedDesc'), tone: 'lime' }
+    : headline.limitingComponent === 'cpu'
+      ? { title: t('verdictCpuTitle', { level }), desc: t('verdictCpuDesc'), tone: sevTone }
+      : { title: t('verdictGpuTitle', { level }), desc: t('verdictGpuDesc'), tone: sevTone };
+  const bannerCls: Record<string, string> = {
+    lime: 'border-lime/40 bg-lime/[0.06]',
+    cblue: 'border-cblue/40 bg-cblue/[0.06]',
+    camber: 'border-camber/40 bg-camber/[0.06]',
+    cred: 'border-cred/40 bg-cred/[0.06]',
+  };
+  const titleCls: Record<string, string> = {
+    lime: 'text-lime-bright',
+    cblue: 'text-cblue-bright',
+    camber: 'text-camber-bright',
+    cred: 'text-cred',
+  };
+  const fpsByRes = RESOLUTIONS.map((res) => ({
+    res,
+    range: result.scenarios.find((x) => x.resolution === res && x.profile === 'aaa')
+      ?.expectedFpsRange,
+  }));
+
   return (
     <section className="mt-8 space-y-4">
+      {/* Plain-language verdict */}
+      <div className={`panel border ${bannerCls[verdict.tone]}`}>
+        <p className={`font-display text-lg font-semibold ${titleCls[verdict.tone]}`}>
+          {verdict.title}
+        </p>
+        <p className="text-ink-mid mt-1 text-[13px] leading-relaxed">{verdict.desc}</p>
+      </div>
+
+      {/* Expected FPS (AAA) across resolutions */}
+      <div className="panel">
+        <div className="mb-3 flex items-center justify-between">
+          <p className="label">{t('expectedFps')}</p>
+          <span className="text-ink-faint text-[11px]">{t('expectedFpsNote')}</span>
+        </div>
+        <div className="grid grid-cols-3 gap-3">
+          {fpsByRes.map((f) => (
+            <div
+              key={f.res}
+              className="border-hairline bg-panel-2 rounded-[10px] border p-3 text-center"
+            >
+              <p className="label">{f.res}</p>
+              <p className="text-ink-hi mt-1 font-mono text-[16px] font-bold">
+                {f.range ? `${f.range.min}–${f.range.max}` : '—'}
+              </p>
+            </div>
+          ))}
+        </div>
+      </div>
+
       <div className="grid gap-4 lg:grid-cols-[360px_1fr]">
         {/* Gauge + metric grid */}
         <div className="panel flex flex-col items-center bg-gradient-to-b from-[#15181C] to-[#101216]">
@@ -62,7 +123,8 @@ export function BottleneckResult({ result }: BottleneckResultProps) {
 
       {/* 12-scenario matrix */}
       <div className="panel">
-        <p className="label mb-3">{t('matrix')}</p>
+        <p className="label mb-1">{t('matrix')}</p>
+        <p className="text-ink-faint mb-3 text-[11px]">{t('matrixHint')}</p>
         <div className="grid grid-cols-[70px_repeat(4,1fr)] gap-[6px]">
           <span />
           {PROFILES.map((p) => (

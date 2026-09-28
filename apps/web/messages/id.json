@@ -63,7 +63,7 @@
   "bottleneck": {
     "label": "Kalkulator",
     "title": "Analisis Bottleneck",
-    "subtitle": "Pasangkan CPU dengan GPU untuk melihat keseimbangan di berbagai resolusi dan profil game. Algoritmanya deterministik dan bobotnya dapat diaudit di",
+    "subtitle": "“Bottleneck” terjadi saat satu komponen (CPU atau GPU) tidak sanggup mengimbangi yang lain, sehingga membatasi frame rate. Pasangkan CPU dengan GPU untuk melihat apakah keduanya seimbang — dan perkiraan FPS di berbagai resolusi serta jenis game.",
     "back": "Kembali",
     "button": "Hitung Bottleneck",
     "buttonLoading": "Menganalisis…",
@@ -75,7 +75,19 @@
     "recommendedPsu": "PSU disarankan",
     "recommendations": "Rekomendasi",
     "algorithm": "algoritma {version}",
-    "share": "bagikan"
+    "share": "bagikan",
+    "verdictBalancedTitle": "Seimbang",
+    "verdictBalancedDesc": "CPU dan GPU Anda cocok — tidak ada yang menahan kinerja yang lain secara berarti.",
+    "verdictCpuTitle": "Bottleneck CPU {level}",
+    "verdictCpuDesc": "CPU Anda menjadi pembatas di sini. Paling terasa di resolusi rendah / FPS tinggi; menaikkan resolusi atau setting mengalihkan beban ke GPU.",
+    "verdictGpuTitle": "Bottleneck GPU {level}",
+    "verdictGpuDesc": "GPU Anda menjadi pembatas di sini — normal dan justru ideal untuk gaming. Turunkan resolusi/setting atau aktifkan upscaling untuk menaikkan FPS.",
+    "level_slight": "ringan",
+    "level_moderate": "sedang",
+    "level_strong": "kuat",
+    "expectedFps": "Perkiraan FPS",
+    "expectedFpsNote": "setting game AAA, per resolusi",
+    "matrixHint": "Tiap sel menunjukkan % bottleneck dan komponen pembatas. Hijau = seimbang, merah = bottleneck kuat."
   },
   "rankings": {
     "title": "Peringkat Performa",

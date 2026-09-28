@@ -38,13 +38,7 @@ export default function BottleneckPage() {
         <h1 className="font-display text-ink-hi mt-2 text-[26px] font-bold tracking-tight">
           {t('title')}
         </h1>
-        <p className="text-ink-faint mt-2 max-w-2xl text-[13px] leading-relaxed">
-          {t('subtitle')}
-          <code className="text-ink-mid ml-1 font-mono text-[11px]">
-            apps/api/src/modules/bottleneck/domain/BottleneckAlgorithm.ts
-          </code>
-          .
-        </p>
+        <p className="text-ink-faint mt-2 max-w-2xl text-[13px] leading-relaxed">{t('subtitle')}</p>
       </header>
 
       <div className="grid gap-4 sm:grid-cols-2">
