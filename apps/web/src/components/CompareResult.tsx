@@ -12,53 +12,69 @@ interface CompareResultProps {
 
 export function CompareResult({ result }: CompareResultProps) {
   const t = useTranslations('compare');
-  const aWins = result.metrics.filter((m) => m.winner === 'a').length;
-  const bWins = result.metrics.filter((m) => m.winner === 'b').length;
-  const winnerName =
-    result.overallWinner === 'a'
-      ? result.a.modelName
-      : result.overallWinner === 'b'
-        ? result.b.modelName
-        : null;
-  const winnerCats = result.overallWinner === 'a' ? aWins : bWins;
+  const scoreA = result.performanceScore.a;
+  const scoreB = result.performanceScore.b;
+
+  // Headline gap from the composite performance score (more intuitive than
+  // "wins in more categories").
+  const fasterSide = scoreA === scoreB ? null : scoreA > scoreB ? 'a' : 'b';
+  const hi = Math.max(scoreA, scoreB);
+  const lo = Math.min(scoreA, scoreB);
+  const fasterPct = lo > 0 ? Math.round((hi / lo - 1) * 100) : 0;
+  const even = fasterSide === null || fasterPct < 3;
+
+  const valueWinner = result.pricePerformanceWinner;
+  const nameFor = (s: 'a' | 'b') => (s === 'a' ? result.a.modelName : result.b.modelName);
+  const fasterName = fasterSide ? nameFor(fasterSide) : '';
+  const valueName = valueWinner === 'a' || valueWinner === 'b' ? nameFor(valueWinner) : null;
+
+  let headline: string;
+  let detail: string | null = null;
+  if (even) {
+    headline = t('blEven');
+    if (valueName) detail = t('blEvenValue', { valueName });
+  } else {
+    headline = t('blFaster', { name: fasterName, pct: fasterPct });
+    detail =
+      valueWinner === fasterSide
+        ? t('blAlsoValue')
+        : valueWinner === 'tied'
+          ? t('blValueEven')
+          : valueName
+            ? t('blTradeoff', { valueName })
+            : null;
+  }
 
   return (
     <section className="mt-8 space-y-4">
       <header className="grid items-center gap-4 sm:grid-cols-[1fr_auto_1fr]">
         <Side
           processor={result.a}
-          score={result.performanceScore.a}
+          score={scoreA}
           winner={result.overallWinner === 'a'}
           side="A"
+          fasterPct={fasterSide === 'a' && !even ? fasterPct : null}
         />
         <div className="font-display text-ink-faint text-3xl font-bold">VS</div>
         <Side
           processor={result.b}
-          score={result.performanceScore.b}
+          score={scoreB}
           winner={result.overallWinner === 'b'}
           side="B"
+          fasterPct={fasterSide === 'b' && !even ? fasterPct : null}
         />
       </header>
 
-      {/* Overall-winner banner — lime accent, no emoji (Console spec). */}
-      <div className="panel border-lime/30 bg-lime/[0.05] flex items-center gap-3">
-        <span className="rounded-pill bg-lime h-[26px] w-[3px] flex-shrink-0" />
-        <p className="text-ink-mid text-[13px]">
-          {winnerName ? (
-            <>
-              <span className="text-ink-hi font-semibold">{winnerName}</span> {t('winnerSuffix')}
-              <span className="text-ink-faint">
-                {' '}
-                {t('winnerCount', { won: winnerCats, total: result.metrics.length })}
-              </span>
-            </>
-          ) : (
-            <>{t('evenlyMatched')}</>
-          )}
-        </p>
-        <span className="text-ink-faint ml-auto font-mono text-[11px]">
-          {t('algorithm', { version: result.algorithmVersion })}
-        </span>
+      {/* Plain-language bottom line. */}
+      <div className="panel border-lime/30 bg-lime/[0.05]">
+        <div className="mb-2 flex items-center justify-between">
+          <p className="label">{t('bottomLine')}</p>
+          <span className="text-ink-faint font-mono text-[11px]">
+            {t('algorithm', { version: result.algorithmVersion })}
+          </span>
+        </div>
+        <p className="text-ink-hi text-[15px] font-semibold leading-snug">{headline}</p>
+        {detail && <p className="text-ink-mid mt-1 text-[13px] leading-relaxed">{detail}</p>}
       </div>
 
       <div className="panel overflow-hidden !p-0">
@@ -159,11 +175,13 @@ function Side({
   score,
   winner,
   side,
+  fasterPct,
 }: {
   processor: ComparisonPayload['a'];
   score: number;
   winner: boolean;
   side: 'A' | 'B';
+  fasterPct: number | null;
 }) {
   const t = useTranslations('compare');
   return (
@@ -183,7 +201,14 @@ function Side({
         </p>
       </div>
       <p className="text-ink-faint mt-1 text-[11px]">{processor.type}</p>
-      <p className="metric mt-4">{score.toFixed(1)}</p>
+      <div className="mt-4 flex items-end gap-2">
+        <p className="metric">{score.toFixed(1)}</p>
+        {fasterPct !== null && (
+          <span className="rounded-pill border-lime/45 bg-lime/[0.14] text-lime-bright mb-[3px] border px-2 py-[1px] text-[10px] font-semibold">
+            {t('fasterBadge', { pct: fasterPct })}
+          </span>
+        )}
+      </div>
       <p className="label mt-1">{t('performanceIndex')}</p>
     </div>
   );

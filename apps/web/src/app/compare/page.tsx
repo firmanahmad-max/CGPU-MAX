@@ -55,6 +55,7 @@ export default function ComparePage() {
         <h1 className="font-display text-ink-hi mt-2 text-[26px] font-bold tracking-tight">
           {t('title')}
         </h1>
+        <p className="text-ink-faint mt-2 max-w-2xl text-[13px] leading-relaxed">{t('subtitle')}</p>
       </header>
 
       <div className="mb-6 flex gap-2">
