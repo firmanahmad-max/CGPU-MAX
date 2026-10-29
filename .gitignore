@@ -12,6 +12,9 @@ coverage/
 # Build outputs
 dist/
 build/
+# ...but not the Next.js /build/[shareSlug] route (public shared AI builds) —
+# the bare `build/` pattern above silently kept it out of the repo and deploys.
+!apps/web/src/app/build/
 out/
 .next/
 .turbo/
