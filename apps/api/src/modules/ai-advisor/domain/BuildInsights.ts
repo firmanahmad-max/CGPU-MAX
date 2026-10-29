@@ -203,7 +203,9 @@ function caseCapacityRank(form: string | null): number | null {
   if (!form) return null;
   if (/full tower|e-atx/i.test(form)) return 4;
   if (/mid tower|^atx$/i.test(form)) return 3;
-  if (/micro|matx|m-atx/i.test(form)) return 2;
+  // "Mini Tower" is a Micro-ATX chassis (e.g. Antec VX100M) — check it before
+  // the generic /mini/ match, which would wrongly rank it as Mini-ITX only.
+  if (/micro|matx|m-atx|mini[\s-]*tower/i.test(form)) return 2;
   if (/mini|itx/i.test(form)) return 1;
   return null;
 }

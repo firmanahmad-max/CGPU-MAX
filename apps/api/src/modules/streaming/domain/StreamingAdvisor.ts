@@ -181,7 +181,9 @@ export function planStream(params: {
     : recommendEncoder(params.gpuManufacturer);
   const platformMax = PLATFORM_MAX_KBPS[params.platform];
 
-  const fpsFactor = params.fps >= 60 ? 1 : 0.7;
+  // Bitrate scales with frame rate: 30fps needs ~70% of 60fps, and high-refresh
+  // streams (~120fps) need ~50% more to keep the same per-frame quality.
+  const fpsFactor = params.fps >= 100 ? 1.5 : params.fps >= 50 ? 1 : 0.7;
   const ideal = Math.round(BASE_BITRATE_60[params.resolution] * fpsFactor);
 
   // Don't exceed the platform cap or ~80% of the user's measured upload.

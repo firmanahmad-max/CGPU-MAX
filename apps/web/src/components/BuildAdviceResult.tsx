@@ -89,9 +89,13 @@ export function BuildAdviceResult({
   const [current, setCurrent] = useState<BuildAdvice>(advice);
   const [busy, setBusy] = useState(false);
   const [copied, setCopied] = useState<'link' | 'list' | null>(null);
+  const [swapError, setSwapError] = useState<string | null>(null);
 
   // Reset when a fresh recommendation arrives.
-  useEffect(() => setCurrent(advice), [advice]);
+  useEffect(() => {
+    setCurrent(advice);
+    setSwapError(null);
+  }, [advice]);
 
   const res = resolution ?? current.insights?.performance?.targetResolution ?? '1440p';
 
@@ -123,17 +127,22 @@ export function BuildAdviceResult({
 
   const onSwap = async (category: string, alt: Alternative) => {
     const key = category as keyof BuildAdvice;
-    const prev = current[key] as ComponentPick;
+    const before = current; // restore point if the recompute fails
     const updated: ComponentPick = {
-      ...prev,
+      ...(current[key] as ComponentPick),
       slug: alt.slug,
       modelName: alt.label,
       approxPriceUsd: alt.priceUsd,
+      // The AI's rationale described the previous part — don't keep it.
+      rationale: t('swappedRationale'),
     };
     const next = { ...current, [key]: updated } as BuildAdvice;
     setCurrent(next);
+    setSwapError(null);
     setBusy(true);
     try {
+      // Send every part — including ones the advisor suggested outside our
+      // catalog (slug null) with their price — so the total stays complete.
       const picks = [
         next.cpu,
         next.gpu,
@@ -144,23 +153,24 @@ export function BuildAdviceResult({
         next.case,
         next.cooler,
         ...(next.monitor ? [next.monitor] : []),
-      ]
-        .filter((p) => p.slug)
-        .map((p) => ({ category: p.category, slug: p.slug }));
+      ].map((p) => ({ category: p.category, slug: p.slug, priceUsd: p.approxPriceUsd }));
       const r = await authedFetch('/api/v1/advisor/insights', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ picks, resolution: res }),
       });
-      if (r.ok) {
-        const data = (await r.json()) as { estimatedTotalUsd: number; insights: BuildInsights };
-        setCurrent((c) => ({
-          ...c,
-          insights: data.insights,
-          estimatedTotalUsd: data.estimatedTotalUsd,
-          withinBudget: budgetUsd ? data.estimatedTotalUsd <= budgetUsd : c.withinBudget,
-        }));
-      }
+      if (!r.ok) throw new Error(`recompute failed: ${r.status}`);
+      const data = (await r.json()) as { estimatedTotalUsd: number; insights: BuildInsights };
+      setCurrent((c) => ({
+        ...c,
+        insights: data.insights,
+        estimatedTotalUsd: data.estimatedTotalUsd,
+        withinBudget: budgetUsd ? data.estimatedTotalUsd <= budgetUsd : c.withinBudget,
+      }));
+    } catch {
+      // Never leave new parts next to the old build's numbers — roll back.
+      setCurrent(before);
+      setSwapError(t('swapFailed'));
     } finally {
       setBusy(false);
     }
@@ -182,6 +192,7 @@ export function BuildAdviceResult({
         </div>
         <p className="text-ink text-sm leading-relaxed">{current.summary}</p>
         {!readOnly && <p className="text-ink-faint mt-2 text-[11px]">{t('swapHint')}</p>}
+        {swapError && <p className="text-cred mt-2 text-[12px]">{swapError}</p>}
 
         <div className="mt-3 flex flex-wrap gap-2">
           {current.shareSlug && (

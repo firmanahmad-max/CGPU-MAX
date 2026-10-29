@@ -55,4 +55,18 @@ describe('GamingOptimizer', () => {
     const weak = opt.evaluate(rtx3060, '1440p', 'aaa').presets.find((p) => p.preset === 'high')!;
     expect(strong.avgFps).toBeGreaterThan(weak.avgFps);
   });
+
+  // Regression: a GPU that can't reach 60 FPS used to be told it "drives 60 Hz".
+  it('returns no refresh target when the recommended preset is below 60 FPS', () => {
+    const weakGpu: ProcessorSnapshot = {
+      ...rtx3060,
+      slug: 'weak',
+      benchmarks: { passmark_g3d_mark: 3000 },
+    };
+    const r = opt.evaluate(weakGpu, '4K', 'aaa');
+    const rec = r.presets.find((p) => p.preset === r.recommendedPreset)!;
+    expect(rec.avgFps).toBeLessThan(60);
+    expect(r.refreshTarget).toBeNull();
+    expect(opt.evaluate(rtx4090, '1080p', 'esports').refreshTarget).toBeGreaterThanOrEqual(144);
+  });
 });

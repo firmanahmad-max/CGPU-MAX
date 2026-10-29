@@ -14,13 +14,55 @@ export interface UsageInput {
 export class EnforceUsageLimit {
   constructor(private readonly prisma: PrismaClient) {}
 
-  async incrementAndCheck(input: UsageInput): Promise<{ current: number; limit: number }> {
+  private limitFor(input: UsageInput): number {
     const limits = getLimits(input.tier);
-    const limit =
-      input.feature === 'comparisons'
-        ? limits.comparisonsPerMonth
-        : limits.aiRecommendationsPerMonth;
+    return input.feature === 'comparisons'
+      ? limits.comparisonsPerMonth
+      : limits.aiRecommendationsPerMonth;
+  }
 
+  // Fail fast when a multi-unit operation (e.g. a two-build tier comparison)
+  // would not fit in what's left this period — before any unit is spent.
+  async assertRemaining(input: UsageInput, needed: number): Promise<void> {
+    const limit = this.limitFor(input);
+    if (isUnlimited(limit)) return;
+    const row = await this.prisma.usageCounter.findUnique({
+      where: {
+        userId_feature_period: {
+          userId: input.userId,
+          feature: input.feature,
+          period: currentPeriodKey(),
+        },
+      },
+      select: { count: true },
+    });
+    const current = row?.count ?? 0;
+    if (current + needed > limit) {
+      throw new AppError(
+        'USAGE_LIMIT_EXCEEDED',
+        `Monthly limit reached for ${input.feature} on tier ${input.tier} (${limit}).`,
+        429,
+        { details: { feature: input.feature, limit, current, needed, tier: input.tier } },
+      );
+    }
+  }
+
+  // Give a unit back when the work it paid for failed (e.g. the AI provider
+  // errored), so users aren't charged for nothing. Never goes below zero.
+  async refund(input: UsageInput): Promise<void> {
+    await this.prisma.usageCounter.updateMany({
+      where: {
+        userId: input.userId,
+        feature: input.feature,
+        period: currentPeriodKey(),
+        count: { gt: 0 },
+      },
+      data: { count: { decrement: 1 } },
+    });
+  }
+
+  async incrementAndCheck(input: UsageInput): Promise<{ current: number; limit: number }> {
+    const limit = this.limitFor(input);
     const period = currentPeriodKey();
 
     if (isUnlimited(limit)) {

@@ -1,4 +1,4 @@
-import { PrismaClient, type Manufacturer } from '@prisma/client';
+import { PrismaClient, type ComponentType, type Manufacturer, type Prisma } from '@prisma/client';
 
 const prisma = new PrismaClient();
 
@@ -270,37 +270,30 @@ const now = new Date();
 
 async function seedCpu(c: CpuSeed) {
   const releaseDate = new Date(c.releaseDate);
+  const base = {
+    manufacturer: c.manufacturer,
+    modelName: c.modelName,
+    generation: c.generation,
+    architecture: c.architecture,
+    processNm: c.processNm,
+    tdpWatts: c.tdpWatts,
+    msrpUsd: c.msrpUsd,
+    priceIdr: PRICE_IDR[c.slug] ?? null,
+    releaseDate,
+  };
+  const specs = {
+    cores: c.cores,
+    threads: c.threads,
+    baseClockGhz: c.baseClockGhz,
+    boostClockGhz: c.boostClockGhz,
+    l3CacheMb: c.l3CacheMb,
+    socket: c.socket,
+  };
+  // Full update (incl. nested specs) so corrected seed data reaches existing rows.
   const proc = await prisma.processor.upsert({
     where: { slug: c.slug },
-    update: {
-      msrpUsd: c.msrpUsd,
-      tdpWatts: c.tdpWatts,
-      releaseDate,
-      priceIdr: PRICE_IDR[c.slug] ?? null,
-    },
-    create: {
-      type: 'CPU',
-      manufacturer: c.manufacturer,
-      modelName: c.modelName,
-      slug: c.slug,
-      generation: c.generation,
-      architecture: c.architecture,
-      processNm: c.processNm,
-      tdpWatts: c.tdpWatts,
-      msrpUsd: c.msrpUsd,
-      priceIdr: PRICE_IDR[c.slug] ?? null,
-      releaseDate,
-      cpuSpecs: {
-        create: {
-          cores: c.cores,
-          threads: c.threads,
-          baseClockGhz: c.baseClockGhz,
-          boostClockGhz: c.boostClockGhz,
-          l3CacheMb: c.l3CacheMb,
-          socket: c.socket,
-        },
-      },
-    },
+    update: { ...base, cpuSpecs: { upsert: { create: specs, update: specs } } },
+    create: { type: 'CPU', slug: c.slug, ...base, cpuSpecs: { create: specs } },
   });
   await refreshSignals(proc.id, c.msrpUsd, [
     { benchmarkType: 'geekbench6_single_core', score: c.gb6Single },
@@ -312,38 +305,30 @@ async function seedCpu(c: CpuSeed) {
 
 async function seedGpu(g: GpuSeed) {
   const releaseDate = new Date(g.releaseDate);
+  const base = {
+    manufacturer: g.manufacturer,
+    modelName: g.modelName,
+    generation: g.generation,
+    architecture: g.architecture,
+    processNm: g.processNm,
+    tdpWatts: g.tdpWatts,
+    msrpUsd: g.msrpUsd,
+    priceIdr: PRICE_IDR[g.slug] ?? null,
+    releaseDate,
+  };
+  const specs = {
+    shaderUnits: g.shaderUnits,
+    vramGb: g.vramGb,
+    vramType: g.vramType,
+    memoryBusBits: g.memoryBusBits,
+    memoryBandwidthGbps: g.memoryBandwidthGbps,
+    baseClockMhz: g.baseClockMhz,
+    boostClockMhz: g.boostClockMhz,
+  };
   const proc = await prisma.processor.upsert({
     where: { slug: g.slug },
-    update: {
-      msrpUsd: g.msrpUsd,
-      tdpWatts: g.tdpWatts,
-      releaseDate,
-      priceIdr: PRICE_IDR[g.slug] ?? null,
-    },
-    create: {
-      type: 'GPU',
-      manufacturer: g.manufacturer,
-      modelName: g.modelName,
-      slug: g.slug,
-      generation: g.generation,
-      architecture: g.architecture,
-      processNm: g.processNm,
-      tdpWatts: g.tdpWatts,
-      msrpUsd: g.msrpUsd,
-      priceIdr: PRICE_IDR[g.slug] ?? null,
-      releaseDate,
-      gpuSpecs: {
-        create: {
-          shaderUnits: g.shaderUnits,
-          vramGb: g.vramGb,
-          vramType: g.vramType,
-          memoryBusBits: g.memoryBusBits,
-          memoryBandwidthGbps: g.memoryBandwidthGbps,
-          baseClockMhz: g.baseClockMhz,
-          boostClockMhz: g.boostClockMhz,
-        },
-      },
-    },
+    update: { ...base, gpuSpecs: { upsert: { create: specs, update: specs } } },
+    create: { type: 'GPU', slug: g.slug, ...base, gpuSpecs: { create: specs } },
   });
   await refreshSignals(proc.id, g.msrpUsd, [
     { benchmarkType: 'passmark_g3d_mark', score: g.g3dMark },
@@ -488,42 +473,42 @@ const RAMS: RamSeed[] = [
 
 const usdFromIdr = (idr: number) => Math.round(idr / 16300);
 
-async function seedMobo(m: MoboSeed) {
+type ComponentData = Omit<Prisma.ComponentUncheckedCreateInput, 'id' | 'type' | 'slug'>;
+
+// Upsert that writes the full spec on update too, so corrected seed data
+// (names, specs, prices) actually reaches rows that already exist.
+async function upsertComponent(type: ComponentType, slug: string, data: ComponentData) {
   await prisma.component.upsert({
-    where: { slug: m.slug },
-    update: { priceIdr: m.priceIdr, msrpUsd: usdFromIdr(m.priceIdr) },
-    create: {
-      type: 'MOTHERBOARD',
-      brand: m.brand,
-      modelName: m.modelName,
-      slug: m.slug,
-      priceIdr: m.priceIdr,
-      msrpUsd: usdFromIdr(m.priceIdr),
-      socket: m.socket,
-      chipset: m.chipset,
-      memoryType: m.memoryType,
-      formFactor: m.formFactor,
-    },
+    where: { slug },
+    update: data,
+    create: { type, slug, ...data },
+  });
+}
+
+const priced = (priceIdr: number) => ({ priceIdr, msrpUsd: usdFromIdr(priceIdr) });
+
+async function seedMobo(m: MoboSeed) {
+  await upsertComponent('MOTHERBOARD', m.slug, {
+    brand: m.brand,
+    modelName: m.modelName,
+    ...priced(m.priceIdr),
+    socket: m.socket,
+    chipset: m.chipset,
+    memoryType: m.memoryType,
+    formFactor: m.formFactor,
   });
 }
 
 async function seedRam(r: RamSeed) {
-  await prisma.component.upsert({
-    where: { slug: r.slug },
-    update: { priceIdr: r.priceIdr, msrpUsd: usdFromIdr(r.priceIdr) },
-    create: {
-      type: 'RAM',
-      brand: r.brand,
-      modelName: r.modelName,
-      slug: r.slug,
-      priceIdr: r.priceIdr,
-      msrpUsd: usdFromIdr(r.priceIdr),
-      memoryType: r.memoryType,
-      capacityGb: r.capacityGb,
-      moduleCount: r.moduleCount,
-      speedMhz: r.speedMhz,
-      casLatency: r.casLatency,
-    },
+  await upsertComponent('RAM', r.slug, {
+    brand: r.brand,
+    modelName: r.modelName,
+    ...priced(r.priceIdr),
+    memoryType: r.memoryType,
+    capacityGb: r.capacityGb,
+    moduleCount: r.moduleCount,
+    speedMhz: r.speedMhz,
+    casLatency: r.casLatency,
   });
 }
 
@@ -638,52 +623,31 @@ const CASES: CaseSeed[] = [
 /* eslint-enable max-len */
 
 async function seedSsd(s: SsdSeed) {
-  await prisma.component.upsert({
-    where: { slug: s.slug },
-    update: { priceIdr: s.priceIdr, msrpUsd: usdFromIdr(s.priceIdr) },
-    create: {
-      type: 'SSD',
-      brand: s.brand,
-      modelName: s.modelName,
-      slug: s.slug,
-      priceIdr: s.priceIdr,
-      msrpUsd: usdFromIdr(s.priceIdr),
-      capacityGb: s.capacityGb,
-      interface: s.interface,
-      formFactor: s.formFactor,
-    },
+  await upsertComponent('SSD', s.slug, {
+    brand: s.brand,
+    modelName: s.modelName,
+    ...priced(s.priceIdr),
+    capacityGb: s.capacityGb,
+    interface: s.interface,
+    formFactor: s.formFactor,
   });
 }
 async function seedPsu(p: PsuSeed) {
-  await prisma.component.upsert({
-    where: { slug: p.slug },
-    update: { priceIdr: p.priceIdr, msrpUsd: usdFromIdr(p.priceIdr) },
-    create: {
-      type: 'PSU',
-      brand: p.brand,
-      modelName: p.modelName,
-      slug: p.slug,
-      priceIdr: p.priceIdr,
-      msrpUsd: usdFromIdr(p.priceIdr),
-      wattage: p.wattage,
-      efficiency: p.efficiency,
-      modular: p.modular,
-    },
+  await upsertComponent('PSU', p.slug, {
+    brand: p.brand,
+    modelName: p.modelName,
+    ...priced(p.priceIdr),
+    wattage: p.wattage,
+    efficiency: p.efficiency,
+    modular: p.modular,
   });
 }
 async function seedCase(c: CaseSeed) {
-  await prisma.component.upsert({
-    where: { slug: c.slug },
-    update: { priceIdr: c.priceIdr, msrpUsd: usdFromIdr(c.priceIdr) },
-    create: {
-      type: 'CASING',
-      brand: c.brand,
-      modelName: c.modelName,
-      slug: c.slug,
-      priceIdr: c.priceIdr,
-      msrpUsd: usdFromIdr(c.priceIdr),
-      formFactor: c.formFactor,
-    },
+  await upsertComponent('CASING', c.slug, {
+    brand: c.brand,
+    modelName: c.modelName,
+    ...priced(c.priceIdr),
+    formFactor: c.formFactor,
   });
 }
 
@@ -707,18 +671,11 @@ const COOLERS: CoolerSeed[] = [
 /* eslint-enable max-len */
 
 async function seedCooler(c: CoolerSeed) {
-  await prisma.component.upsert({
-    where: { slug: c.slug },
-    update: { priceIdr: c.priceIdr, msrpUsd: usdFromIdr(c.priceIdr) },
-    create: {
-      type: 'COOLER',
-      brand: c.brand,
-      modelName: c.modelName,
-      slug: c.slug,
-      priceIdr: c.priceIdr,
-      msrpUsd: usdFromIdr(c.priceIdr),
-      formFactor: c.formFactor,
-    },
+  await upsertComponent('COOLER', c.slug, {
+    brand: c.brand,
+    modelName: c.modelName,
+    ...priced(c.priceIdr),
+    formFactor: c.formFactor,
   });
 }
 
@@ -777,21 +734,14 @@ const MONITORS: MonitorSeed[] = [
 /* eslint-enable max-len */
 
 async function seedMonitor(m: MonitorSeed) {
-  await prisma.component.upsert({
-    where: { slug: m.slug },
-    update: { priceIdr: m.priceIdr, msrpUsd: usdFromIdr(m.priceIdr) },
-    create: {
-      type: 'MONITOR',
-      brand: m.brand,
-      modelName: m.modelName,
-      slug: m.slug,
-      priceIdr: m.priceIdr,
-      msrpUsd: usdFromIdr(m.priceIdr),
-      sizeInch: m.sizeInch,
-      resolution: m.resolution,
-      refreshHz: m.refreshHz,
-      panel: m.panel,
-    },
+  await upsertComponent('MONITOR', m.slug, {
+    brand: m.brand,
+    modelName: m.modelName,
+    ...priced(m.priceIdr),
+    sizeInch: m.sizeInch,
+    resolution: m.resolution,
+    refreshHz: m.refreshHz,
+    panel: m.panel,
   });
 }
 

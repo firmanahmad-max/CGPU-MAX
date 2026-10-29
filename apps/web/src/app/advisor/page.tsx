@@ -33,6 +33,12 @@ export default function AdvisorPage() {
   const [preferences, setPreferences] = useState('');
   const [advice, setAdvice] = useState<BuildAdvice | null>(null);
   const [pair, setPair] = useState<{ value: BuildAdvice; premium: BuildAdvice } | null>(null);
+  // The budget/resolution the shown result was generated for. Swaps recompute
+  // against these, not the live form (which may have changed since).
+  const [generatedFor, setGeneratedFor] = useState<{ resolution: Resolution; budget: number }>({
+    resolution: '1440p',
+    budget: 1500,
+  });
   const [loading, setLoading] = useState(false);
   const [comparing, setComparing] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -46,6 +52,7 @@ export default function AdvisorPage() {
     setAdvice(null);
     setPair(null);
     const mergedPreferences = [preferences, extra].filter(Boolean).join('; ');
+    const snap = { resolution, budget };
     try {
       const res = await authedFetch('/api/v1/advisor/build', {
         method: 'POST',
@@ -63,6 +70,7 @@ export default function AdvisorPage() {
       if (msg) throw new Error(msg);
       if (!res.ok) throw new Error(await res.text());
       setAdvice((await res.json()) as BuildAdvice);
+      setGeneratedFor(snap);
     } catch (err) {
       setError((err as Error).message);
     } finally {
@@ -75,6 +83,7 @@ export default function AdvisorPage() {
     setError(null);
     setAdvice(null);
     setPair(null);
+    const snap = { resolution, budget };
     try {
       const res = await authedFetch('/api/v1/advisor/compare', {
         method: 'POST',
@@ -92,6 +101,7 @@ export default function AdvisorPage() {
       if (msg) throw new Error(msg);
       if (!res.ok) throw new Error(await res.text());
       setPair((await res.json()) as { value: BuildAdvice; premium: BuildAdvice });
+      setGeneratedFor(snap);
     } catch (err) {
       setError((err as Error).message);
     } finally {
@@ -269,8 +279,8 @@ export default function AdvisorPage() {
                 </div>
                 <BuildAdviceResult
                   advice={pair.value}
-                  resolution={resolution}
-                  budgetUsd={budget}
+                  resolution={generatedFor.resolution}
+                  budgetUsd={generatedFor.budget}
                   readOnly
                 />
               </div>
@@ -283,8 +293,8 @@ export default function AdvisorPage() {
                 </div>
                 <BuildAdviceResult
                   advice={pair.premium}
-                  resolution={resolution}
-                  budgetUsd={budget}
+                  resolution={generatedFor.resolution}
+                  budgetUsd={generatedFor.budget}
                   readOnly
                 />
               </div>
@@ -310,7 +320,11 @@ export default function AdvisorPage() {
           )}
 
           {advice && (
-            <BuildAdviceResult advice={advice} resolution={resolution} budgetUsd={budget} />
+            <BuildAdviceResult
+              advice={advice}
+              resolution={generatedFor.resolution}
+              budgetUsd={generatedFor.budget}
+            />
           )}
         </SignedIn>
       </main>

@@ -51,7 +51,7 @@ export function CompareResult({ result }: CompareResultProps) {
         <Side
           processor={result.a}
           score={scoreA}
-          winner={result.overallWinner === 'a'}
+          winner={!even && result.overallWinner === 'a'}
           side="A"
           fasterPct={fasterSide === 'a' && !even ? fasterPct : null}
         />
@@ -59,7 +59,7 @@ export function CompareResult({ result }: CompareResultProps) {
         <Side
           processor={result.b}
           score={scoreB}
-          winner={result.overallWinner === 'b'}
+          winner={!even && result.overallWinner === 'b'}
           side="B"
           fasterPct={fasterSide === 'b' && !even ? fasterPct : null}
         />

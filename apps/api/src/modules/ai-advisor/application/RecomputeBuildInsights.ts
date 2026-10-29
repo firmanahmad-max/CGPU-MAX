@@ -5,7 +5,8 @@ import type { PickCategory, Resolution } from '../domain/BuildAdvice.js';
 import { computeBuildInsights, type ResolvedPick } from './BuildInsightsService.js';
 
 export interface RecomputeInput {
-  picks: { category: PickCategory; slug: string }[];
+  // slug is null for an out-of-catalog part; priceUsd is its fallback price.
+  picks: { category: PickCategory; slug: string | null; priceUsd?: number }[];
   resolution: Resolution;
 }
 
@@ -13,17 +14,18 @@ const PROCESSOR_CATEGORIES = new Set<PickCategory>(['cpu', 'gpu']);
 
 // Recompute the deterministic insight panel for a user-edited parts list (the
 // interactive "swap a part" flow). No AI call, so no quota is consumed — prices
-// come straight from the catalog we control.
+// come from the catalog we control, falling back to the client-supplied price
+// for parts we can't price (so the total never silently drops them).
 export class RecomputeBuildInsights {
   constructor(private readonly prisma: PrismaClient) {}
 
   async execute(input: RecomputeInput) {
-    const procSlugs = input.picks
-      .filter((p) => PROCESSOR_CATEGORIES.has(p.category))
-      .map((p) => p.slug);
-    const compSlugs = input.picks
-      .filter((p) => !PROCESSOR_CATEGORIES.has(p.category))
-      .map((p) => p.slug);
+    const slugsFor = (proc: boolean) =>
+      input.picks
+        .filter((p) => p.slug && PROCESSOR_CATEGORIES.has(p.category) === proc)
+        .map((p) => p.slug as string);
+    const procSlugs = slugsFor(true);
+    const compSlugs = slugsFor(false);
 
     const [procs, comps] = await Promise.all([
       procSlugs.length
@@ -47,7 +49,7 @@ export class RecomputeBuildInsights {
     const resolved: ResolvedPick[] = input.picks.map((p) => ({
       category: p.category,
       slug: p.slug,
-      priceUsd: priceBySlug.get(p.slug) ?? 0,
+      priceUsd: (p.slug ? priceBySlug.get(p.slug) : undefined) ?? p.priceUsd ?? 0,
     }));
 
     const { totalUsd, insights } = await computeBuildInsights(

@@ -22,7 +22,9 @@ interface GamingResult {
   upscaling: { recommended: boolean; tech: string; noteKey: string };
   upscaledFps: number | null;
   vram: { gb: number | null; recommendedGb: number; adequate: boolean };
-  refreshTarget: number;
+  refreshTarget: number | null;
+  // The resolution this result was computed for (echoed by the API).
+  resolution: string;
   resolutionScaling: { resolution: string; avgFps: number }[];
   tipKeys: string[];
   cpuLimited: boolean;
@@ -137,7 +139,7 @@ export default function GamingPage() {
             {error && <p className="text-cred text-sm">{error}</p>}
           </div>
 
-          {result && <GamingResultView result={result} resolution={resolution} />}
+          {result && <GamingResultView result={result} resolution={result.resolution} />}
         </SignedIn>
       </main>
     </>
@@ -166,7 +168,11 @@ function GamingResultView({ result, resolution }: { result: GamingResult; resolu
         </span>
         <span className="text-ink-faint text-xs">{t('targets', { fps: result.targetFps })}</span>
         <Pill className={smoothCls}>{t(`smooth_${result.smoothness}`)}</Pill>
-        <span className="text-ink-faint ml-auto font-mono text-xs">◻ {result.refreshTarget}Hz</span>
+        {result.refreshTarget !== null && (
+          <span className="text-ink-faint ml-auto font-mono text-xs">
+            ◻ {result.refreshTarget}Hz
+          </span>
+        )}
       </div>
 
       {/* FPS by preset with bars + target marker */}
@@ -239,8 +245,14 @@ function GamingResultView({ result, resolution }: { result: GamingResult; resolu
 
         <div className="card">
           <p className="label mb-2">{t('monitorTitle')}</p>
-          <p className="metric">{result.refreshTarget} Hz</p>
-          <p className="text-ink-faint mt-1 text-[11px]">{t('monitorNote')}</p>
+          {result.refreshTarget !== null ? (
+            <>
+              <p className="metric">{result.refreshTarget} Hz</p>
+              <p className="text-ink-faint mt-1 text-[11px]">{t('monitorNote')}</p>
+            </>
+          ) : (
+            <p className="text-camber-bright text-sm">{t('monitorBelow60')}</p>
+          )}
         </div>
 
         <div className="card">

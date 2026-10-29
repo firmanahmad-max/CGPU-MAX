@@ -52,7 +52,14 @@ export default function StreamingPage() {
   const [resolution, setResolution] = useState<Res>('1080p');
   const [fps, setFps] = useState(60);
   const [uploadMbps, setUpload] = useState(20);
-  const [result, setResult] = useState<StreamingResult | null>(null);
+  // The result plus the exact inputs it was computed for — the view must show
+  // these, not the live form (which the user may change after computing).
+  const [result, setResult] = useState<{
+    data: StreamingResult;
+    resolution: Res;
+    fps: number;
+    upload: number;
+  } | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -60,6 +67,7 @@ export default function StreamingPage() {
     if (!gpuSlug) return;
     setLoading(true);
     setError(null);
+    const inputs = { resolution, fps, upload: uploadMbps };
     try {
       const res = await authedFetch('/api/v1/streaming/plan', {
         method: 'POST',
@@ -68,14 +76,14 @@ export default function StreamingPage() {
           gpuSlug,
           cpuSlug: cpuSlug ?? undefined,
           platform,
-          resolution,
-          fps,
-          uploadMbps,
+          resolution: inputs.resolution,
+          fps: inputs.fps,
+          uploadMbps: inputs.upload,
         }),
       });
       if (res.status === 402) throw new Error(t('errProFeature'));
       if (!res.ok) throw new Error(await res.text());
-      setResult((await res.json()) as StreamingResult);
+      setResult({ data: (await res.json()) as StreamingResult, ...inputs });
     } catch (err) {
       setError((err as Error).message);
     } finally {
@@ -182,10 +190,10 @@ export default function StreamingPage() {
 
           {result && (
             <StreamingResultView
-              result={result}
-              resolution={resolution}
-              fps={fps}
-              upload={uploadMbps}
+              result={result.data}
+              resolution={result.resolution}
+              fps={result.fps}
+              upload={result.upload}
             />
           )}
         </SignedIn>

@@ -38,8 +38,9 @@ export interface GamingResult {
   upscaledFps: number | null;
   // GPU memory adequacy for this resolution/profile.
   vram: { gb: number | null; recommendedGb: number; adequate: boolean };
-  // Monitor refresh rate the recommended preset comfortably drives.
-  refreshTarget: number;
+  // Monitor refresh rate the recommended preset comfortably drives; null when
+  // it can't even sustain 60 FPS (no refresh tier is actually saturated).
+  refreshTarget: number | null;
   // Avg FPS (recommended preset) at each resolution — shows how it scales.
   resolutionScaling: { resolution: Resolution; avgFps: number }[];
   tipKeys: TipKey[];
@@ -194,8 +195,8 @@ export class GamingOptimizer {
     return { gb, recommendedGb, adequate: gb === null ? true : gb >= recommendedGb };
   }
 
-  private refreshTarget(recAvg: number): number {
-    let tier = 60;
+  private refreshTarget(recAvg: number): number | null {
+    let tier: number | null = null;
     for (const r of REFRESH_TIERS) if (recAvg >= r) tier = r;
     return tier;
   }

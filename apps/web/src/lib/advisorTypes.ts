@@ -90,6 +90,19 @@ export interface BuildInsights {
   futureProofing?: FutureProofingInsight | null;
 }
 
+const CORE_PICKS = ['cpu', 'gpu', 'motherboard', 'ram', 'ssd', 'psu', 'case', 'cooler'] as const;
+
+// True when a payload has the full-build shape the result view renders. Builds
+// saved by the earlier CPU+GPU-only advisor lack most parts and would crash it.
+export function isFullBuild(x: unknown): x is BuildAdvice {
+  if (!x || typeof x !== 'object') return false;
+  const o = x as Record<string, unknown>;
+  return CORE_PICKS.every((k) => {
+    const p = o[k] as Record<string, unknown> | undefined;
+    return !!p && typeof p.category === 'string' && typeof p.modelName === 'string';
+  });
+}
+
 export interface BuildAdvice {
   summary: string;
   cpu: ComponentPick;

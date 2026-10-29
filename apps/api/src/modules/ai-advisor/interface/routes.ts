@@ -43,6 +43,9 @@ aiAdvisorRouter.post(
   async (req, res, next) => {
     try {
       const body = adviceBody.parse(req.body);
+      // Both builds must fit in the remaining quota — otherwise one would spend
+      // a unit and the response would still be an error.
+      await useCase.assertQuota(req.auth!, 2);
       const [value, premium] = await Promise.all([
         useCase.execute(req.auth!, { ...body, tier: 'value' }),
         useCase.execute(req.auth!, { ...body, tier: 'premium' }),

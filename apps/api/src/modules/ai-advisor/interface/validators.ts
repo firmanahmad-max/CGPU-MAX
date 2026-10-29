@@ -6,7 +6,8 @@ export const adviceBody = z.object({
   resolution: z.enum(['1080p', '1440p', '4K']),
   preferences: z.string().max(500).optional(),
   language: z.enum(['en', 'id']).optional(),
-  includeMonitor: z.coerce.boolean().optional(),
+  // Strict boolean: z.coerce.boolean() would turn the string "false" into true.
+  includeMonitor: z.boolean().optional(),
   tier: z.enum(['value', 'balanced', 'premium']).optional(),
 });
 
@@ -24,7 +25,16 @@ const PICK_CATEGORY = z.enum([
 
 export const recomputeBody = z.object({
   picks: z
-    .array(z.object({ category: PICK_CATEGORY, slug: z.string().trim().min(1).max(120) }))
+    .array(
+      z.object({
+        category: PICK_CATEGORY,
+        // null for a part the advisor suggested outside our catalog — it still
+        // counts toward the total via its priceUsd.
+        slug: z.string().trim().min(1).max(120).nullable(),
+        // Fallback price when the slug has no catalog price (or slug is null).
+        priceUsd: z.number().nonnegative().max(100000).optional(),
+      }),
+    )
     .min(1)
     .max(9),
   resolution: z.enum(['1080p', '1440p', '4K']),

@@ -1,3 +1,5 @@
+import { randomBytes } from 'node:crypto';
+
 import type { PrismaClient } from '@prisma/client';
 
 import type { AuthContext } from '../../../shared/auth/AuthContext.js';
@@ -32,9 +34,9 @@ function activeModel(): string {
   return useOpenAI() ? env.AI_MODEL : env.ANTHROPIC_MODEL;
 }
 
-// How many catalog parts to feed the model. Keep bounded so the prompt stays
-// cache-friendly and within a sensible token budget.
-const CATALOG_LIMIT = 60;
+// Upper bound on processors fed to the model. The catalog (~125 parts) fits
+// whole, so this is a safety cap rather than a filter — see loadCatalog.
+const CATALOG_LIMIT = 160;
 
 export class GenerateBuildAdvice {
   private readonly usage: EnforceUsageLimit;
@@ -43,18 +45,37 @@ export class GenerateBuildAdvice {
     this.usage = new EnforceUsageLimit(prisma);
   }
 
+  // Reject up front when `n` builds would exceed the remaining monthly quota,
+  // so a multi-build request never spends a unit and then fails.
+  async assertQuota(auth: AuthContext, n: number): Promise<void> {
+    if (!aiConfigured()) {
+      throw new AppError('AI_NOT_CONFIGURED', 'AI advisor is not configured on this server', 503);
+    }
+    await this.usage.assertRemaining(
+      { userId: auth.userId, tier: auth.tier, feature: 'aiRecommendations' },
+      n,
+    );
+  }
+
   async execute(auth: AuthContext, req: AdvisorRequest) {
     if (!aiConfigured()) {
       throw new AppError('AI_NOT_CONFIGURED', 'AI advisor is not configured on this server', 503);
     }
 
     // Enforce the monthly AI-recommendation quota for the user's tier.
-    await this.usage.incrementAndCheck({
-      userId: auth.userId,
-      tier: auth.tier,
-      feature: 'aiRecommendations',
-    });
+    const usage = { userId: auth.userId, tier: auth.tier, feature: 'aiRecommendations' as const };
+    await this.usage.incrementAndCheck(usage);
 
+    try {
+      return await this.generate(auth, req);
+    } catch (err) {
+      // The unit paid for a build that never arrived — give it back.
+      await this.usage.refund(usage).catch((e) => logger.warn({ err: e }, 'Quota refund failed'));
+      throw err;
+    }
+  }
+
+  private async generate(auth: AuthContext, req: AdvisorRequest) {
     const [catalog, components] = await Promise.all([
       this.loadCatalog(req.budgetUsd),
       this.loadComponents(),
@@ -81,7 +102,9 @@ export class GenerateBuildAdvice {
     const enriched = { ...validated, insights };
 
     const modelUsed = activeModel();
-    const shareSlug = `build-${auth.userId.slice(0, 8)}-${Date.now().toString(36)}`;
+    // Random, unguessable, and free of user identifiers (public share links);
+    // also can't collide when two builds finish in the same millisecond.
+    const shareSlug = `build-${Date.now().toString(36)}-${randomBytes(5).toString('hex')}`;
     await this.prisma.savedBuild.create({
       data: {
         shareSlug,
@@ -98,14 +121,16 @@ export class GenerateBuildAdvice {
   }
 
   private async loadCatalog(budgetUsd: number): Promise<CatalogPart[]> {
-    // Pull parts roughly in budget range (allow up to 1.5x for headroom), newest first.
+    // The budget covers the WHOLE build, so no single CPU/GPU may exceed it.
+    // Offer every part under that cap, cheapest first — a budget build needs
+    // the low-end parts, which a "most expensive N" cut used to drop.
     const rows = await this.prisma.processor.findMany({
       where: {
         deletedAt: null,
-        OR: [{ msrpUsd: { lte: budgetUsd * 1.5 } }, { msrpUsd: null }],
+        OR: [{ msrpUsd: { lte: budgetUsd } }, { msrpUsd: null }],
       },
       take: CATALOG_LIMIT,
-      orderBy: [{ msrpUsd: 'desc' }],
+      orderBy: [{ msrpUsd: 'asc' }],
       select: {
         slug: true,
         type: true,
